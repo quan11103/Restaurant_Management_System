@@ -1,0 +1,244 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// ENUMS (Định nghĩa các hằng số phân loại)
+// ==========================================
+enum Role {
+  CLIENT
+  CASHIER
+  WAITER
+  MANAGER
+  WAREHOUSE_STAFF
+}
+
+enum OrderType {
+  DINE_IN     // Tại quán
+  DELIVERY    // Giao hàng trực tuyến
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+// ==========================================
+// THỰC THỂ HỆ THỐNG VÀ NGƯỜI DÙNG (User Hierarchy)
+// ==========================================
+
+model Restaurant {
+  id          Int      @id @default(autoincrement())
+  name        String
+  address     String
+  rating      Float?
+  description String?
+
+  dishes      Dish[]
+  tables      Table[]
+}
+
+// Gộp chung User, Client, Staff, Waiter, Cashier, v.v. vào một bảng
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  password    String
+  fullName    String
+  phone       String?
+  role        Role
+
+  // Các thuộc tính riêng của Client
+  email       String?  @unique
+  address     String?
+
+  // Các thuộc tính riêng của Staff
+  position    String?
+  description String?
+
+  // Các mối quan hệ (Relationships)
+  clientOrders      Order[]     @relation("ClientOrders")
+  waiterOrders      Order[]     @relation("WaiterOrders")
+  billsHandled      Bill[]      @relation("CashierBills")
+  goodsBillsCreated GoodsBill[] @relation("WarehouseGoodsBills")
+}
+
+// ==========================================
+// THỰC THỂ NGHIỆP VỤ: GỌI MÓN & ĐẶT BÀN
+// ==========================================
+
+model Table {
+  id          Int          @id @default(autoincrement())
+  restaurantId Int
+  name        String
+  capacity    Int
+  description String?
+  isOccupied  Boolean      @default(false)
+
+  restaurant  Restaurant   @relation(fields: [restaurantId], references: [id])
+  orderTables OrderTable[]
+}
+
+model Dish {
+  id           Int           @id @default(autoincrement())
+  restaurantId Int
+  name         String
+  type         String
+  price        Float
+  description  String?
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
+  orderedDishes OrderedDish[]
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  clientId        Int?        // Nullable nếu khách vãng lai không có tài khoản
+  waiterId        Int?        // Nullable nếu khách tự đặt online
+  orderTime       DateTime    @default(now())
+  totalQuantity   Int         @default(0)
+  total           Float       @default(0.0)
+  orderType       OrderType
+  shippingAddress String?
+  receiverPhone   String?
+  receiverName    String?
+  status          OrderStatus @default(PENDING)
+
+  client          User?       @relation("ClientOrders", fields: [clientId], references: [id])
+  waiter          User?       @relation("WaiterOrders", fields: [waiterId], references: [id])
+  
+  orderedDishes   OrderedDish[]
+  orderTables     OrderTable[]
+  bill            Bill?       // 1 Order có tối đa 1 Bill
+}
+
+// Lớp liên kết (Association Class) giữa Order và Dish
+model OrderedDish {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  dishId      Int
+  dateAndTime DateTime @default(now())
+  price       Float
+  quantity    Int
+  subTotal    Float
+
+  order       Order    @relation(fields: [orderId], references: [id])
+  dish        Dish     @relation(fields: [dishId], references: [id])
+}
+
+// Lớp liên kết (Association Class) giữa Order và Table
+model OrderTable {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  tableId     Int
+  dateAndTime DateTime @default(now())
+  isPaid      Boolean  @default(false)
+
+  order       Order    @relation(fields: [orderId], references: [id])
+  table       Table    @relation(fields: [tableId], references: [id])
+}
+
+// ==========================================
+// THỰC THỂ NGHIỆP VỤ: THANH TOÁN
+// ==========================================
+
+model Promotion {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  type          String
+  value         Float
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  minOrderValue Float?
+  maxDiscount   Float?
+  usageLimit    Int?
+  usedCount     Int      @default(0)
+
+  bills         Bill[]
+}
+
+model Bill {
+  id            Int        @id @default(autoincrement())
+  orderId       Int        @unique // Đảm bảo quan hệ 1-1 với Order
+  cashierId     Int?
+  promotionId   Int?
+  paymentTime   DateTime   @default(now())
+  paymentMethod String
+  discount      Float      @default(0.0)
+  total         Float
+
+  order         Order      @relation(fields: [orderId], references: [id])
+  cashier       User?      @relation("CashierBills", fields: [cashierId], references: [id])
+  promotion     Promotion? @relation(fields: [promotionId], references: [id])
+}
+
+// ==========================================
+// THỰC THỂ NGHIỆP VỤ: NHẬP NGUYÊN LIỆU (WAREHOUSE)
+// ==========================================
+
+model Supplier {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  phone              String
+  address            String?
+
+  ingredientSuppliers IngredientSupplier[]
+}
+
+model Ingredient {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  type               String
+
+  ingredientSuppliers IngredientSupplier[]
+}
+
+// Lớp liên kết giữa Ingredient và Supplier
+model IngredientSupplier {
+  id           Int      @id @default(autoincrement())
+  ingredientId Int
+  supplierId   Int
+  price        Float
+  description  String?
+
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  supplier     Supplier   @relation(fields: [supplierId], references: [id])
+  
+  goodsBillDetails GoodsBillDetail[]
+}
+
+model GoodsBill {
+  id               Int      @id @default(autoincrement())
+  warehouseStaffId Int
+  receivedTime     DateTime @default(now())
+  totalQuantity    Int      @default(0)
+  total            Float    @default(0.0)
+
+  warehouseStaff   User     @relation("WarehouseGoodsBills", fields: [warehouseStaffId], references: [id])
+  goodsBillDetails GoodsBillDetail[]
+}
+
+// Lớp liên kết giữa GoodsBill và IngredientSupplier
+model GoodsBillDetail {
+  id                   Int                @id @default(autoincrement())
+  goodsBillId          Int
+  ingredientSupplierId Int
+  dateAndTime          DateTime           @default(now())
+  price                Float
+  quantity             Int
+  subTotal             Float
+
+  goodsBill            GoodsBill          @relation(fields: [goodsBillId], references: [id])
+  ingredientSupplier   IngredientSupplier @relation(fields: [ingredientSupplierId], references: [id])
+}

@@ -1,0 +1,24 @@
+# Dành cho cả Back-end (NestJS) và Front-end (React/TypeScript) sau này
+node_modules/
+dist/
+build/
+
+# Các file sinh tự động của Prisma
+prisma/migrations/sqlite/
+
+# Thông tin nhạy cảm (Cấu hình DB, Password)
+.env
+.env.*
+
+# Logs lỗi cục bộ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Các file rác của hệ điều hành Windows
+Thumbs.db
+desktop.ini
+
+# File cấu hình của Editor (VSCode)
+.vscode/
+.idea/
