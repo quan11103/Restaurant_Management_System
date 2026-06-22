@@ -56,4 +56,16 @@ export class DishService {
     await this.prisma.dish.delete({ where: { id } });
     return { message: 'Xóa món ăn thành công!' };
   }
+
+  // Tìm kiếm các món có chứa từ khóa
+  async searchDish(keyword: string) {
+    return this.prisma.dish.findMany({
+      where: {
+        name: {
+          contains: keyword,
+          mode: 'insensitive',
+        },
+      },
+    });
+  }
 }

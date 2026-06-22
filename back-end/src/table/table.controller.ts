@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
@@ -39,5 +39,21 @@ export class TableController {
   @Auth(Role.MANAGER)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tableService.remove(id);
+  }
+
+  // Lấy bàn trống
+  @Get('status')
+  getTableByStatus(@Query('isOccupied') isOccupied: string) {
+    const status = isOccupied === 'true';
+    return this.tableService.getTableByStatus(status);
+  }
+
+  // Cập nhật trạng thái bàn
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id') id: string,
+    @Body('isOccupied') isOccupied: boolean
+  ) {
+    return this.tableService.updateStatus(Number(id), isOccupied);
   }
 }

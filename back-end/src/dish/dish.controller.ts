@@ -41,4 +41,9 @@ export class DishController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.remove(id);
   }
+
+  @Get('search')
+  searchDish(@Query('keyword') keyword: string) {
+    return this.dishService.searchDish(keyword);
+  }
 }

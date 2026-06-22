@@ -52,4 +52,17 @@ export class TableService {
     await this.prisma.table.delete({ where: { id } });
     return { message: `Đã xóa bàn ăn thành công!` };
   }
+
+  async getTableByStatus(isOccupied: boolean) {
+    return this.prisma.table.findMany({
+      where: { isOccupied: isOccupied },
+    });
+  }
+
+  async updateStatus(id: number, isOccupied: boolean) {
+    return this.prisma.table.update({
+      where: { id: id },
+      data: { isOccupied: isOccupied },
+    });
+  }
 }
