@@ -7,6 +7,18 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 export class SupplierService {
   constructor(private prisma: PrismaService) { }
 
+  // SearchSupplier
+  async searchSupplier(keyword: string) {
+    return this.prisma.supplier.findMany({
+      where: {
+        name: {
+          contains: keyword || '',
+          mode: 'insensitive',
+        },
+      },
+    });
+  }
+
   async create(createSupplierDto: CreateSupplierDto) {
     // Kiểm tra xem đã có nhà cung cấp nào dùng số điện thoại này chưa
     const existPhone = await this.prisma.supplier.findFirst({

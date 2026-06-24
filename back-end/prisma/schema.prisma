@@ -34,10 +34,6 @@ enum OrderStatus {
   CANCELLED
 }
 
-// ==========================================
-// THỰC THỂ HỆ THỐNG VÀ NGƯỜI DÙNG (User Hierarchy)
-// ==========================================
-
 model Restaurant {
   id          Int      @id @default(autoincrement())
   name        String
@@ -49,7 +45,7 @@ model Restaurant {
   tables      Table[]
 }
 
-// Gộp chung User, Client, Staff, Waiter, Cashier, v.v. vào một bảng
+// Gộp chung User, Client, Staff, Waiter, Cashier vào một bảng
 model User {
   id          Int      @id @default(autoincrement())
   username    String   @unique
@@ -73,19 +69,15 @@ model User {
   goodsBillsCreated GoodsBill[] @relation("WarehouseGoodsBills")
 }
 
-// ==========================================
-// THỰC THỂ NGHIỆP VỤ: GỌI MÓN & ĐẶT BÀN
-// ==========================================
-
 model Table {
-  id          Int          @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   restaurantId Int
-  name        String
-  capacity    Int
-  description String?
-  isOccupied  Boolean      @default(false)
+  name         String
+  capacity     Int
+  description  String?
+  isOccupied   Boolean      @default(false)
 
-  restaurant  Restaurant   @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
   orderTables OrderTable[]
 }
 
@@ -122,7 +114,7 @@ model Order {
   bill            Bill?       // 1 Order có tối đa 1 Bill
 }
 
-// Lớp liên kết (Association Class) giữa Order và Dish
+// Lớp liên kết giữa Order và Dish
 model OrderedDish {
   id          Int      @id @default(autoincrement())
   orderId     Int
@@ -136,7 +128,7 @@ model OrderedDish {
   dish        Dish     @relation(fields: [dishId], references: [id])
 }
 
-// Lớp liên kết (Association Class) giữa Order và Table
+// Lớp liên kết giữa Order và Table
 model OrderTable {
   id          Int      @id @default(autoincrement())
   orderId     Int
@@ -147,10 +139,6 @@ model OrderTable {
   order       Order    @relation(fields: [orderId], references: [id])
   table       Table    @relation(fields: [tableId], references: [id])
 }
-
-// ==========================================
-// THỰC THỂ NGHIỆP VỤ: THANH TOÁN
-// ==========================================
 
 model Promotion {
   id            Int      @id @default(autoincrement())
@@ -183,33 +171,32 @@ model Bill {
   promotion     Promotion? @relation(fields: [promotionId], references: [id])
 }
 
-// ==========================================
-// THỰC THỂ NGHIỆP VỤ: NHẬP NGUYÊN LIỆU (WAREHOUSE)
-// ==========================================
-
 model Supplier {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  phone              String
-  address            String?
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  phone               String
+  address             String?
 
   ingredientSuppliers IngredientSupplier[]
 }
 
 model Ingredient {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  type               String
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  type                String
+  unit                String
+  quantity            Float                @default(0.0)
 
   ingredientSuppliers IngredientSupplier[]
 }
 
 // Lớp liên kết giữa Ingredient và Supplier
 model IngredientSupplier {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   ingredientId Int
   supplierId   Int
   price        Float
+  quantity     Float      @default(0.0)
   description  String?
 
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
