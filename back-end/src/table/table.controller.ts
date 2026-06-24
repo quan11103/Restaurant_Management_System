@@ -23,10 +23,28 @@ export class TableController {
     return this.tableService.findAll();
   }
 
+  // Lấy danh sách bàn theo trạng thái
+  @Get('status')
+  @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER)
+  getTableByStatus(@Query('isOccupied') isOccupied: string) {
+    const status = isOccupied === 'true';
+    return this.tableService.getTableByStatus(status);
+  }
+
   @Get(':id')
   @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.tableService.findOne(id);
+  }
+
+  // Cập nhật trạng thái
+  @Patch(':id/status')
+  @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER)
+  updateStatus(
+    @Param('id') id: string,
+    @Body('isOccupied') isOccupied: boolean
+  ) {
+    return this.tableService.updateStatus(Number(id), isOccupied);
   }
 
   @Patch(':id')
@@ -39,21 +57,5 @@ export class TableController {
   @Auth(Role.MANAGER)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tableService.remove(id);
-  }
-
-  // Lấy bàn trống
-  @Get('status')
-  getTableByStatus(@Query('isOccupied') isOccupied: string) {
-    const status = isOccupied === 'true';
-    return this.tableService.getTableByStatus(status);
-  }
-
-  // Cập nhật trạng thái bàn
-  @Patch(':id/status')
-  updateStatus(
-    @Param('id') id: string,
-    @Body('isOccupied') isOccupied: boolean
-  ) {
-    return this.tableService.updateStatus(Number(id), isOccupied);
   }
 }

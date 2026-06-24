@@ -84,4 +84,47 @@ export class PromotionService {
 
     return { message: `Đã xóa chương trình khuyến mãi thành công!` };
   }
+
+  // getPromotionByCode
+  async applyPromotionCode(code: string, currentOrderTotal: number) {
+    const promotion = await this.prisma.promotion.findUnique({
+      where: { code: code }
+    });
+
+    if (!promotion) {
+      throw new BadRequestException('Mã giảm giá không tồn tại!');
+    }
+
+    const now = new Date();
+    if (now < promotion.startDate || now > promotion.endDate) {
+      throw new BadRequestException('Mã giảm giá đã hết hạn hoặc chưa có hiệu lực!');
+    }
+
+    if (promotion.usageLimit && promotion.usedCount >= promotion.usageLimit) {
+      throw new BadRequestException('Mã giảm giá đã hết lượt sử dụng!');
+    }
+
+    if (promotion.minOrderValue && currentOrderTotal < promotion.minOrderValue) {
+      throw new BadRequestException(`Đơn hàng phải đạt tối thiểu ${promotion.minOrderValue} để áp dụng mã này!`);
+    }
+
+    // Tính toán số tiền được giảm
+    let discountAmount = 0;
+    if (promotion.type === 'PERCENTAGE') {
+      discountAmount = (currentOrderTotal * promotion.value) / 100;
+      // Kiểm tra giới hạn giảm tối đa (nếu có)
+      if (promotion.maxDiscount && discountAmount > promotion.maxDiscount) {
+        discountAmount = promotion.maxDiscount;
+      }
+    } else if (promotion.type === 'FIXED_AMOUNT') {
+      discountAmount = promotion.value;
+    }
+
+    return {
+      promotionId: promotion.id,
+      code: promotion.code,
+      discountAmount: discountAmount,
+      finalTotal: Math.max(0, currentOrderTotal - discountAmount) // Đảm bảo tổng tiền không bị âm
+    };
+  }
 }

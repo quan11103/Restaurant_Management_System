@@ -8,9 +8,10 @@ import { IngredientModule } from './ingredient/ingredient.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { PromotionModule } from './promotion/promotion.module';
 import { OrderModule } from './order/order.module';
+import { CheckoutModule } from './checkout/checkout.module';
 
 @Module({
-    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule],
+    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule],
     controllers: [],
     providers: [PrismaService],
 })
