@@ -1,0 +1,11 @@
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -5px;
+    margin-bottom: 20px;
+}

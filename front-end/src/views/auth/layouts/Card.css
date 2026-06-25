@@ -1,0 +1,21 @@
+.card-container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.card-title {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 1.5rem;
+}
+
+.card-body {
+    width: 100%;
+}
