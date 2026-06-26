@@ -1,4 +1,6 @@
 import React, { type ReactNode } from 'react';
+import { LayoutDashboard, Layers, Utensils, Archive, Users, Smile, Settings } from 'lucide-react';
+import Logo from '../../../components/Logo';
 import './AdminLayout.css';
 
 interface AdminLayoutProps {
@@ -11,19 +13,30 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
             {/* Cột trái: Sidebar*/}
             <aside className="admin-sidebar">
-                <div className="sidebar-logo">
-                    <img src="/logo.png" alt="Nhà hàng Hòa Hảo" className="sidebar-logo-img" />
-                </div>
-
+                <Logo />
                 <nav className="sidebar-nav">
                     <ul>
-                        <li className="active"><a href="#">Dashboard</a></li>
-                        <li><a href="#">Đơn hàng & Bàn</a></li>
-                        <li><a href="#">Thực đơn</a></li>
-                        <li><a href="#">Kho & Nguyên liệu</a></li>
-                        <li><a href="#">Nhân sự</a></li>
-                        <li><a href="#">Khách hàng</a></li>
-                        <li><a href="#">Cài đặt</a></li>
+                        <li className="active">
+                            <a href="#"><LayoutDashboard className="sidebar-icon" /><span>Dashboard</span></a>
+                        </li>
+                        <li>
+                            <a href="#"><Layers className="sidebar-icon" /><span>Đơn hàng & Bàn</span></a>
+                        </li>
+                        <li>
+                            <a href="#"><Utensils className="sidebar-icon" /><span>Thực đơn</span></a>
+                        </li>
+                        <li>
+                            <a href="#"><Archive className="sidebar-icon" /><span>Kho & Vật tư</span></a>
+                        </li>
+                        <li>
+                            <a href="#"><Users className="sidebar-icon" /><span>Nhân sự</span></a>
+                        </li>
+                        <li>
+                            <a href="#"><Smile className="sidebar-icon" /><span>Khách hàng</span></a>
+                        </li>
+                        <li>
+                            <a href="#"><Settings className="sidebar-icon" /><span>Cài đặt</span></a>
+                        </li>
                     </ul>
                 </nav>
             </aside>

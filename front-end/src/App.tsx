@@ -3,6 +3,7 @@ import './App.css';
 import AuthLayout from './views/auth/layouts/AuthLayout';
 import LoginView from './views/auth/login/LoginView';
 import AdminLayout from './views/admin/layouts/AdminLayout';
+import MenuManagementView from './views/admin/menu/MenuManagementView';
 
 function App() {
   return (
@@ -10,7 +11,7 @@ function App() {
     //   <LoginView />
     // </AuthLayout >
     <AdminLayout>
-      <LoginView />
+      <MenuManagementView />
     </AdminLayout>
   );
 }

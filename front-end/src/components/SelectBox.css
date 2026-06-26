@@ -1,0 +1,71 @@
+.selectbox-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.selectbox-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.selectbox-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.selectbox-input {
+    width: 100%;
+    padding: 10px 36px 10px 12px;
+    /* Dành khoảng trống bên phải cho Icon */
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+
+    /* Ẩn mũi tên xổ xuống mặc định của các trình duyệt */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.selectbox-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.selectbox-input:disabled {
+    background-color: #f5f5f5;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.selectbox-input.is-error {
+    border-color: #dc3545;
+}
+
+.selectbox-input.is-error:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Icon mũi tên custom đặt đè lên ô select */
+.selectbox-icon {
+    position: absolute;
+    right: 12px;
+    color: #666;
+    pointer-events: none;
+    /* Không cản trở sự kiện click chuột vào thẻ select bên dưới */
+}
+
+.selectbox-error-text {
+    font-size: 0.8rem;
+    color: #dc3545;
+    margin-top: 2px;
+}

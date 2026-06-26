@@ -1,0 +1,19 @@
+.logo-container {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-img {
+    max-height: 70px;
+    max-width: 80%;
+    object-fit: contain;
+}
+
+.logo-container h2 {
+    margin: 0;
+    color: #007bff;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+}

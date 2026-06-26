@@ -1,0 +1,60 @@
+.menu-filter-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+/* Khu vực thanh tìm kiếm chiếm tối đa không gian còn lại */
+.filter-search-box {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.filter-search-icon {
+    position: absolute;
+    left: 14px;
+    color: #888;
+    pointer-events: none;
+    /* Tránh cản trở thao tác click vào ô input */
+}
+
+.filter-search-input {
+    width: 100%;
+    padding: 10px 16px 10px 42px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.filter-search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Khu vực bộ lọc SelectBox giới hạn chiều rộng */
+.filter-select-box {
+    width: 250px;
+    flex-shrink: 0;
+    /* Không cho phép SelectBox bị bóp nhỏ lại khi màn hình hẹp */
+}
+
+@media (max-width: 768px) {
+    .menu-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-select-box {
+        width: 100%;
+    }
+}
