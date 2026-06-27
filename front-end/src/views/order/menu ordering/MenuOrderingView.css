@@ -1,0 +1,24 @@
+/* Layout chính: Chia đôi màn hình */
+.ordering-view-layout {
+    display: flex;
+    height: 100vh;
+    /* Hoặc 100% chiều cao của khu vực content */
+    background-color: #f5f6fa;
+    overflow: hidden;
+    font-family: sans-serif;
+}
+
+.menu-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow: hidden;
+    /* Ẩn scroll chéo */
+}
+
+.menu-header h2 {
+    margin: 0 0 16px 0;
+    font-size: 1.4rem;
+    color: #2c3e50;
+}

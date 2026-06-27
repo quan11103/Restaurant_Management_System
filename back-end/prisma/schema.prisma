@@ -88,6 +88,7 @@ model Dish {
   type         String
   price        Float
   description  String?
+  isAvailable  Boolean       @default(true)
 
   restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
   orderedDishes OrderedDish[]

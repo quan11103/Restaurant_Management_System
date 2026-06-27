@@ -6,7 +6,7 @@ export interface MenuFormData {
     name: string;
     category: string;
     price: number | string;
-    status: 'Có thể gọi' | 'Tạm ngưng';
+    status: 'Có thể gọi' | 'Tạm ngừng';
 }
 
 interface MenuFormProps {
@@ -70,10 +70,10 @@ const MenuForm: React.FC<MenuFormProps> = ({ formData, onChange, categoryOptions
                     <label className="radio-label">
                         <input
                             type="radio"
-                            checked={formData.status === 'Tạm ngưng'}
-                            onChange={() => handleChange('status', 'Tạm ngưng')}
+                            checked={formData.status === 'Tạm ngừng'}
+                            onChange={() => handleChange('status', 'Tạm ngừng')}
                         />
-                        Tạm ngưng (hết nguyên liệu)
+                        Tạm ngừng (hết nguyên liệu)
                     </label>
                 </div>
             </div>

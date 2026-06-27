@@ -1,0 +1,102 @@
+.dish-card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+}
+
+.dish-card:hover:not(.unavailable) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dish-card.unavailable {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+/* Khung bọc ảnh cố định chiều cao */
+.dish-img-container {
+    height: 135px;
+    position: relative;
+    background-color: #f1f2f6;
+    overflow: hidden;
+}
+
+/* Định dạng cấu hình ảnh */
+.dish-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Cắt ảnh vừa vặn với khung không làm méo hình */
+    transition: transform 0.3s ease;
+}
+
+.dish-card:hover:not(.unavailable) .dish-img-container:hover .dish-img {
+    transform: scale(1.06);
+}
+
+/* Khung hiển thị khi không có ảnh */
+.dish-img-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #a1a1a1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background-color: #e9ecef;
+}
+
+.dish-img-placeholder {
+    height: 120px;
+    background-color: #e9ecef;
+    position: relative;
+}
+
+.badge-unavailable {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #e74c3c;
+    color: white;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dish-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.dish-info h4 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    line-height: 1.4;
+    /* Giới hạn tên món tối đa 2 dòng, nếu dài quá sẽ hiện dấu ... */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.dish-price {
+    margin: 0;
+    color: #007bff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}

@@ -1,0 +1,37 @@
+.dish-grid-container {
+    flex: 1;
+    display: grid;
+    /* Mỗi cột tối thiểu 200px, giãn đều không gian trống */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    overflow-y: auto;
+    padding-bottom: 20px;
+    /* Ép các card bắt đầu từ trên xuống, không bị kéo dãn nếu ít món */
+    align-content: start;
+    padding-top: 3px;
+}
+
+/* Ẩn thanh cuộn */
+.dish-grid-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dish-grid-container::-webkit-scrollbar-thumb {
+    background-color: #dcdcdc;
+    border-radius: 4px;
+}
+
+.dish-grid-empty {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #888;
+    font-size: 1.1rem;
+    padding: 40px 20px;
+    background-color: #fdfdfd;
+    border-radius: 8px;
+    border: 1px dashed #ccc;
+    margin-top: 10px;
+}

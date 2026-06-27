@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import DataTable, { type Column } from '../../../components/DataTable';
 import Modal from '../../../components/Modal';
-import SelectBox, { type SelectOption } from '../../../components/SelectBox';
+import { type SelectOption } from '../../../components/SelectBox';
 import Badge from '../../../components/Badge';
-import MenuFilterBar from './MenuFilterBar';
+import MenuFilterBar from '../../../components/MenuFilterBar';
 import MenuForm, { type MenuFormData } from './MenuForm';
 import './MenuManagementView.css';
 
@@ -13,7 +13,7 @@ interface MenuItem {
     name: string;
     category: string;
     price: number;
-    status: 'Có thể gọi' | 'Tạm ngưng';
+    status: 'Có thể gọi' | 'Tạm ngừng';
 }
 
 // Danh sách danh mục để dùng cho bộ lọc và form
@@ -29,7 +29,7 @@ const INITIAL_MENU: MenuItem[] = [
     { id: 'MA001', name: 'Bánh sừng bò (Croissant)', category: 'Bánh ngọt', price: 45000, status: 'Có thể gọi' },
     { id: 'MA002', name: 'Cà phê Latte đá', category: 'Cà phê', price: 55000, status: 'Có thể gọi' },
     { id: 'MA003', name: 'Trà đào cam sả', category: 'Trà trái cây', price: 50000, status: 'Có thể gọi' },
-    { id: 'MA004', name: 'Bánh Tiramisu', category: 'Bánh ngọt', price: 65000, status: 'Tạm ngưng' },
+    { id: 'MA004', name: 'Bánh Tiramisu', category: 'Bánh ngọt', price: 65000, status: 'Tạm ngừng' },
     { id: 'MA005', name: 'Khoai tây chiên sốt phô mai', category: 'Món ăn nhẹ', price: 40000, status: 'Có thể gọi' },
 ];
 

@@ -12,7 +12,7 @@ export class AuthService {
         private jwtService: JwtService
     ) { }
 
-    // 1. Hàm Đăng ký
+    // Hàm Đăng ký
     async register(registerDto: RegisterDto) {
         const { username, password, fullName, role } = registerDto;
 
@@ -31,7 +31,7 @@ export class AuthService {
         return { message: 'Đăng ký thành công', userId: newUser.id };
     }
 
-    // 2. Hàm Đăng nhập
+    // Hàm Đăng nhập
     async login(loginDto: LoginDto) {
         const { username, password } = loginDto;
 
