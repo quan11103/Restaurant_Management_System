@@ -1,0 +1,59 @@
+.table-item {
+    height: 120px;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 2px solid transparent;
+}
+
+.table-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.table-name {
+    font-size: 1.15rem;
+    font-weight: bold;
+}
+
+.table-sub-info {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* --- MÀU SẮC THEO TRẠNG THÁI --- */
+.status-available {
+    background-color: #f7fafc;
+    border-color: #e2e8f0;
+    color: #718096;
+}
+
+.status-occupied {
+    background-color: #ebf8ff;
+    border-color: #90cdf4;
+    color: #2b6cb0;
+}
+
+.status-occupied .table-icon {
+    color: #3182ce;
+}
+
+.status-waiting {
+    background-color: #fff5f5;
+    border-color: #feb2b2;
+    color: #c53030;
+}
+
+.status-waiting .table-icon {
+    color: #e53e3e;
+}

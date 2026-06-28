@@ -1,0 +1,19 @@
+.table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 20px;
+    padding-top: 3px;
+}
+
+.no-results {
+    grid-column: 1 / -1;
+    /* Ép dòng thông báo chiếm toàn bộ chiều ngang của grid */
+    text-align: center;
+    padding: 40px;
+    color: #718096;
+    font-style: italic;
+}

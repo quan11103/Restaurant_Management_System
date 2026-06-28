@@ -30,6 +30,7 @@ enum OrderType {
 enum OrderStatus {
   PENDING
   PROCESSING
+  DELIVERING
   COMPLETED
   CANCELLED
 }
