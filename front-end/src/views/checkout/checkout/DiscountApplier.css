@@ -1,0 +1,142 @@
+.discount-applier-container,
+.discount-applied-container {
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+/* ==================== TRẠNG THÁI CHƯA ÁP DỤNG ==================== */
+.promo-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px 4px 4px 12px;
+    transition: border-color 0.2s;
+}
+
+.promo-input-wrapper:focus-within {
+    border-color: #3182ce;
+    background: white;
+}
+
+.promo-icon {
+    color: #a0aec0;
+    margin-right: 8px;
+}
+
+.promo-input-wrapper input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
+
+.promo-input-wrapper input::placeholder {
+    text-transform: none;
+}
+
+.btn-apply-promo {
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    transition: background 0.2s;
+}
+
+.btn-apply-promo:hover:not(:disabled) {
+    background: #2d3748;
+}
+
+.btn-apply-promo:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.promo-error-msg {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #e53e3e;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    padding-left: 4px;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==================== TRẠNG THÁI ĐÃ ÁP DỤNG ==================== */
+.discount-applied-container {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ebf8ff;
+    border: 1px dashed #63b3ed;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.discount-success-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.success-icon {
+    color: #3182ce;
+}
+
+.promo-code-badge {
+    background: #3182ce;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-right: 8px;
+}
+
+.promo-amount {
+    color: #2b6cb0;
+    font-weight: 600;
+}
+
+.btn-remove-promo {
+    background: none;
+    border: none;
+    color: #fc8181;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.btn-remove-promo:hover {
+    background: #fff5f5;
+    color: #e53e3e;
+}

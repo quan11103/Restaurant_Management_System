@@ -1,0 +1,209 @@
+/* ==================== OVERLAY & CONTAINER ==================== */
+.bill-summary-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.bill-summary-container {
+    position: relative;
+    background: #f0f2f5;
+    padding: 24px 0px 24px 24px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.bill-summary-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 24px;
+    margin-bottom: 16px;
+}
+
+.bill-actions {
+    display: flex;
+    padding-right: 40px;
+}
+
+/* ==================== HEADER THÀNH CÔNG ==================== */
+.bill-success-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.success-icon {
+    color: #38a169;
+    margin-bottom: 8px;
+}
+
+.bill-success-header h3 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.25rem;
+}
+
+/* ==================== GIẤY BIÊN LAI (RECEIPT) ==================== */
+.receipt-paper {
+    background: white;
+    padding: 24px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-family: 'Courier New', Courier, monospace;
+    /* Font chữ in hóa đơn đặc trưng */
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.divider-dashed {
+    border-top: 1px dashed #718096;
+    margin: 16px 0;
+}
+
+.receipt-header {
+    text-align: center;
+}
+
+.receipt-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.receipt-header p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+}
+
+.receipt-header h3 {
+    margin: 16px 0 0 0;
+    font-size: 1.1rem;
+}
+
+.receipt-meta .meta-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+/* Danh sách món ăn */
+.receipt-items .item-header {
+    display: flex;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #000;
+    padding-bottom: 4px;
+}
+
+.receipt-items .item-row {
+    display: flex;
+    margin-bottom: 8px;
+    align-items: flex-start;
+}
+
+.receipt-items .name {
+    flex: 5;
+    padding-right: 8px;
+}
+
+.receipt-items .qty {
+    flex: 1;
+    text-align: center;
+}
+
+.receipt-items .total {
+    flex: 3;
+    text-align: right;
+}
+
+/* Tổng kết thanh toán */
+.receipt-summary .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.summary-row.discount {
+    color: #e53e3e;
+    /* Vẫn có màu trên web, khi in đen trắng sẽ tự chuyển xám */
+}
+
+.summary-row.final-total {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 12px;
+}
+
+.receipt-footer {
+    text-align: center;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.receipt-footer p {
+    margin: 4px 0;
+}
+
+/* ==================== BUTTONS ==================== */
+.bill-actions {
+    display: flex;
+}
+
+.btn-print-bill {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background: #3182ce;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-print-bill:hover {
+    background: #2b6cb0;
+}
+
+/* ==================== MEDIA QUERY CHO MÁY IN ==================== */
+@media print {
+    body * {
+        visibility: hidden;
+        /* Ẩn toàn bộ web */
+    }
+
+    .receipt-paper,
+    .receipt-paper * {
+        visibility: visible;
+        /* Chỉ hiện vùng biên lai */
+    }
+
+    .receipt-paper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+        /* Hoặc set fix width như 80mm cho máy in nhiệt */
+    }
+}

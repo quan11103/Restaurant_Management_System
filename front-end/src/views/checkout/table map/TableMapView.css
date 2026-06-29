@@ -6,7 +6,6 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    font-family: sans-serif;
 }
 
 .table-map-header {

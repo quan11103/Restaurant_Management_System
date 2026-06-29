@@ -1,12 +1,12 @@
 import './App.css';
-import TableMapView from './views/checkout/table map view/TableMapView';
+import CheckoutView from './views/checkout/checkout/CheckoutView';
 
 function App() {
   return (
     // <AuthLayout>
     //   <LoginView />
     // </AuthLayout >
-    <TableMapView />
+    <CheckoutView />
   );
 }
 

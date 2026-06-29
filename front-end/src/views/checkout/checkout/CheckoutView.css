@@ -1,0 +1,196 @@
+.checkout-layout {
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: #f0f2f5;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.checkout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.checkout-header h2 {
+    margin: 0;
+    color: #2d3748;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #4a5568;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-back:hover {
+    background-color: #e2e8f0;
+}
+
+/* ==================== NỘI DUNG CHÍNH (2 CỘT) ==================== */
+.checkout-content {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* --- Cột trái: Chi tiết món --- */
+.order-details-section {
+    flex: 6;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.order-meta {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed #e2e8f0;
+    margin-bottom: 16px;
+    color: #4a5568;
+}
+
+.ordered-items-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.item-header,
+.item-row {
+    display: flex;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.item-header {
+    font-weight: 600;
+    color: #718096;
+    border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.col-name {
+    flex: 3;
+}
+
+.col-qty {
+    flex: 1;
+    text-align: center;
+}
+
+.col-price {
+    flex: 2;
+    text-align: right;
+}
+
+.col-subtotal {
+    flex: 2;
+    text-align: right;
+    font-weight: 500;
+}
+
+/* --- Cột phải: Thanh toán --- */
+.payment-section {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.summary-block,
+.payment-methods {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    color: #4a5568;
+}
+
+.discount-row {
+    color: #e53e3e;
+}
+
+.total-row {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 16px;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #2d3748;
+    margin-bottom: 0;
+}
+
+.final-price {
+    color: #3182ce;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    margin-top: auto;
+    /* Đẩy các nút xuống đáy cột phải */
+}
+
+.btn-print-temp {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #cbd5e0;
+    color: #4a5568;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-print-temp:hover {
+    background: #f7fafc;
+}
+
+.btn-pay {
+    flex: 2;
+    background: #38a169;
+    border: none;
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(56, 161, 105, 0.2);
+    transition: background 0.2s;
+}
+
+.btn-pay:hover {
+    background: #2f855a;
+}
