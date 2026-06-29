@@ -1,0 +1,65 @@
+.action-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.btn-footer-cancel,
+.btn-footer-submit {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-footer-cancel {
+    background: white;
+    color: #e84118;
+    border: 1px solid #e84118;
+}
+
+.btn-footer-cancel:hover:not(:disabled) {
+    background: #fff0ed;
+}
+
+.btn-footer-submit {
+    background: #20bf6b;
+    color: white;
+    box-shadow: 0 4px 12px rgba(32, 191, 107, 0.3);
+}
+
+.btn-footer-submit:hover:not(:disabled) {
+    background: #26de81;
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.25);
+}
+
+.btn-footer-cancel:disabled,
+.btn-footer-submit:disabled {
+    background: #a4b0be;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.footer-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: footerSpin 0.8s linear infinite;
+}
+
+@keyframes footerSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}

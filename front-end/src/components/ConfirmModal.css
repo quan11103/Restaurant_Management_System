@@ -1,0 +1,177 @@
+/* Lớp nền mờ phủ toàn màn hình */
+.cm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(44, 62, 80, 0.6);
+    /* Màu nền tối nhẹ mượt mà */
+    backdrop-filter: blur(4px);
+    /* Làm mờ hậu cảnh phía sau */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* Luôn nổi lên trên cùng */
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Hộp thoại chính */
+.cm-box {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Header */
+.cm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f2f6;
+}
+
+.cm-header h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.cm-btn-close {
+    background: none;
+    border: none;
+    color: #a4b0be;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    transition: all 0.2s;
+}
+
+.cm-btn-close:hover {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+}
+
+/* Body */
+.cm-body {
+    display: flex;
+    gap: 16px;
+    padding: 24px 20px;
+    align-items: flex-start;
+}
+
+.cm-icon {
+    flex-shrink: 0;
+}
+
+.cm-message {
+    color: #4b6584;
+    font-size: 0.98rem;
+    line-height: 1.5;
+}
+
+.cm-message p {
+    margin: 0;
+}
+
+/* Footer & Buttons */
+.cm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #f1f2f6;
+}
+
+.cm-btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.cm-btn-cancel {
+    background: white;
+    color: #7f8fa6;
+    border: 1px solid #dcdde1;
+}
+
+.cm-btn-cancel:hover {
+    background: #f1f2f6;
+    color: #2c3e50;
+}
+
+/* Định nghĩa màu sắc theo ngữ cảnh (Type-driven classes) */
+.text-danger {
+    color: #e84118;
+}
+
+.text-warning {
+    color: #f39c12;
+}
+
+.text-info {
+    color: #2980b9;
+}
+
+.cm-btn-confirm.btn-danger {
+    background: #e84118;
+    color: white;
+}
+
+.cm-btn-confirm.btn-danger:hover {
+    background: #c23616;
+}
+
+.cm-btn-confirm.btn-warning {
+    background: #f39c12;
+    color: white;
+}
+
+.cm-btn-confirm.btn-warning:hover {
+    background: #d35400;
+}
+
+.cm-btn-confirm.btn-info {
+    background: #3498db;
+    color: white;
+}
+
+.cm-btn-confirm.btn-info:hover {
+    background: #2980b9;
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

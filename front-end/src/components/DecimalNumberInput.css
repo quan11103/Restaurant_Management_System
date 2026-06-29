@@ -1,0 +1,33 @@
+/* Style nền tảng cho ô nhập liệu (Tương tự .table-input của bạn) */
+.decimal-input-base {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.decimal-input-base:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 2px rgba(92, 106, 196, 0.1);
+}
+
+/* ========================================================
+   ĐOẠN CSS CỐT LÕI ĐỂ ẨN 2 MŨI TÊN (SPINNERS)
+======================================================== */
+
+/* Dành cho Chrome, Safari, Edge, Opera */
+.decimal-input-base::-webkit-outer-spin-button,
+.decimal-input-base::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Dành cho Firefox */
+.decimal-input-base[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}

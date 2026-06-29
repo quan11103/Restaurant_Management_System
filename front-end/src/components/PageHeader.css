@@ -1,0 +1,79 @@
+.page-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    background-color: transparent;
+}
+
+/* ==================== KHỐI BÊN TRÁI ==================== */
+.ph-left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Breadcrumbs */
+.ph-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #7f8fa6;
+}
+
+.ph-breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ph-separator {
+    color: #cbd5e1;
+    font-size: 0.8rem;
+}
+
+/* Tiêu đề & Nút quay lại */
+.ph-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ph-title {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.ph-btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #dcdde1;
+    color: #5c6ac4;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.ph-btn-back:hover {
+    background-color: #eef0ff;
+    border-color: #5c6ac4;
+    color: #5c6ac4;
+    transform: translateX(-2px);
+    /* Hiệu ứng nhích nhẹ sang trái khi hover */
+}
+
+/* ==================== KHỐI BÊN PHẢI ==================== */
+.ph-right-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}

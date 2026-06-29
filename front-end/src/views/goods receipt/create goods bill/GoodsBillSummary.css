@@ -1,0 +1,76 @@
+.gb-summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid #ecf0f1;
+    margin-bottom: 20px;
+}
+
+.summary-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #dcdde1;
+}
+
+.summary-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.summary-label {
+    color: #4b6584;
+}
+
+.summary-value {
+    color: #2d3436;
+}
+
+.text-discount {
+    color: #e84118;
+}
+
+.summary-divider {
+    height: 1px;
+    background-color: #ecf0f1;
+    margin: 4px 0;
+}
+
+.summary-total {
+    margin-top: 4px;
+    font-size: 1.1rem;
+}
+
+.summary-total .summary-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.text-highlight {
+    font-weight: 700;
+    color: #20bf6b;
+    font-size: 1.25rem;
+}
+
+/* Kế thừa một số tiện ích từ các file trước nếu cần */
+.font-medium {
+    font-weight: 600;
+}
+
+.text-info {
+    color: #2980b9;
+}

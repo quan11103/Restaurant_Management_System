@@ -1,12 +1,12 @@
 import './App.css';
-import CheckoutView from './views/checkout/checkout/CheckoutView';
+import CreateGoodsBillView from './views/goods receipt/create goods bill/CreateGoodsBillView';
 
 function App() {
   return (
-    // <AuthLayout>
-    //   <LoginView />
-    // </AuthLayout >
-    <CheckoutView />
+    // <AdminLayout>
+    //   <MenuManagementView />
+    // </AdminLayout >
+    <CreateGoodsBillView />
   );
 }
 
