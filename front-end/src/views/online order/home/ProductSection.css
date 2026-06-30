@@ -1,0 +1,98 @@
+.product-section {
+    margin: 48px 0;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 4px 0;
+}
+
+.section-subtitle {
+    font-size: 0.95rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.view-all-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #e84118;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: transform 0.2s;
+}
+
+.view-all-btn:hover {
+    transform: translateX(4px);
+    /* Hiệu ứng dịch mũi tên sang phải */
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-section {
+        margin: 32px 0;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        /* Chuyển sang dạng vuốt ngang (Horizontal Scroll) trên Mobile nhỏ */
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        /* Hỗ trợ khấc cuộn */
+        padding-bottom: 12px;
+        /* Chừa không gian cho shadow */
+        margin: 0 -16px;
+        /* Bỏ padding container để scroll mượt */
+        padding: 0 16px 16px 16px;
+    }
+
+    .product-grid::-webkit-scrollbar {
+        display: none;
+        /* Ẩn thanh cuộn trên mobile */
+    }
+
+    .product-card {
+        min-width: 240px;
+        /* Cố định độ rộng để scroll ngang */
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+}

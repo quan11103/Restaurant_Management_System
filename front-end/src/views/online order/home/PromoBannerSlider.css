@@ -1,0 +1,139 @@
+.banner-slider-container {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    /* Cắt các ảnh tràn ra ngoài */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background-color: #eaeded;
+    aspect-ratio: 1200 / 350;
+}
+
+/* Khung bọc dịch chuyển bằng Flexbox */
+.banner-slides-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Hiệu ứng lướt mượt */
+}
+
+.banner-slide {
+    min-width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.banner-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Giữ tỷ lệ ảnh không bị móp méo */
+    display: block;
+}
+
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.85);
+    border: none;
+    color: #2c3e50;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    /* Ẩn đi mặc định */
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.banner-slider-container:hover .slider-arrow {
+    opacity: 1;
+}
+
+.slider-arrow:hover {
+    background-color: #ffffff;
+    color: #e84118;
+    box-shadow: 0 4px 15px rgba(232, 65, 24, 0.3);
+}
+
+.arrow-left {
+    left: 16px;
+}
+
+.arrow-right {
+    right: 16px;
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.dot-item {
+    border: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
+.dot-item.active {
+    background-color: #ffffff;
+    width: 24px;
+    border-radius: 4px;
+}
+
+.banner-slider-skeleton {
+    width: 100%;
+    aspect-ratio: 1200 / 350;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #f2f2f2 25%, #e6e6e6 50%, #f2f2f2 75%);
+    background-size: 200% 100%;
+    animation: sliderSkeletonLoading 1.5s infinite;
+}
+
+@keyframes sliderSkeletonLoading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .banner-slider-container {
+        aspect-ratio: 16 / 9;
+        border-radius: 12px;
+    }
+
+    .slider-arrow {
+        display: none;
+    }
+
+    .slider-dots {
+        bottom: 10px;
+    }
+}

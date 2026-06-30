@@ -1,0 +1,138 @@
+.category-section {
+    margin: 32px 0;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px 12px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.category-image-wrapper {
+    width: 130px;
+    height: 130px;
+    background-color: #f5f6fa;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.category-image {
+    width: 100%;
+    object-fit: contain;
+    /* Đảm bảo icon/ảnh không bị méo */
+    transition: transform 0.3s ease;
+}
+
+.category-name {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #34495e;
+    text-align: center;
+    line-height: 1.3;
+    transition: color 0.2s;
+    /* Giới hạn hiển thị 2 dòng, cắt chữ nếu quá dài */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* --- Hiệu ứng Hover (Tương tác chuột) --- */
+.category-item:hover .category-image-wrapper {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 16px rgba(232, 65, 24, 0.15);
+    background-color: #ffffff;
+}
+
+.category-item:hover .category-image {
+    transform: scale(1.1);
+}
+
+.category-item:hover .category-name {
+    color: #e84118;
+}
+
+.skeleton-img {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: gridSkeletonLoading 1.5s infinite linear;
+}
+
+.skeleton-text {
+    width: 70%;
+    height: 14px;
+    margin-top: 10px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: gridSkeletonLoading 1.5s infinite linear;
+}
+
+@keyframes gridSkeletonLoading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Laptop / Tablet ngang */
+@media (max-width: 1024px) {
+    .category-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+/* Tablet dọc / Mobile lớn */
+@media (max-width: 768px) {
+    .category-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .category-image-wrapper {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+    }
+}
+
+/* Mobile nhỏ */
+@media (max-width: 480px) {
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px 8px;
+    }
+
+    .category-image-wrapper {
+        width: 64px;
+        height: 64px;
+    }
+
+    .category-name {
+        font-size: 0.75rem;
+    }
+}

@@ -1,0 +1,151 @@
+.product-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #f1f2f6;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    /* Tỉ lệ cho ảnh đồ ăn */
+    overflow: hidden;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.promo-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: #e84118;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(232, 65, 24, 0.4);
+}
+
+.product-info {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* Đẩy giá tiền xuống đáy*/
+}
+
+.product-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-meta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+.product-price-row {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e84118;
+}
+
+.original-price {
+    font-size: 0.85rem;
+    color: #b2bec3;
+    text-decoration: line-through;
+}
+
+.skeleton-card {
+    border: none;
+    box-shadow: none;
+}
+
+.skeleton-image {
+    width: 100%;
+    aspect-ratio: 4/3;
+}
+
+.skeleton-text {
+    height: 16px;
+    border-radius: 4px;
+    margin: 16px 16px 0;
+}
+
+.skeleton-text.title {
+    width: 80%;
+}
+
+.skeleton-text.short {
+    width: 50%;
+    margin-top: 12px;
+}
+
+.skeleton-text.price {
+    width: 40%;
+    margin-top: 24px;
+    height: 20px;
+}
+
+.skeleton-image,
+.skeleton-text {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: cardSkeletonLoading 1.5s infinite linear;
+}
+
+@keyframes cardSkeletonLoading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

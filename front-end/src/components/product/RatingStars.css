@@ -1,0 +1,46 @@
+.rating-stars-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stars-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Reset style cho nút bấm chứa icon */
+.star-icon {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.stars-container.interactive .star-icon {
+    cursor: pointer;
+}
+
+.stars-container.interactive .star-icon:hover {
+    transform: scale(1.15);
+}
+
+.star-full,
+.star-half {
+    color: #f39c12;
+}
+
+.star-empty {
+    color: #dcdde1;
+}
+
+.rating-text {
+    color: #7f8fa6;
+    font-weight: 600;
+    line-height: 1;
+}

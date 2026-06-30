@@ -1,0 +1,70 @@
+.search-bar-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: #f5f6fa;
+    border: 1px solid #dcdde1;
+    border-radius: 24px;
+    padding: 6px 16px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.search-bar-wrapper:focus-within {
+    border-color: #e84118;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(232, 65, 24, 0.1);
+}
+
+.search-bar-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 8px 8px 0;
+    font-size: 0.95rem;
+    color: #2f3640;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+}
+
+.search-bar-input::placeholder {
+    color: #a4b0be;
+}
+
+/* Base style cho các nút bấm bên trong */
+.search-bar-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 4px;
+    color: #7f8fa6;
+    transition: color 0.2s;
+}
+
+.clear-btn:hover {
+    color: #e74c3c;
+}
+
+.submit-btn {
+    margin-left: 4px;
+    padding-left: 8px;
+    border-left: 1px solid #dcdde1;
+}
+
+.submit-btn:hover {
+    color: #e84118;
+}
+
+@media (max-width: 480px) {
+    .search-bar-wrapper {
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .search-bar-input {
+        font-size: 0.9rem;
+    }
+}

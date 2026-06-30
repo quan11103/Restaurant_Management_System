@@ -1,0 +1,199 @@
+.customer-footer {
+    background-color: #2f3542;
+    color: #ced6e0;
+    padding-top: 60px;
+    font-family: 'Inter', system-ui, sans-serif;
+    margin-top: auto;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.5fr;
+    gap: 40px;
+    padding-bottom: 40px !important;
+}
+
+/* Cột 1: Thương hiệu */
+.footer-logo-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.footer-logo-image.logo-container {
+    height: 0px;
+    width: auto;
+    justify-content: flex-start;
+}
+
+.footer-logo-image .logo-img {
+    max-height: 60px;
+}
+
+.footer-logo-text {
+    color: #e84118;
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.brand-desc {
+    line-height: 1.6;
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+.contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: #dfe4ea;
+}
+
+.contact-list li svg {
+    color: #747d8c;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Cột 2 & 3: Tiêu đề & links */
+.footer-title {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mt-4 {
+    margin-top: 32px !important;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-links a {
+    color: #a4b0be;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #e84118;
+    padding-left: 4px;
+}
+
+.social-links {
+    display: flex;
+    gap: 16px;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: #57606f;
+    color: #ffffff;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.social-icon:hover {
+    background-color: #e84118;
+    transform: translateY(-3px);
+}
+
+/* Cột 4: Chứng nhận & thanh toán */
+.cert-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #1e242d;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.payment-methods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.payment-badge {
+    background-color: #ffffff;
+    color: #2f3542;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #dfe4ea;
+}
+
+.payment-badge.vnpay {
+    color: #005a9e;
+}
+
+.payment-badge.momo {
+    color: #a50064;
+}
+
+/* Dòng bản quyền */
+.footer-bottom {
+    border-top: 1px solid #4a505c;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #747d8c;
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+
+@media (max-width: 992px) {
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .customer-footer {
+        padding-top: 40px;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .footer-title {
+        margin-bottom: 16px;
+    }
+}

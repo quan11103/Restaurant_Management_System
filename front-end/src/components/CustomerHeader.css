@@ -1,0 +1,167 @@
+.customer-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Luôn nổi lên trên các thành phần khác */
+    background-color: #ffffff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    height: 72px;
+    display: flex;
+    align-items: center;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Khối Logo */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: #2c3e50;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.logo-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+/* Ghi đè height 70px của Logo mặc định để vừa vặn với Header hơn */
+.header-logo-image.logo-container {
+    height: 50px;
+    margin-bottom: 5px;
+    width: auto;
+}
+
+.header-logo-image .logo-img {
+    max-height: 50px;
+}
+
+.logo-text-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.logo-main {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #e84118;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.logo-sub {
+    font-size: 0.75rem;
+    color: #7f8fa6;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Khối địa chỉ */
+.header-address {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    max-width: 250px;
+}
+
+.header-address:hover {
+    background-color: #f5f6fa;
+}
+
+.address-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.address-label {
+    font-size: 0.75rem;
+    color: #7f8fa6;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.address-text {
+    font-size: 0.85rem;
+    color: #2f3640;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Cắt chữ nếu địa chỉ quá dài */
+}
+
+/* Khối tìm kiếm */
+.header-search {
+    flex: 1;
+    max-width: 400px;
+}
+
+/* Khối actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #2c3e50;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #f5f6fa;
+    color: #e84118;
+}
+
+@media (max-width: 900px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+        /* Hiện nút hamburger */
+    }
+
+    .header-container {
+        gap: 0;
+    }
+
+    .action-btn {
+        padding: 8px;
+    }
+}
