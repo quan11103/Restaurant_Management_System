@@ -1,14 +1,14 @@
 import './App.css';
-import CreateGoodsBillView from './views/goods receipt/create goods bill/CreateGoodsBillView';
 import HomeView from './views/online order/home/HomeView';
-
+import ProductDetailView from './views/online order/product detail/ProductDetailView';
 
 function App() {
   return (
     // <AuthLayout>
     //   <LoginView />
     // </AuthLayout>
-    <HomeView />
+    <ProductDetailView />
+    // <HomeView />
   );
 }
 

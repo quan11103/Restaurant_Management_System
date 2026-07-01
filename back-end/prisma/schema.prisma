@@ -46,28 +46,29 @@ model Restaurant {
   tables      Table[]
 }
 
-// Gộp chung User, Client, Staff, Waiter, Cashier vào một bảng
+// Gộp chung User, Client, Staff, Waiter, Cashier vào một bảng (Single Table Inheritance)
 model User {
   id          Int      @id @default(autoincrement())
   username    String   @unique
   password    String
   fullName    String
   phone       String?
+  email       String?  @unique
   role        Role
 
   // Các thuộc tính riêng của Client
-  email       String?  @unique
   address     String?
 
-  // Các thuộc tính riêng của Staff
+  // Các thuộc tính riêng của Staff (Manager, Cashier, Waiter, WarehouseStaff)
   position    String?
   description String?
 
   // Các mối quan hệ (Relationships)
-  clientOrders      Order[]     @relation("ClientOrders")
-  waiterOrders      Order[]     @relation("WaiterOrders")
-  billsHandled      Bill[]      @relation("CashierBills")
-  goodsBillsCreated GoodsBill[] @relation("WarehouseGoodsBills")
+  clientOrders      Order[]       @relation("ClientOrders")
+  waiterOrders      Order[]       @relation("WaiterOrders")
+  billsHandled      Bill[]        @relation("CashierBills")
+  goodsBillsCreated GoodsBill[]   @relation("WarehouseGoodsBills")
+  clientReviews     Review[]      @relation("ClientReviews")
 }
 
 model Table {
@@ -79,7 +80,7 @@ model Table {
   isOccupied   Boolean      @default(false)
 
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
-  orderTables OrderTable[]
+  orderTables  OrderTable[]
 }
 
 model Dish {
@@ -93,12 +94,34 @@ model Dish {
 
   restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
   orderedDishes OrderedDish[]
+  images       DishImage[]
+  reviews      Review[]
+}
+
+model DishImage {
+  id          Int      @id @default(autoincrement())
+  dishId      Int
+  imageUrl    String
+  isMain      Boolean  @default(false)
+
+  dish        Dish     @relation(fields: [dishId], references: [id])
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  dishId      Int
+  clientId    Int
+  rating      Int
+  comment     String?
+
+  dish        Dish     @relation(fields: [dishId], references: [id])
+  client      User     @relation("ClientReviews", fields: [clientId], references: [id])
 }
 
 model Order {
   id              Int         @id @default(autoincrement())
-  clientId        Int?        // Nullable nếu khách vãng lai không có tài khoản
-  waiterId        Int?        // Nullable nếu khách tự đặt online
+  clientId        Int?
+  waiterId        Int?
   orderTime       DateTime    @default(now())
   totalQuantity   Int         @default(0)
   total           Float       @default(0.0)
@@ -185,7 +208,6 @@ model Supplier {
 model Ingredient {
   id                  Int                  @id @default(autoincrement())
   name                String
-  type                String
   unit                String
   quantity            Float                @default(0.0)
 
@@ -199,7 +221,6 @@ model IngredientSupplier {
   supplierId   Int
   price        Float
   quantity     Float      @default(0.0)
-  description  String?
 
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
   supplier     Supplier   @relation(fields: [supplierId], references: [id])
@@ -211,7 +232,6 @@ model GoodsBill {
   id               Int      @id @default(autoincrement())
   warehouseStaffId Int
   receivedTime     DateTime @default(now())
-  totalQuantity    Int      @default(0)
   total            Float    @default(0.0)
 
   warehouseStaff   User     @relation("WarehouseGoodsBills", fields: [warehouseStaffId], references: [id])
