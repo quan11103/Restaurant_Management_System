@@ -3,11 +3,12 @@ import { Minus, Plus } from 'lucide-react';
 import './QuantitySelector.css';
 
 interface QuantitySelectorProps {
-    value: number;                        // Giá trị số lượng hiện tại
-    onChange: (newValue: number) => void; // Hàm gọi ngược (callback) khi thay đổi số lượng
-    min?: number;                         // Số lượng tối thiểu (mặc định: 1)
-    max?: number;                         // Số lượng tối đa (mặc định: 99)
-    className?: string;                   // Class phụ nếu muốn custom từ bên ngoài
+    value: number;
+    onChange: (newValue: number) => void;
+    min?: number;
+    max?: number;
+    size?: 'small' | 'medium' | 'large';
+    className?: string;
 }
 
 const QuantitySelector: React.FC<QuantitySelectorProps> = ({
@@ -15,10 +16,13 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     onChange,
     min = 1,
     max = 99,
+    size = 'medium',
     className = ''
 }) => {
+    const iconSize = size === 'small' ? 14 : size === 'large' ? 18 : 16;
+
     return (
-        <div className={`quantity-controller ${className}`.trim()}>
+        <div className={`quantity-controller size-${size} ${className}`.trim()}>
             <button
                 type="button"
                 className="qty-btn"
@@ -26,7 +30,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 disabled={value <= min}
                 aria-label="Giảm số lượng"
             >
-                <Minus size={16} />
+                <Minus size={iconSize} />
             </button>
 
             <span className="qty-number">{value}</span>
@@ -38,7 +42,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 disabled={value >= max}
                 aria-label="Tăng số lượng"
             >
-                <Plus size={16} />
+                <Plus size={iconSize} />
             </button>
         </div>
     );

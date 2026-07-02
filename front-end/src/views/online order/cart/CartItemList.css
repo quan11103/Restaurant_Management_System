@@ -1,0 +1,133 @@
+.cart-item-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-list-header {
+    display: grid;
+    grid-template-columns: 2fr 120px 88px 100px 40px;
+    gap: 20px;
+    padding: 0 20px 12px 20px;
+    color: #7f8fa6;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.header-col-product,
+.header-col-qty {
+    text-align: center;
+}
+
+.cart-list-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-item-row {
+    display: grid;
+    grid-template-columns: 2fr 120px 88px 100px 40px;
+    gap: 20px;
+    align-items: center;
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.cart-item-product-col {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.cart-item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #f1f2f6;
+    flex-shrink: 0;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cart-item-name {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #2f3640;
+    font-weight: 700;
+}
+
+.cart-item-price-col,
+.cart-item-total-col {
+    font-weight: 700;
+    color: #2f3640;
+}
+
+.cart-item-price-mobile {
+    display: none;
+}
+
+.cart-item-remove-btn {
+    background: none;
+    border: none;
+    color: #dcdde1;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    border-radius: 8px;
+}
+
+.cart-item-remove-btn:hover {
+    color: #e84118;
+    background-color: #fff5f2;
+}
+
+@media (max-width: 768px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+
+    /* Đổi từ dạng bảng sang dạng thẻ (flex) */
+    .cart-item-row {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 16px;
+        position: relative;
+    }
+
+    .cart-item-product-col {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .cart-item-price-mobile {
+        display: block;
+        font-weight: 700;
+        color: #e84118;
+        margin-top: 4px;
+    }
+
+    .cart-item-qty-col {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+    }
+
+    /* Nút xóa bay lên góc phải trên cùng */
+    .cart-item-action-col {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+}

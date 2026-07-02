@@ -1,0 +1,79 @@
+.order-summary-box {
+    background-color: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.summary-box-title {
+    margin: 0 0 20px 0;
+    font-size: 1.15rem;
+    color: #2f3640;
+    font-weight: 700;
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #57606f;
+    font-size: 0.95rem;
+}
+
+.summary-label {
+    color: #7f8fa6;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #2f3640;
+}
+
+/* Format riêng cho dòng hiển thị giảm giá */
+.discount-row .summary-label,
+.discount-row .summary-value {
+    color: #44bd32;
+    font-weight: 700;
+}
+
+.summary-divider {
+    height: 3px;
+    background-color: #edeff4;
+    margin: 4px 0;
+}
+
+.total-row {
+    align-items: flex-end;
+    margin-top: 4px;
+}
+
+.total-row .summary-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2f3640;
+}
+
+.total-amount {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #e84118;
+}
+
+.checkout-btn {
+    width: 100%;
+}
+
+.checkout-btn:disabled {
+    background-color: #dcdde1;
+    color: #7f8fa6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}

@@ -245,7 +245,7 @@ model GoodsBillDetail {
   ingredientSupplierId Int
   dateAndTime          DateTime           @default(now())
   price                Float
-  quantity             Int
+  quantity             Float
   subTotal             Float
 
   goodsBill            GoodsBill          @relation(fields: [goodsBillId], references: [id])

@@ -1,5 +1,5 @@
 import './App.css';
-import HomeView from './views/online order/home/HomeView';
+import CartView from './views/online order/cart/CartView';
 import ProductDetailView from './views/online order/product detail/ProductDetailView';
 
 function App() {
@@ -7,8 +7,8 @@ function App() {
     // <AuthLayout>
     //   <LoginView />
     // </AuthLayout>
-    <ProductDetailView />
-    // <HomeView />
+    <CartView />
+    // <ProductDetailView />
   );
 }
 

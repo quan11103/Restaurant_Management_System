@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import CustomerHeader from '../../../components/CustomerHeader';
 import CustomerFooter from '../../../components/CustomerFooter';
 import QuantitySelector from '../../../components/QuantitySelector';
@@ -71,6 +71,7 @@ const ProductDetailView: React.FC = () => {
                             value={quantity}
                             onChange={setQuantity}
                             max={10}
+                            size='large'
                         />
 
                         <button className="add-to-cart-action-btn" onClick={handleAddToCart} type="button">

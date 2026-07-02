@@ -35,3 +35,44 @@
     min-width: 30px;
     text-align: center;
 }
+
+/* --- Size variants --- */
+
+.size-small {
+    border-radius: 8px;
+}
+
+.size-small .qty-btn {
+    padding: 6px 8px;
+}
+
+.size-small .qty-number {
+    font-size: 0.95rem;
+    min-width: 24px;
+}
+
+.size-medium {
+    border-radius: 10px;
+}
+
+.size-medium .qty-btn {
+    padding: 10px 12px;
+}
+
+.size-medium .qty-number {
+    font-size: 1.05rem;
+    min-width: 30px;
+}
+
+.size-large {
+    border-radius: 12px;
+}
+
+.size-large .qty-btn {
+    padding: 14px 16px;
+}
+
+.size-large .qty-number {
+    font-size: 1.15rem;
+    min-width: 36px;
+}

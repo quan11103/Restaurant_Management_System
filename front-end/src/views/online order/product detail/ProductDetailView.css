@@ -25,7 +25,6 @@
 
 /* --- KHU VỰC ĐẶT HÀNG --- */
 .purchase-action-wrapper {
-    border-top: 3px solid #edeff4;
     padding-top: 30px;
     display: flex;
     gap: 16px;

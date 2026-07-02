@@ -3,3 +3,10 @@ body {
     padding: 0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}

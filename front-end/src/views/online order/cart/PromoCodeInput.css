@@ -1,0 +1,92 @@
+.promo-code-box {
+    background-color: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.promo-box-title {
+    margin: 0 0 16px 0;
+    font-size: 1.15rem;
+    color: #2f3640;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.promo-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.promo-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #edeff4;
+    border-radius: 10px;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    transition: border-color 0.2s;
+}
+
+.promo-input:focus {
+    border-color: #e84118;
+}
+
+.promo-input:disabled {
+    background-color: #f5f6fa;
+    cursor: not-allowed;
+}
+
+.promo-apply-btn {
+    background-color: #2f3640;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    white-space: nowrap;
+}
+
+.promo-apply-btn:hover:not(:disabled) {
+    background-color: #1e272e;
+}
+
+.promo-apply-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.promo-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    animation: slideDown 0.3s ease-out;
+}
+
+.promo-message.error {
+    color: #e84118;
+}
+
+.promo-message.success {
+    color: #44bd32;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
