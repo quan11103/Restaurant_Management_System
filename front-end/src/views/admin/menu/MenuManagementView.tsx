@@ -4,7 +4,7 @@ import DataTable, { type Column } from '../../../components/DataTable';
 import Modal from '../../../components/Modal';
 import { type SelectOption } from '../../../components/SelectBox';
 import Badge from '../../../components/Badge';
-import MenuFilterBar from '../../../components/MenuFilterBar';
+import MenuFilterBar from './MenuFilterBar';
 import MenuForm, { type MenuFormData } from './MenuForm';
 import './MenuManagementView.css';
 

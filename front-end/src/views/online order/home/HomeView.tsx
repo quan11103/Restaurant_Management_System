@@ -27,6 +27,13 @@ const MOCK_BEST_SELLERS = [
     { id: 'f4', name: 'Burger bò phô mai', price: 55000, rating: 4.5, imageUrl: 'https://burgerking.vn/media/catalog/product/cache/1/image/1800x/040ec09b1e35df139433887a97daa66f/e/x/exc_whopper_2.jpg' },
 ];
 
+const MOCK_RECOMMENDED = [
+    { id: 'r1', name: 'Mì cay 7 cấp độ', price: 49000, rating: 4.6, imageUrl: 'https://cdn.tgdd.vn/2021/05/CookProduct/1-1200x676-11.jpg' },
+    { id: 'r2', name: 'Cơm tấm sườn bì chả', price: 50000, rating: 4.8, imageUrl: 'https://cdn.tgdd.vn/2021/03/CookRecipe/Avatar/com-tam-suon-bi-cha-thumbnail.jpg' },
+    { id: 'r3', name: 'Bánh tráng trộn', price: 25000, rating: 4.5, imageUrl: 'https://cdn.tgdd.vn/2020/09/CookProduct/btt-1200x676.jpg' },
+    { id: 'r4', name: 'Sinh tố bơ', price: 35000, rating: 4.9, imageUrl: 'https://cdn.tgdd.vn/2021/01/CookProduct/Sinh-to-bo-1200x676.jpg' },
+];
+
 const HomeView: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
 
@@ -62,6 +69,14 @@ const HomeView: React.FC = () => {
                         />
                     </section>
 
+                    <section className="home-section">
+                        <ProductSection
+                            title="Gợi ý dành riêng cho bạn"
+                            subtitle="Dựa trên sở thích và xu hướng đặt món hiện tại"
+                            products={MOCK_RECOMMENDED}
+                            isLoading={isLoading}
+                        />
+                    </section>
                 </div>
             </main>
 

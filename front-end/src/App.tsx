@@ -1,14 +1,15 @@
 import './App.css';
-import CartView from './views/online order/cart/CartView';
-import ProductDetailView from './views/online order/product detail/ProductDetailView';
+import MenuManagementView from './views/admin/menu/MenuManagementView';
+import AdminLayout from './views/admin/layouts/AdminLayout';
+import HomeView from './views/online order/home/HomeView';
+import DashboardView from './views/admin/dashboard/DashboardView';
 
 function App() {
   return (
-    // <AuthLayout>
-    //   <LoginView />
-    // </AuthLayout>
-    <CartView />
-    // <ProductDetailView />
+    <AdminLayout>
+      <DashboardView />
+    </AdminLayout>
+    // <HomeView />
   );
 }
 

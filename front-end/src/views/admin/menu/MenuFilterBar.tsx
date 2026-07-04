@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import SelectBox, { type SelectOption } from './SelectBox';
+import SelectBox, { type SelectOption } from '../../../components/SelectBox';
 import './MenuFilterBar.css';
 
 interface MenuFilterBarProps {
