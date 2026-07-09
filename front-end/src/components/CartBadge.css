@@ -25,28 +25,6 @@
     display: inline-flex;
 }
 
-.cart-badge-count {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    background-color: #e84118;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 20px;
-    border: 2px solid #ffffff;
-    /* Viền trắng để tách biệt với icon bên dưới */
-    min-width: 18px;
-    text-align: center;
-    line-height: 1.2;
-    pointer-events: none;
-    /* Tránh việc user lỡ click trúng cái badge thì lỗi sự kiện */
-
-    /* Hiệu ứng nổi bật (pop-in) khi badge xuất hiện */
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
 @keyframes popIn {
     0% {
         transform: scale(0);

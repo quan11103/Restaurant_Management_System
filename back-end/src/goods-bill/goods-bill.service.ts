@@ -13,8 +13,6 @@ export class GoodsBillService {
       throw new BadRequestException('Phiếu nhập kho phải có ít nhất một nguyên liệu.');
     }
 
-    // Tính toán tổng tiền và tổng số lượng
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     // Transaction
@@ -53,7 +51,6 @@ export class GoodsBillService {
       const newGoodsBill = await tx.goodsBill.create({
         data: {
           warehouseStaffId: warehouseStaffId,
-          totalQuantity: totalQuantity,
           total: totalAmount,
         },
       });

@@ -1,21 +1,85 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import InputField from '../../../components/InputField';
 import Button from '../../../components/Button';
 import CustomLink from '../../../components/CustomLink';
 import './LoginForm.css';
 
 const LoginForm: React.FC = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const navigate = useNavigate();
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('http://localhost:3000/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+            }
+
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user_name', data.fullName || 'Thành viên');
+            if (data.refresh_token) {
+                localStorage.setItem('refresh_token', data.refresh_token);
+            }
+
+            navigate('/');
+
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <form className="login-form">
+        <form className="login-form" onSubmit={handleLogin}>
+
+            {error && <div style={{ color: 'red', marginBottom: '15px', fontSize: '14px' }}>{error}</div>}
+
             <InputField
                 label="Tên đăng nhập"
                 type="text"
+                value={username}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
             />
 
-            <InputField
-                label="Mật khẩu"
-                type="password"
-            />
+            <div className="password-field-wrapper">
+                <InputField
+                    label="Mật khẩu"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                    className="password-input-field"
+                />
+
+                <button
+                    type="button" // Bắt buộc phải là type="button" để không kích hoạt submit form nhầm
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    title={showPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'}
+                >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+            </div>
 
             <div className="login-actions">
                 <CustomLink href="#" variant="primary" underline="hover">
@@ -23,8 +87,8 @@ const LoginForm: React.FC = () => {
                 </CustomLink>
             </div>
 
-            <Button type="button" fullWidth variant="primary">
-                Đăng nhập
+            <Button type="submit" fullWidth variant="primary" disabled={isLoading}>
+                {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
             </Button>
         </form>
     );

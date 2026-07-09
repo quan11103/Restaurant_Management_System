@@ -15,7 +15,6 @@ const CartBadge: React.FC<CartBadgeProps> = ({
     className = "",
     size = 24
 }) => {
-    const displayCount = itemCount > 99 ? '99+' : itemCount;
 
     return (
         <button
@@ -25,12 +24,6 @@ const CartBadge: React.FC<CartBadgeProps> = ({
         >
             <div className="cart-badge-wrapper">
                 <ShoppingCart size={size} />
-
-                {itemCount > 0 && (
-                    <span className="cart-badge-count">
-                        {displayCount}
-                    </span>
-                )}
             </div>
         </button>
     );
