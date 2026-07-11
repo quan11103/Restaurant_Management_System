@@ -14,7 +14,9 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
     return (
         <div className={`logo-container ${className}`.trim()}>
-            <img src={src} alt={alt} className="logo-img" />
+            <a href="/">
+                <img src={src} alt={alt} className="logo-img" />
+            </a>
         </div>
     );
 };

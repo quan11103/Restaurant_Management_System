@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useAlert } from '../../../components/Alert';
 import DataTable, { type Column } from '../../../components/DataTable';
 import Modal from '../../../components/Modal';
 import { type SelectOption } from '../../../components/SelectBox';
 import Badge from '../../../components/Badge';
 import MenuFilterBar from './MenuFilterBar';
-import MenuForm, { type MenuFormData } from './MenuForm';
+import MenuForm, { type DishImageInput, type MenuFormData } from './MenuForm';
 import './MenuManagementView.css';
 
 interface MenuItem {
@@ -13,50 +14,86 @@ interface MenuItem {
     name: string;
     category: string;
     price: number;
-    status: 'Có thể gọi' | 'Tạm ngừng';
+    isAvailable: 'Có thể gọi' | 'Tạm ngừng';
+    description: string;
+    images: DishImageInput[];
 }
 
-// Danh sách danh mục để dùng cho bộ lọc và form
 const categoryOptions: SelectOption[] = [
     { label: 'Tất cả danh mục', value: 'Tất cả' },
-    { label: 'Cà phê', value: 'Cà phê' },
-    { label: 'Trà trái cây', value: 'Trà trái cây' },
-    { label: 'Bánh ngọt', value: 'Bánh ngọt' },
-];
-
-// Dữ liệu giả lập ban đầu cho thực đơn của L'amande
-const INITIAL_MENU: MenuItem[] = [
-    { id: 'MA001', name: 'Bánh sừng bò (Croissant)', category: 'Bánh ngọt', price: 45000, status: 'Có thể gọi' },
-    { id: 'MA002', name: 'Cà phê Latte đá', category: 'Cà phê', price: 55000, status: 'Có thể gọi' },
-    { id: 'MA003', name: 'Trà đào cam sả', category: 'Trà trái cây', price: 50000, status: 'Có thể gọi' },
-    { id: 'MA004', name: 'Bánh Tiramisu', category: 'Bánh ngọt', price: 65000, status: 'Tạm ngừng' },
-    { id: 'MA005', name: 'Khoai tây chiên sốt phô mai', category: 'Món ăn nhẹ', price: 40000, status: 'Có thể gọi' },
+    { label: 'Đồ ăn nhanh', value: 'Đồ ăn nhanh' },
+    { label: 'Trà sữa', value: 'Trà sữa' },
+    { label: 'Cơm văn phòng', value: 'Cơm văn phòng' },
+    { label: 'Đồ ăn vặt', value: 'Đồ ăn vặt' },
+    { label: 'Món tráng miệng', value: 'Món tráng miệng' },
+    { label: 'Đồ chay', value: 'Đồ chay' },
 ];
 
 const MenuManagementView: React.FC = () => {
-    // Các States quản lý dữ liệu và bộ lọc
-    const [menuItems, setMenuItems] = useState<MenuItem[]>(INITIAL_MENU);
+    const { showAlert } = useAlert();
+
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Tất cả');
-
-    // Các States quản lý Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-
-    // State quản lý toàn bộ dữ liệu Form
     const [formData, setFormData] = useState<MenuFormData>({
         name: '',
         category: 'Cà phê',
         price: '',
-        status: 'Có thể gọi'
+        isAvailable: 'Có thể gọi',
+        description: '',
+        images: [],
     });
 
-    // Logic Tìm kiếm và Lọc dữ liệu
+    const fetchDishes = async () => {
+        setIsLoading(true);
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch('http://localhost:3000/dishes', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                const formattedData: MenuItem[] = data.map((item: any) => ({
+                    id: item.id,
+                    name: item.name,
+                    category: item.type,
+                    price: item.price,
+                    isAvailable: item.isAvailable !== false ? 'Có thể gọi' : 'Tạm ngừng',
+                    description: item.description || '',
+                    images: item.images || []
+                }));
+
+                setMenuItems(formattedData);
+            } else {
+                showAlert('error', 'Không thể tải dữ liệu thực đơn', 'Lỗi');
+            }
+        } catch (error) {
+            console.error('Lỗi khi fetch data:', error);
+            showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDishes();
+    }, []);
+
     const filteredMenuItems = useMemo(() => {
         return menuItems.filter((item) => {
+            const idString = String(item.id || '');
             const matchesSearch =
                 item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.id.toLowerCase().includes(searchTerm.toLowerCase());
+                idString.toLowerCase().includes(searchTerm.toLowerCase());
 
             const matchesCategory =
                 selectedCategory === 'Tất cả' || item.category === selectedCategory;
@@ -65,10 +102,9 @@ const MenuManagementView: React.FC = () => {
         });
     }, [searchTerm, selectedCategory, menuItems]);
 
-    // Xử lý mở đóng Form
     const handleOpenAddModal = () => {
         setEditingItem(null);
-        setFormData({ name: '', category: 'Cà phê', price: '', status: 'Có thể gọi' });
+        setFormData({ name: '', category: 'Đồ ăn nhanh', price: '', isAvailable: 'Có thể gọi', description: '', images: [] });
         setIsModalOpen(true);
     };
 
@@ -78,41 +114,93 @@ const MenuManagementView: React.FC = () => {
             name: item.name,
             category: item.category,
             price: item.price,
-            status: item.status
+            isAvailable: item.isAvailable,
+            description: item.description || '',
+            images: item.images || []
         });
         setIsModalOpen(true);
     };
 
-    const handleSaveItem = () => {
-        if (!formData.name || !formData.price) {
-            alert('Vui lòng nhập đầy đủ tên món và giá bán!');
+    const handleSaveItem = async () => {
+        if (!formData.name.trim() || !formData.price) {
+            alert('Vui lòng nhập tên và giá món ăn!');
             return;
         }
 
-        if (editingItem) {
-            setMenuItems(prev => prev.map(item => item.id === editingItem.id
-                ? { ...item, ...formData, price: Number(formData.price) }
-                : item
-            ));
-        } else {
-            const newId = `MA${String(menuItems.length + 1).padStart(3, '0')}`;
-            const newItem: MenuItem = {
-                id: newId,
-                ...formData,
-                price: Number(formData.price)
-            };
-            setMenuItems(prev => [newItem, ...prev]);
+        const payload = {
+            name: formData.name,
+            type: formData.category,
+            price: Number(formData.price),
+            description: formData.description,
+            images: formData.images,
+            isAvailable: formData.isAvailable === 'Có thể gọi',
+        };
+
+        const isEditMode = !!editingItem;
+        const url = isEditMode
+            ? `http://localhost:3000/dishes/${editingItem.id}`
+            : 'http://localhost:3000/dishes';
+        const method = isEditMode ? 'PATCH' : 'POST';
+
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                showAlert(
+                    'success',
+                    isEditMode ? 'Cập nhật thông tin món ăn thành công!' : 'Đã thêm món ăn mới vào thực đơn',
+                    'Thành công'
+                );
+                setIsModalOpen(false);
+                fetchDishes();
+            } else {
+                const errorData = await response.json();
+                showAlert(
+                    'error',
+                    errorData.message || (isEditMode ? 'Không thể cập nhật món ăn' : 'Không thể tạo món ăn'),
+                    'Lỗi hệ thống'
+                );
+            }
+        } catch (error) {
+            console.error('Lỗi khi gọi API:', error);
+            showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
         }
-        setIsModalOpen(false);
     };
 
-    const handleDeleteItem = (id: string) => {
+    const handleDeleteItem = async (id: string) => {
         if (window.confirm(`Bạn có chắc chắn muốn xóa món có mã ${id}?`)) {
-            setMenuItems(prev => prev.filter(item => item.id !== id));
+            try {
+                const token = localStorage.getItem('access_token');
+
+                const response = await fetch(`http://localhost:3000/dishes/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    showAlert('success', 'Đã xóa món ăn khỏi thực đơn!', 'Thành công');
+                    fetchDishes();
+                } else {
+                    const errorData = await response.json();
+                    showAlert('error', errorData.message || 'Không thể xóa món ăn này', 'Lỗi hệ thống');
+                }
+            } catch (error) {
+                console.error('Lỗi khi gọi API xóa:', error);
+                showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
+            }
         }
     };
 
-    // Cấu hình các cột cho DataTable
     const columns: Column<MenuItem>[] = [
         { key: 'id', title: 'Mã món' },
         { key: 'name', title: 'Tên món ăn / đồ uống' },
@@ -123,13 +211,11 @@ const MenuManagementView: React.FC = () => {
             render: (item) => <strong className="price-text">{item.price.toLocaleString('vi-VN')} đ</strong>
         },
         {
-            key: 'status',
+            key: 'isAvailable',
             title: 'Trạng thái',
             render: (item) => (
-                <Badge
-                    variant={item.status === 'Có thể gọi' ? 'success' : 'danger'}
-                >
-                    {item.status}
+                <Badge variant={item.isAvailable === 'Có thể gọi' ? 'success' : 'danger'}>
+                    {item.isAvailable}
                 </Badge>
             )
         },
@@ -151,8 +237,6 @@ const MenuManagementView: React.FC = () => {
 
     return (
         <div className="menu-management-view">
-
-            {/* Tiêu đề góc trên */}
             <div className="view-header">
                 <div>
                     <h1 className="view-title">Quản Lý Thực Đơn</h1>
@@ -163,7 +247,6 @@ const MenuManagementView: React.FC = () => {
                 </button>
             </div>
 
-            {/* Thanh công cụ: tìm kiếm & bộ lọc */}
             <MenuFilterBar
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
@@ -172,12 +255,14 @@ const MenuManagementView: React.FC = () => {
                 categoryOptions={categoryOptions}
             />
 
-            {/* Bảng dữ liệu chính */}
             <div className="view-content">
-                <DataTable columns={columns} data={filteredMenuItems} emptyMessage="Không tìm thấy món ăn nào khớp với bộ lọc" />
+                <DataTable
+                    columns={columns}
+                    data={filteredMenuItems}
+                    emptyMessage={isLoading ? "Đang tải dữ liệu..." : "Không tìm thấy món ăn nào khớp với bộ lọc"}
+                />
             </div>
 
-            {/* Modal */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -196,7 +281,6 @@ const MenuManagementView: React.FC = () => {
                     categoryOptions={categoryOptions}
                 />
             </Modal>
-
         </div>
     );
 };

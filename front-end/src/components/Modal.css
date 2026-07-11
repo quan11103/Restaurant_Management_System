@@ -40,22 +40,6 @@
     color: #333;
 }
 
-.modal-close-btn {
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-
-.modal-close-btn:hover {
-    background-color: #f0f0f0;
-    color: #dc3545;
-}
-
 .modal-body {
     padding: 24px;
     overflow-y: auto;

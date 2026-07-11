@@ -1,0 +1,121 @@
+.alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    min-width: 300px;
+    max-width: 400px;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+    border-left: 5px solid;
+}
+
+.alert-success {
+    border-left-color: #28a745;
+}
+
+.alert-error {
+    border-left-color: #dc3545;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+}
+
+.alert-info {
+    border-left-color: #17a2b8;
+}
+
+.alert-icon {
+    font-size: 20px;
+    margin-right: 12px;
+}
+
+.alert-success .alert-icon {
+    color: #28a745;
+}
+
+.alert-error .alert-icon {
+    color: #dc3545;
+}
+
+.alert-warning .alert-icon {
+    color: #ffc107;
+}
+
+.alert-info .alert-icon {
+    color: #17a2b8;
+}
+
+.alert-content {
+    flex-grow: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.alert-message {
+    font-size: 13px;
+    color: #555;
+    margin: 0;
+}
+
+.alert-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.alert-close-btn:hover {
+    color: #333;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Class này sẽ được thêm vào bằng JavaScript trước khi thẻ bị xóa */
+.alert-item.closing {
+    animation: slideOutRight 0.3s ease-in forwards;
+}

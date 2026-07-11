@@ -36,12 +36,13 @@ const LoginForm: React.FC = () => {
             }
 
             localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('user_name', data.fullName || 'Thành viên');
+            localStorage.setItem('user_name', data.fullName || 'quý khách');
+            localStorage.setItem('user_role', data.role || 'CLIENT');
             if (data.refresh_token) {
                 localStorage.setItem('refresh_token', data.refresh_token);
             }
 
-            navigate('/');
+            navigate(data.role === 'MANAGER' ? '/manager/dashboard' : '/');
 
         } catch (err: any) {
             setError(err.message);

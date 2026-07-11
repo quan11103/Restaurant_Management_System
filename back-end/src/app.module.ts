@@ -11,9 +11,10 @@ import { OrderModule } from './order/order.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { IngredientSupplierModule } from './ingredient-supplier/ingredient-supplier.module';
 import { GoodsBillModule } from './goods-bill/goods-bill.module';
+import { DishImageModule } from './dish-image/dish-image.module';
 
 @Module({
-    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule],
+    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule],
     controllers: [],
     providers: [PrismaService],
 })

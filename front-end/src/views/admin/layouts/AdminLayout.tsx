@@ -1,13 +1,23 @@
-import React, { type ReactNode } from 'react';
-import { LayoutDashboard, Layers, Utensils, Archive, Users, Smile, Settings } from 'lucide-react';
+import React from 'react';
+import { NavLink, useLocation, Outlet } from 'react-router-dom';
+import { LayoutDashboard, Layers, Utensils, Archive, Users, Smile } from 'lucide-react';
 import Logo from '../../../components/Logo';
 import './AdminLayout.css';
 
-interface AdminLayoutProps {
-    children: ReactNode;
-}
+const MENU_ITEMS = [
+    { path: '/manager/dashboard', name: 'Dashboard', icon: LayoutDashboard },
+    { path: '/manager/orders', name: 'Đơn hàng & Bàn', icon: Layers },
+    { path: '/manager/menu', name: 'Thực đơn', icon: Utensils },
+    { path: '/manager/inventory', name: 'Kho & Vật tư', icon: Archive },
+    { path: '/manager/staff', name: 'Nhân sự', icon: Users },
+    { path: '/manager/customers', name: 'Khách hàng', icon: Smile },
+];
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC = () => {
+    const location = useLocation();
+    const currentMenuItem = MENU_ITEMS.find(item => location.pathname.includes(item.path));
+    const pageTitle = currentMenuItem ? currentMenuItem.name : 'Tổng quan';
+
     return (
         <div className="admin-layout">
 
@@ -16,38 +26,26 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <Logo />
                 <nav className="sidebar-nav">
                     <ul>
-                        <li className="active">
-                            <a href="#"><LayoutDashboard className="sidebar-icon" /><span>Dashboard</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><Layers className="sidebar-icon" /><span>Đơn hàng & Bàn</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><Utensils className="sidebar-icon" /><span>Thực đơn</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><Archive className="sidebar-icon" /><span>Kho & Vật tư</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><Users className="sidebar-icon" /><span>Nhân sự</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><Smile className="sidebar-icon" /><span>Khách hàng</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><Settings className="sidebar-icon" /><span>Cài đặt</span></a>
-                        </li>
+                        {MENU_ITEMS.map((item) => {
+                            const Icon = item.icon;
+                            return (
+                                <li key={item.path}>
+                                    <NavLink to={item.path} className={({ isActive }) => isActive ? "active-link" : ""}>
+                                        <Icon className="sidebar-icon" />
+                                        <span>{item.name}</span>
+                                    </NavLink>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </nav>
             </aside>
 
             {/* Cột phải: Header và nội dung */}
             <main className="admin-main">
-
-                {/* Thanh Header */}
                 <header className="admin-header">
                     <div className="header-left">
-                        <span className="page-title">Tổng quan (Dashboard)</span>
+                        <span className="page-title">{pageTitle}</span>
                     </div>
                     <div className="header-right">
                         <span className="user-profile">Xin chào quản trị viên</span>
@@ -56,9 +54,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
                 {/* Khu vực hiển thị View */}
                 <div className="admin-content">
-                    {children}
+                    {/* 3. Thay {children} bằng <Outlet /> */}
+                    <Outlet />
                 </div>
-
             </main>
 
         </div>

@@ -3,7 +3,6 @@ import DataTable, { type Column } from '../../../components/DataTable';
 import { TrendingUp, Users, ShoppingBag } from 'lucide-react';
 import './DashboardView.css';
 
-// 1. Khai báo kiểu dữ liệu
 interface ProductStat {
     id: string;
     name: string;
@@ -16,7 +15,6 @@ interface RankedProductStat extends ProductStat {
     rank: number;
 }
 
-// 2. Dữ liệu giả (Mock Data)
 const MOCK_DATA: ProductStat[] = [
     { id: 'p1', name: 'Gà rán giòn cay', imageUrl: 'https://via.placeholder.com/40', soldCount: 150, revenue: 6750000 },
     { id: 'p2', name: 'Burger bò phô mai', imageUrl: 'https://via.placeholder.com/40', soldCount: 85, revenue: 4675000 },
@@ -40,7 +38,6 @@ const DashboardView: React.FC = () => {
         setProducts(sortedData);
     }, []);
 
-    // Hàm tiện ích format tiền tệ VNĐ
     const formatCurrency = (amount: number) => {
         return amount.toLocaleString('vi-VN') + ' đ';
     };

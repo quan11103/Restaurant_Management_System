@@ -43,7 +43,7 @@ export class AuthService {
 
         // Tạo cả cặp Access Token (ngắn hạn) và Refresh Token (dài hạn)
         return {
-            access_token: await this.jwtService.signAsync(payload, { expiresIn: '15m' }),
+            access_token: await this.jwtService.signAsync(payload, { expiresIn: '1d' }),
             refresh_token: await this.jwtService.signAsync(payload, { expiresIn: '7d' }),
             username: user.username,
             fullName: user.fullName,

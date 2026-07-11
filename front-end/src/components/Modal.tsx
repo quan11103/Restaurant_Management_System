@@ -1,5 +1,4 @@
 import React, { type ReactNode, useEffect, useState } from 'react';
-import { X } from 'lucide-react';
 import './Modal.css';
 
 interface ModalProps {
@@ -62,9 +61,7 @@ const Modal: React.FC<ModalProps> = ({
 
                 <div className="modal-header">
                     <h3 className="modal-title">{title}</h3>
-                    <button className="modal-close-btn" onClick={onClose}>
-                        <X size={20} />
-                    </button>
+
                 </div>
 
                 <div className="modal-body">
