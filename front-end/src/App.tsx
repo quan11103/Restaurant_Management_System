@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AlertProvider } from './components/Alert';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 import AuthLayout from './views/auth/layouts/AuthLayout';
@@ -7,7 +8,7 @@ import HomeView from './views/online order/home/HomeView';
 import AdminLayout from './views/admin/layouts/AdminLayout';
 import DashboardView from './views/admin/dashboard/DashboardView';
 import MenuManagementView from './views/admin/menu/MenuManagementView';
-import { AlertProvider } from './components/Alert';
+import ProductDetailView from './views/online order/product detail/ProductDetailView';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardView />} />
             <Route path="menu" element={<MenuManagementView />} />
+            <Route path="product" element={<ProductDetailView />} />
           </Route>
 
           {/* Route 404 (Bắt mọi URL nhập sai) */}

@@ -23,7 +23,9 @@ const AdminLayout: React.FC = () => {
 
             {/* Cột trái: Sidebar*/}
             <aside className="admin-sidebar">
-                <Logo />
+                <a href="/">
+                    <Logo />
+                </a>
                 <nav className="sidebar-nav">
                     <ul>
                         {MENU_ITEMS.map((item) => {

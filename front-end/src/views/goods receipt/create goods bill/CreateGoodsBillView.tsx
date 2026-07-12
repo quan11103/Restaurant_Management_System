@@ -31,7 +31,6 @@ const MOCK_INGREDIENTS: Ingredient[] = [
 ];
 
 const CreateGoodsBillView: React.FC = () => {
-    // --- STATE ---
     const [targetSupplier, setTargetSupplier] = useState<Supplier | null>(null);
     const [billItems, setBillItems] = useState<BillItem[]>([]);
 

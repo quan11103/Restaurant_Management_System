@@ -42,17 +42,9 @@ export class DishService {
     });
   }
 
-  async findAll(type?: string) {
-    const whereCondition: any = { restaurantId: 1 };
-
-    if (type) {
-      whereCondition.type = type; // Lọc theo loại món: Đồ ăn, đồ uống...
-    }
-
+  async findAll() {
     return this.prisma.dish.findMany({
-      where: whereCondition,
-      include: { images: true },
-      orderBy: { name: 'asc' },
+      include: { images: true }
     });
   }
 
@@ -113,6 +105,9 @@ export class DishService {
           mode: 'insensitive',
         },
       },
+      include: {
+        images: true
+      }
     });
   }
 }

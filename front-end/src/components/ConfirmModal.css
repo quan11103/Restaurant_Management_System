@@ -1,4 +1,3 @@
-/* Lớp nền mờ phủ toàn màn hình */
 .cm-overlay {
     position: fixed;
     top: 0;
@@ -6,7 +5,6 @@
     right: 0;
     bottom: 0;
     background-color: rgba(44, 62, 80, 0.6);
-    /* Màu nền tối nhẹ mượt mà */
     backdrop-filter: blur(4px);
     /* Làm mờ hậu cảnh phía sau */
     display: flex;
@@ -17,7 +15,10 @@
     animation: fadeIn 0.2s ease-out;
 }
 
-/* Hộp thoại chính */
+.cm-overlay.cm-closing {
+    animation: fadeOut 0.2s ease-in forwards;
+}
+
 .cm-box {
     background: white;
     border-radius: 12px;
@@ -28,13 +29,16 @@
     animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Header */
+.cm-box.cm-closing {
+    animation: scaleDown 0.2s cubic-bezier(0.36, 0, 0.66, -0.56);
+}
+
 .cm-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #f1f2f6;
+    border-bottom: 3px solid #f1f2f6;
 }
 
 .cm-header h4 {
@@ -60,7 +64,6 @@
     color: #2c3e50;
 }
 
-/* Body */
 .cm-body {
     display: flex;
     gap: 16px;
@@ -82,14 +85,12 @@
     margin: 0;
 }
 
-/* Footer & Buttons */
 .cm-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
     padding: 16px 20px;
     background-color: #f8f9fa;
-    border-top: 1px solid #f1f2f6;
 }
 
 .cm-btn {
@@ -113,7 +114,6 @@
     color: #2c3e50;
 }
 
-/* Định nghĩa màu sắc theo ngữ cảnh (Type-driven classes) */
 .text-danger {
     color: #e84118;
 }
@@ -153,7 +153,6 @@
     background: #2980b9;
 }
 
-/* Animation Effects */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -164,14 +163,36 @@
     }
 }
 
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
 @keyframes scaleUp {
     from {
-        transform: scale(0.95);
+        transform: scale(0.8);
         opacity: 0;
     }
 
     to {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+@keyframes scaleDown {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(0.8);
+        opacity: 0;
     }
 }

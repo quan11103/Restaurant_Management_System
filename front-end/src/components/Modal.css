@@ -23,7 +23,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    animation: slideUp 0.3s ease-out;
+    animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .modal-header {
@@ -55,17 +55,14 @@
     border-radius: 0 0 8px 8px;
 }
 
-/* Lớp nền tối: mờ dần khi đóng */
 .modal-overlay.closing {
     animation: fadeOut 0.3s ease-in-out forwards;
 }
 
-/* Khung nội dung: trượt xuống và mờ dần khi đóng */
 .modal-container.closing {
-    animation: slideDown 0.3s ease-in-out forwards;
+    animation: scaleDown 0.2s cubic-bezier(0.36, 0, 0.66, -0.56);
 }
 
-/* Hiệu ứng chuyển động */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -86,26 +83,26 @@
     }
 }
 
-@keyframes slideUp {
+@keyframes scaleUp {
     from {
+        transform: scale(0.8);
         opacity: 0;
-        transform: translateY(20px);
     }
 
     to {
+        transform: scale(1);
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
-@keyframes slideDown {
+@keyframes scaleDown {
     from {
+        transform: scale(1);
         opacity: 1;
-        transform: translateY(0);
     }
 
     to {
+        transform: scale(0.8);
         opacity: 0;
-        transform: translateY(20px);
     }
 }

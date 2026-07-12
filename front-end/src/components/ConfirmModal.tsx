@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, AlertTriangle, Info, HelpCircle } from 'lucide-react';
 import './ConfirmModal.css';
 
@@ -23,10 +23,31 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     onConfirm,
     onCancel
 }) => {
+    // Quản lý việc thực tế có render HTML ra DOM hay không
+    const [shouldRender, setShouldRender] = useState(isOpen);
+    // Quản lý việc thêm class hiệu ứng đóng
+    const [isClosing, setIsClosing] = useState(false);
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        if (isOpen) {
+            setShouldRender(true);
+            setIsClosing(false);
+        } else if (shouldRender) {
+            // Khi isOpen chuyển từ true -> false, kích hoạt trạng thái đóng trước
+            setIsClosing(true);
 
-    // Hàm render icon phù hợp với loại modal
+            // Chờ hiệu ứng CSS chạy xong (200ms) mới chính thức gỡ khỏi DOM
+            const timer = setTimeout(() => {
+                setShouldRender(false);
+            }, 200);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, shouldRender]);
+
+    // Nếu không cần render thì trả về null
+    if (!shouldRender) return null;
+
     const renderIcon = () => {
         switch (type) {
             case 'danger':
@@ -39,19 +60,15 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     };
 
     return (
-        <div className="cm-overlay" onClick={onCancel}>
+        /* Thêm class cm-closing khi đang trong trạng thái đóng */
+        <div className={`cm-overlay ${isClosing ? 'cm-closing' : ''}`} onClick={onCancel}>
             {/* Dừng nổi bọt sự kiện để click vào trong modal không bị đóng */}
-            <div className={`cm-box cm-type-${type}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`cm-box cm-type-${type} ${isClosing ? 'cm-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
 
-                {/* Header */}
                 <div className="cm-header">
                     <h4>{title}</h4>
-                    <button className="cm-btn-close" onClick={onCancel}>
-                        <X size={18} />
-                    </button>
                 </div>
 
-                {/* Body */}
                 <div className="cm-body">
                     {renderIcon()}
                     <div className="cm-message">
@@ -59,7 +76,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                     </div>
                 </div>
 
-                {/* Footer Actions */}
                 <div className="cm-footer">
                     <button className="cm-btn cm-btn-cancel" onClick={onCancel}>
                         {cancelLabel}

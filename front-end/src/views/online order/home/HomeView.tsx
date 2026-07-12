@@ -12,37 +12,77 @@ const MOCK_BANNERS = [
 ];
 
 const MOCK_CATEGORIES = [
-    { id: 'c1', name: 'Đồ ăn nhanh', imageUrl: 'https://www.cet.edu.vn/wp-content/uploads/2019/04/fastfood-la-gi.jpg', link: '/menu?category=fastfood' },
-    { id: 'c2', name: 'Trà sữa', imageUrl: 'https://congthucphache.com/wp-content/uploads/2023/09/Tra-sua-truyen-thong.png', link: '/menu?category=milktea' },
-    { id: 'c3', name: 'Cơm văn phòng', imageUrl: 'https://in.pito.vn/wp-content/uploads/2023/03/Thuc-don-com-van-phong-mon-chay-rau-cu-kho-PITO-Cloud-Canteen.webp', link: '/menu?category=rice' },
-    { id: 'c4', name: 'Đồ ăn vặt', imageUrl: 'https://nbtlogistics.vn/public/upload/do-an-vat-noi-dia-trung-quoc-4.jpg?1730189261532', link: '/menu?category=snack' },
-    { id: 'c5', name: 'Món tráng miệng', imageUrl: 'https://riversidepalace.vn/newsmultidata/1-873.jpg', link: '/menu?category=cake' },
-    { id: 'c6', name: 'Đồ chay', imageUrl: 'https://kingfoodmart.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fsc_pcm_product%2Fprod%2F2024%2F6%2F21%2F413919-8.6_o_chay_cac_loai.png&w=256&q=75', link: '/menu?category=vegan' },
+    { id: 'c1', name: 'Món chính', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJea-m_K3FixBJ-TbZxkJgfQ2EgqYUNgWy2LmGgOSGITzpuhUUYCVZ4vQ&s=10', link: '/menu?category=fastfood' },
+    { id: 'c2', name: 'Pizza', imageUrl: 'https://pizzahut.vn/_next/image?url=https%3A%2F%2Fcdn.pizzahut.vn%2Fimages%2FWeb_V3%2FProducts_MenuTool%2FPesto%20H%E1%BA%A3i%20S%E1%BA%A3n._20250317172201GL5.webp&w=1170&q=75', link: '/menu?category=milktea' },
+    { id: 'c3', name: 'Gà rán', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJSH1oVFCBjq13mIjK_Kgy0ixI7bcU-XnPXTCz2hoQFuMgYx2Kbi_K1L9-&s=10', link: '/menu?category=rice' },
+    { id: 'c4', name: 'Đồ uống', imageUrl: 'https://congthucphache.com/wp-content/uploads/2023/09/Tra-sua-truyen-thong.png', link: '/menu?category=snack' },
+    { id: 'c5', name: 'Cà phê', imageUrl: 'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2026/6/7/bi-quyet-pha-ca-phe-ngon-10-ly-nhu-scaled-1780833704154867879700.jpg', link: '/menu?category=cake' },
+    { id: 'c6', name: 'Tráng miệng', imageUrl: 'https://riversidepalace.vn/newsmultidata/1-873.jpg', link: '/menu?category=vegan' },
 ];
 
-const MOCK_BEST_SELLERS = [
-    { id: 'f1', name: 'Gà rán giòn cay', price: 45000, rating: 4.8, imageUrl: 'https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/kien-thuc/cach-lam-ga-ran-sot-cay-han-quoc/cach-lam-ga-ran-sot-cay-han-quoc-5.jpg' },
-    { id: 'f2', name: 'Trà sữa trân châu đường đen', price: 35000, rating: 4.9, imageUrl: 'https://mixuediemdien.com/wp-content/uploads/2024/03/Sua-tuoi-tran-chau-duong-den-600x600.jpg' },
-    { id: 'f3', name: 'Pizza hải sản (Size M)', price: 129000, rating: 4.7, imageUrl: 'https://cdn.tgdd.vn/2020/09/CookProduct/1200bzhspm-1200x676.jpg' },
-    { id: 'f4', name: 'Burger bò phô mai', price: 55000, rating: 4.5, imageUrl: 'https://burgerking.vn/media/catalog/product/cache/1/image/1800x/040ec09b1e35df139433887a97daa66f/e/x/exc_whopper_2.jpg' },
-];
-
-const MOCK_RECOMMENDED = [
-    { id: 'r1', name: 'Mì cay 7 cấp độ', price: 49000, rating: 4.6, imageUrl: 'https://cdn.tgdd.vn/2021/05/CookProduct/1-1200x676-11.jpg' },
-    { id: 'r2', name: 'Cơm tấm sườn bì chả', price: 50000, rating: 4.8, imageUrl: 'https://cdn.tgdd.vn/2021/03/CookRecipe/Avatar/com-tam-suon-bi-cha-thumbnail.jpg' },
-    { id: 'r3', name: 'Bánh tráng trộn', price: 25000, rating: 4.5, imageUrl: 'https://cdn.tgdd.vn/2020/09/CookProduct/btt-1200x676.jpg' },
-    { id: 'r4', name: 'Sinh tố bơ', price: 35000, rating: 4.9, imageUrl: 'https://cdn.tgdd.vn/2021/01/CookProduct/Sinh-to-bo-1200x676.jpg' },
-];
+interface HomeProduct {
+    id: string;
+    name: string;
+    price: number;
+    rating: number;
+    imageUrl: string;
+}
 
 const HomeView: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
+    const [bestSellers, setBestSellers] = useState<HomeProduct[]>([]);
+    const [recommended, setRecommended] = useState<HomeProduct[]>([]);
 
     useEffect(() => {
-        // Giả lập độ trễ gọi API từ backend (Ví dụ: fetch danh sách món)
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const fetchRandomDishes = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch('http://localhost:3000/dishes', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    const formattedData: HomeProduct[] = data
+                        .filter((item: any) => item.isAvailable !== false)
+                        .map((item: any) => {
+                            const mainImage = item.images?.find((img: any) => img.isMain === true);
+
+                            let finalImageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+                            if (mainImage) {
+                                finalImageUrl = mainImage.imageUrl;
+                            } else if (item.images && item.images.length > 0) {
+                                finalImageUrl = item.images[0].imageUrl;
+                            }
+
+                            return {
+                                id: item.id,
+                                name: item.name,
+                                price: item.price,
+                                rating: item.rating || Number((Math.random() * (5 - 4) + 4).toFixed(1)),
+                                imageUrl: finalImageUrl
+                            };
+                        });
+
+                    // Thuật toán xáo trộn mảng ngẫu nhiên (Fisher-Yates Shuffle)
+                    for (let i = formattedData.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [formattedData[i], formattedData[j]] = [formattedData[j], formattedData[i]];
+                    }
+
+                    setBestSellers(formattedData.slice(0, 4));
+                    setRecommended(formattedData.slice(4, 8));
+                }
+            } catch (error) {
+                console.error('Lỗi khi fetch data món ăn trang chủ:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchRandomDishes();
     }, []);
 
     return (
@@ -51,7 +91,6 @@ const HomeView: React.FC = () => {
 
             <main className="home-main-content">
                 <div className="container">
-
                     <section className="home-section">
                         <PromoBannerSlider banners={MOCK_BANNERS} isLoading={isLoading} />
                     </section>
@@ -64,7 +103,7 @@ const HomeView: React.FC = () => {
                         <ProductSection
                             title="Món ngon bán chạy"
                             subtitle="Khám phá các món ăn được yêu thích nhất tuần qua"
-                            products={MOCK_BEST_SELLERS}
+                            products={bestSellers}
                             isLoading={isLoading}
                         />
                     </section>
@@ -73,7 +112,7 @@ const HomeView: React.FC = () => {
                         <ProductSection
                             title="Gợi ý dành riêng cho bạn"
                             subtitle="Dựa trên sở thích và xu hướng đặt món hiện tại"
-                            products={MOCK_RECOMMENDED}
+                            products={recommended}
                             isLoading={isLoading}
                         />
                     </section>

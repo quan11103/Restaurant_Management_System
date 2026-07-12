@@ -17,11 +17,9 @@ export class DishController {
     return this.dishService.create(createDishDto);
   }
 
-  // Khách và nhân viên xem được Menu
   @Get()
-  @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER, Role.CLIENT)
-  findAll(@Query('type') type?: string) { // Lọc theo loại
-    return this.dishService.findAll(type);
+  findAll() {
+    return this.dishService.findAll();
   }
 
   @Get(':id')

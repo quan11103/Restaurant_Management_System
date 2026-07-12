@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useAlert } from '../../../components/Alert';
+import { type SelectOption } from '../../../components/SelectBox';
 import DataTable, { type Column } from '../../../components/DataTable';
 import Modal from '../../../components/Modal';
-import { type SelectOption } from '../../../components/SelectBox';
 import Badge from '../../../components/Badge';
+import ConfirmModal from '../../../components/ConfirmModal';
 import MenuFilterBar from './MenuFilterBar';
 import MenuForm, { type DishImageInput, type MenuFormData } from './MenuForm';
 import './MenuManagementView.css';
@@ -21,12 +22,18 @@ interface MenuItem {
 
 const categoryOptions: SelectOption[] = [
     { label: 'Tất cả danh mục', value: 'Tất cả' },
-    { label: 'Đồ ăn nhanh', value: 'Đồ ăn nhanh' },
-    { label: 'Trà sữa', value: 'Trà sữa' },
-    { label: 'Cơm văn phòng', value: 'Cơm văn phòng' },
-    { label: 'Đồ ăn vặt', value: 'Đồ ăn vặt' },
-    { label: 'Món tráng miệng', value: 'Món tráng miệng' },
-    { label: 'Đồ chay', value: 'Đồ chay' },
+    { label: 'Món chính', value: 'Món chính' },
+    { label: 'Pizza', value: 'Pizza' },
+    { label: 'Burger', value: 'Burger' },
+    { label: 'Gà rán', value: 'Gà rán' },
+    { label: 'Ăn kèm', value: 'Ăn kèm' },
+    { label: 'Salad', value: 'Salad' },
+    { label: 'Khai vị', value: 'Khai vị' },
+    { label: 'Đồ uống', value: 'Đồ uống' },
+    { label: 'Cà phê', value: 'Cà phê' },
+    { label: 'Nước ép', value: 'Nước ép' },
+    { label: 'Sinh tố', value: 'Sinh tố' },
+    { label: 'Tráng miệng', value: 'Tráng miệng' },
 ];
 
 const MenuManagementView: React.FC = () => {
@@ -37,10 +44,12 @@ const MenuManagementView: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Tất cả');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+    const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
     const [formData, setFormData] = useState<MenuFormData>({
         name: '',
-        category: 'Cà phê',
+        category: 'Món chính',
         price: '',
         isAvailable: 'Có thể gọi',
         description: '',
@@ -121,6 +130,11 @@ const MenuManagementView: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    const handleOpenDeleteModal = (id: string) => {
+        setDeleteItemId(id);
+        setIsDeleteModalOpen(true);
+    };
+
     const handleSaveItem = async () => {
         if (!formData.name.trim() || !formData.price) {
             alert('Vui lòng nhập tên và giá món ăn!');
@@ -160,6 +174,7 @@ const MenuManagementView: React.FC = () => {
                     'Thành công'
                 );
                 setIsModalOpen(false);
+                setEditingItem(null);
                 fetchDishes();
             } else {
                 const errorData = await response.json();
@@ -176,28 +191,30 @@ const MenuManagementView: React.FC = () => {
     };
 
     const handleDeleteItem = async (id: string) => {
-        if (window.confirm(`Bạn có chắc chắn muốn xóa món có mã ${id}?`)) {
-            try {
-                const token = localStorage.getItem('access_token');
+        if (!id) {
+            showAlert('error', 'Không tìm thấy ID món ăn để tiến hành xóa!', 'Lỗi dữ liệu');
+            return;
+        }
 
-                const response = await fetch(`http://localhost:3000/dishes/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    showAlert('success', 'Đã xóa món ăn khỏi thực đơn!', 'Thành công');
-                    fetchDishes();
-                } else {
-                    const errorData = await response.json();
-                    showAlert('error', errorData.message || 'Không thể xóa món ăn này', 'Lỗi hệ thống');
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(`http://localhost:3000/dishes/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            } catch (error) {
-                console.error('Lỗi khi gọi API xóa:', error);
-                showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
+            });
+
+            if (response.ok) {
+                showAlert('success', 'Đã xóa món ăn khỏi thực đơn!', 'Thành công');
+                fetchDishes();
+            } else {
+                const errorData = await response.json();
+                showAlert('error', errorData.message || 'Không thể xóa món ăn này', 'Lỗi hệ thống');
             }
+        } catch (error) {
+            console.error('Lỗi khi gọi API xóa:', error);
+            showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
         }
     };
 
@@ -227,7 +244,7 @@ const MenuManagementView: React.FC = () => {
                     <button className="btn-action edit" onClick={() => handleOpenEditModal(item)} title="Sửa">
                         <Edit size={16} />
                     </button>
-                    <button className="btn-action delete" onClick={() => handleDeleteItem(item.id)} title="Xóa">
+                    <button className="btn-action delete" onClick={() => handleOpenDeleteModal(item.id)} title="Xóa">
                         <Trash2 size={16} />
                     </button>
                 </div>
@@ -265,11 +282,14 @@ const MenuManagementView: React.FC = () => {
 
             <Modal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setEditingItem(null);
+                }}
                 title={editingItem ? 'Cập Nhật Món Ăn' : 'Thêm Món Ăn Mới'}
                 footer={
                     <>
-                        <button className="btn-form-cancel" onClick={() => setIsModalOpen(false)}>Hủy bỏ</button>
+                        <button className="btn-form-cancel" onClick={() => { setIsModalOpen(false); setEditingItem(null); }}>Hủy bỏ</button>
                         <button className="btn-form-submit" onClick={handleSaveItem}>Lưu thông tin</button>
                     </>
                 }
@@ -281,6 +301,24 @@ const MenuManagementView: React.FC = () => {
                     categoryOptions={categoryOptions}
                 />
             </Modal>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title="Xác nhận xóa món ăn"
+                message={`Bạn có chắc chắn muốn xóa món này?`}
+                confirmLabel="Xác nhận xóa"
+                cancelLabel="Hủy bỏ"
+                onConfirm={async () => {
+                    const idToDelete = deleteItemId || '';
+                    setIsDeleteModalOpen(false);
+                    await handleDeleteItem(idToDelete);
+                    setDeleteItemId(null);
+                }}
+                onCancel={() => {
+                    setIsDeleteModalOpen(false);
+                    setDeleteItemId(null);
+                }}
+            />
         </div>
     );
 };
