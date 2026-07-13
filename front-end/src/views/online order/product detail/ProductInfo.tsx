@@ -33,7 +33,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
 
             <div className="price-display-box">
                 <span className="current-price">{price.toLocaleString('vi-VN')} đ</span>
-                <span className="price-note">/ Phần ăn</span>
+                <span className="price-note">/ suất</span>
             </div>
 
             <p className="short-desc-text">{description}</p>

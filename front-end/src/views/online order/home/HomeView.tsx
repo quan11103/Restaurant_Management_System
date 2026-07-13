@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import CustomerHeader from '../../../components/CustomerHeader';
-import CustomerFooter from '../../../components/CustomerFooter';
+import axiosClient from '../../../api/axios'
 import PromoBannerSlider from './PromoBannerSlider';
 import CategoryGrid from './CategoryGrid';
 import ProductSection from './ProductSection';
@@ -15,7 +14,7 @@ const MOCK_CATEGORIES = [
     { id: 'c1', name: 'Món chính', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJea-m_K3FixBJ-TbZxkJgfQ2EgqYUNgWy2LmGgOSGITzpuhUUYCVZ4vQ&s=10', link: '/menu?category=fastfood' },
     { id: 'c2', name: 'Pizza', imageUrl: 'https://pizzahut.vn/_next/image?url=https%3A%2F%2Fcdn.pizzahut.vn%2Fimages%2FWeb_V3%2FProducts_MenuTool%2FPesto%20H%E1%BA%A3i%20S%E1%BA%A3n._20250317172201GL5.webp&w=1170&q=75', link: '/menu?category=milktea' },
     { id: 'c3', name: 'Gà rán', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJSH1oVFCBjq13mIjK_Kgy0ixI7bcU-XnPXTCz2hoQFuMgYx2Kbi_K1L9-&s=10', link: '/menu?category=rice' },
-    { id: 'c4', name: 'Đồ uống', imageUrl: 'https://congthucphache.com/wp-content/uploads/2023/09/Tra-sua-truyen-thong.png', link: '/menu?category=snack' },
+    { id: 'c4', name: 'Đồ uống', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScAOGatmvawiDeDp9vKvALwcrXHwBIj6Dhmwsz_Wg7YPeqwkhrueVFRAk&s=10', link: '/menu?category=snack' },
     { id: 'c5', name: 'Cà phê', imageUrl: 'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2026/6/7/bi-quyet-pha-ca-phe-ngon-10-ly-nhu-scaled-1780833704154867879700.jpg', link: '/menu?category=cake' },
     { id: 'c6', name: 'Tráng miệng', imageUrl: 'https://riversidepalace.vn/newsmultidata/1-873.jpg', link: '/menu?category=vegan' },
 ];
@@ -37,13 +36,10 @@ const HomeView: React.FC = () => {
         const fetchRandomDishes = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:3000/dishes', {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                const response = await axiosClient.get('/dishes');
 
-                if (response.ok) {
-                    const data = await response.json();
+                if (response.data) {
+                    const data = response.data;
 
                     const formattedData: HomeProduct[] = data
                         .filter((item: any) => item.isAvailable !== false)
@@ -87,8 +83,6 @@ const HomeView: React.FC = () => {
 
     return (
         <div className="home-layout">
-            <CustomerHeader cartItemCount={3} />
-
             <main className="home-main-content">
                 <div className="container">
                     <section className="home-section">
@@ -102,7 +96,7 @@ const HomeView: React.FC = () => {
                     <section className="home-section">
                         <ProductSection
                             title="Món ngon bán chạy"
-                            subtitle="Khám phá các món ăn được yêu thích nhất tuần qua"
+                            subtitle="Khám phá các món ăn được yêu thích nhất"
                             products={bestSellers}
                             isLoading={isLoading}
                         />
@@ -118,8 +112,6 @@ const HomeView: React.FC = () => {
                     </section>
                 </div>
             </main>
-
-            <CustomerFooter />
         </div>
     );
 };

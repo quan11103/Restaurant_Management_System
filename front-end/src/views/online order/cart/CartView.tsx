@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { ShoppingBag, ArrowLeft, Ticket } from 'lucide-react';
-import CustomerHeader from '../../../components/CustomerHeader';
-import CustomerFooter from '../../../components/CustomerFooter';
 import EmptyState from '../../../components/EmptyState';
 import CartItemList from './CartItemList';
 import CartItem from './CartItem';
@@ -77,18 +75,12 @@ const CartView: React.FC = () => {
 
     return (
         <div className="cart-view-page">
-            <CustomerHeader />
-
             <main className="cart-main-container">
                 <div className="cart-header-wrapper">
                     <h1 className="cart-page-title">
                         <ShoppingBag size={28} className="title-icon" />
                         Giỏ hàng của bạn
                     </h1>
-                    <a href="/menu" className="continue-shopping-link">
-                        <ArrowLeft size={16} />
-                        Tiếp tục chọn món
-                    </a>
                 </div>
 
                 {cartItems.length === 0 ? (
@@ -139,8 +131,6 @@ const CartView: React.FC = () => {
                     </div>
                 )}
             </main>
-
-            <CustomerFooter />
         </div>
     );
 };

@@ -3,8 +3,8 @@ import './ProductImageGallery.css';
 
 interface ProductImageGalleryProps {
     images: string[];
-    productName?: string;    // Tên món ăn để làm thẻ alt hỗ trợ SEO
-    className?: string;      // Class CSS phụ để tuỳ biến
+    productName?: string;
+    className?: string;
 }
 
 const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
@@ -16,7 +16,7 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
     const defaultImage = images && images.length > 0 ? images[0] : '';
     const [mainImage, setMainImage] = useState(defaultImage);
 
-    // Cập nhật lại ảnh chính nếu prop `images` thay đổi (rất hữu ích khi data từ API trả về chậm)
+    // Cập nhật lại ảnh chính nếu prop `images` thay đổi (khi data từ API trả về chậm)
     useEffect(() => {
         if (images && images.length > 0) {
             setMainImage(images[0]);

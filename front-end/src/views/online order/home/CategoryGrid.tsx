@@ -24,8 +24,9 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({
 
     return (
         <section className="category-section">
-            <h2 className="section-title">{title}</h2>
-
+            <div className="section-header">
+                <h2 className="section-title">{title}</h2>
+            </div>
             <div className="category-grid">
                 {isLoading ? (
                     skeletonArray.map((_, index) => (

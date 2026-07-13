@@ -12,9 +12,10 @@ import { CheckoutModule } from './checkout/checkout.module';
 import { IngredientSupplierModule } from './ingredient-supplier/ingredient-supplier.module';
 import { GoodsBillModule } from './goods-bill/goods-bill.module';
 import { DishImageModule } from './dish-image/dish-image.module';
+import { CartItemModule } from './cart-item/cart-item.module';
 
 @Module({
-    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule],
+    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule],
     controllers: [],
     providers: [PrismaService],
 })

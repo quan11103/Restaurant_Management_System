@@ -172,7 +172,7 @@
 }
 
 .user-popup-body {
-    padding: 0 16px 16px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -231,6 +231,10 @@
 
 .action-btn.user-btn.user-logged-in {
     color: #28a745;
+}
+
+a.action-btn.cart-wrapper {
+    text-decoration: none;
 }
 
 @keyframes fadeInDown {

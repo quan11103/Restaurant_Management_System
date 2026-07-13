@@ -1,19 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { User, MapPin, Menu, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../utils/auth';
 import Logo from './Logo';
 import SearchBar from './SearchBar';
 import CartBadge from './CartBadge';
 import './CustomerHeader.css';
 
 interface CustomerHeaderProps {
-    cartItemCount?: number;
+    isLoggedIn: boolean;
+    setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CustomerHeader: React.FC<CustomerHeaderProps> = ({ cartItemCount = 0 }) => {
+const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLoggedIn }) => {
     const [searchText, setSearchText] = useState('');
     const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState('');
 
     const userPopupRef = useRef<HTMLDivElement>(null);
@@ -44,15 +45,10 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ cartItemCount = 0 }) =>
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_name');
+        logout();
 
         setIsLoggedIn(false);
         setIsUserPopupOpen(false);
-
-        navigate('/');
-        window.location.reload();
     };
 
     const handleTriggerSearch = () => {
@@ -139,14 +135,10 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ cartItemCount = 0 }) =>
                         )}
                     </div>
 
-                    <div className="action-btn cart-wrapper">
-                        <CartBadge
-                            itemCount={cartItemCount}
-                            size={22}
-                            onClick={() => console.log("Mở trang giỏ hàng!")}
-                        />
+                    <Link to={`/cart`} className="action-btn cart-wrapper">
+                        <CartBadge size={22} />
                         <span className="action-text hidden-mobile">Giỏ hàng</span>
-                    </div>
+                    </Link>
                 </div>
 
             </div>

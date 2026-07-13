@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axiosClient from '../../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import InputField from '../../../components/InputField';
@@ -21,33 +22,21 @@ const LoginForm: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3000/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
+            const response = await axiosClient.post('/auth/login', { username, password });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+            localStorage.setItem('access_token', response.data.access_token);
+            localStorage.setItem('user_name', response.data.fullName || 'quý khách');
+            localStorage.setItem('user_role', response.data.role || 'CLIENT');
+            if (response.data.refresh_token) {
+                localStorage.setItem('refresh_token', response.data.refresh_token);
             }
-
-            localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('user_name', data.fullName || 'quý khách');
-            localStorage.setItem('user_role', data.role || 'CLIENT');
-            if (data.refresh_token) {
-                localStorage.setItem('refresh_token', data.refresh_token);
+            navigate(response.data.role === 'MANAGER' ? '/manager/dashboard' : '/');
+        } catch (error: any) {
+            if (error.response && error.response.status === 401) {
+                setError('Sai tên đăng nhập hoặc mật khẩu');
+            } else {
+                setError('Có lỗi xảy ra, vui lòng thử lại sau.');
             }
-
-            navigate(data.role === 'MANAGER' ? '/manager/dashboard' : '/');
-
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
         }
     };
 

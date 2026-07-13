@@ -23,7 +23,6 @@ export class DishController {
   }
 
   @Get(':id')
-  @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER, Role.CLIENT)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.findOne(id);
   }

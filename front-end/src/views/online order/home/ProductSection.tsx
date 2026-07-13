@@ -48,7 +48,6 @@ const ProductSection: React.FC<ProductSectionProps> = ({
                         </div>
                     ))
                 ) : (
-                    // Trạng thái hiển thị dữ liệu thật
                     products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { type Product } from '../../types';
 import RatingStars from './RatingStars';
 import './ProductCard.css';
@@ -14,7 +15,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     };
 
     return (
-        <a href={`/product/${product.id}`} className="product-card">
+        <Link to={`/product/${product.id}`} className="product-card">
             <div className="product-image-wrapper">
                 <img
                     src={product.imageUrl}
@@ -60,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     )}
                 </div>
             </div>
-        </a>
+        </Link>
     );
 };
 

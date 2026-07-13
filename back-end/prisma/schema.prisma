@@ -69,6 +69,7 @@ model User {
   billsHandled      Bill[]        @relation("CashierBills")
   goodsBillsCreated GoodsBill[]   @relation("WarehouseGoodsBills")
   clientReviews     Review[]      @relation("ClientReviews")
+  cartItems         CartItem[]    @relation("ClientCart")
 }
 
 model Table {
@@ -96,6 +97,7 @@ model Dish {
   orderedDishes OrderedDish[]
   images       DishImage[]
   reviews      Review[]
+  cartItems    CartItem[]
 }
 
 model DishImage {
@@ -151,6 +153,19 @@ model OrderedDish {
 
   order       Order    @relation(fields: [orderId], references: [id])
   dish        Dish     @relation(fields: [dishId], references: [id])
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  clientId  Int
+  dishId    Int
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  client    User     @relation("ClientCart", fields: [clientId], references: [id])
+  dish      Dish     @relation(fields: [dishId], references: [id])
+
+  @@unique([clientId, dishId]) 
 }
 
 // Lớp liên kết giữa Order và Table

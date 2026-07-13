@@ -36,20 +36,6 @@
     color: #e84118;
 }
 
-.continue-shopping-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #e84118;
-    text-decoration: none;
-    font-weight: 600;
-    transition: transform 0.2s;
-}
-
-.continue-shopping-link:hover {
-    transform: translateX(-4px);
-}
-
 /* --- BỐ CỤC CHÍNH (GRID 2 CỘT) --- */
 .cart-content-layout {
     display: grid;

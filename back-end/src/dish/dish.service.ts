@@ -59,8 +59,23 @@ export class DishService {
 
   async update(id: number, updateDishDto: UpdateDishDto) {
     await this.findOne(id);
+
     const RESTAURANT_ID = 1;
     const { name, type, price, description, images, isAvailable } = updateDishDto;
+
+    let imagesAction = undefined;
+
+    if (images !== undefined) {
+      imagesAction = {
+        deleteMany: {}, // Xóa tất cả các ảnh cũ có dishId = id
+        ...(images.length > 0 && {
+          create: images.map(img => ({
+            imageUrl: img.imageUrl,
+            isMain: img.isMain || false
+          }))
+        })
+      };
+    }
 
     return this.prisma.dish.update({
       where: { id },
@@ -71,12 +86,7 @@ export class DishService {
         description,
         isAvailable,
         restaurantId: RESTAURANT_ID,
-        images: images && images.length > 0 ? {
-          create: images.map(img => ({
-            imageUrl: img.imageUrl,
-            isMain: img.isMain || false
-          }))
-        } : undefined
+        images: imagesAction // Truyền cấu trúc xử lý ảnh đã tối ưu vào đây
       },
       include: {
         images: true

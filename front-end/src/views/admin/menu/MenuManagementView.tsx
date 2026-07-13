@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import axiosClient from '../../../api/axios';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useAlert } from '../../../components/Alert';
 import { type SelectOption } from '../../../components/SelectBox';
@@ -59,17 +60,9 @@ const MenuManagementView: React.FC = () => {
     const fetchDishes = async () => {
         setIsLoading(true);
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch('http://localhost:3000/dishes', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
+            const response = await axiosClient.get('/dishes');
+            if (response.data) {
+                const data = response.data;
 
                 const formattedData: MenuItem[] = data.map((item: any) => ({
                     id: item.id,
@@ -152,22 +145,17 @@ const MenuManagementView: React.FC = () => {
 
         const isEditMode = !!editingItem;
         const url = isEditMode
-            ? `http://localhost:3000/dishes/${editingItem.id}`
-            : 'http://localhost:3000/dishes';
-        const method = isEditMode ? 'PATCH' : 'POST';
+            ? `/dishes/${editingItem.id}`
+            : '/dishes';
+        const method = isEditMode ? 'patch' : 'post';
 
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(url, {
+            const response = await axiosClient(url, {
                 method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
+                data: payload
             });
 
-            if (response.ok) {
+            if (response.data) {
                 showAlert(
                     'success',
                     isEditMode ? 'Cập nhật thông tin món ăn thành công!' : 'Đã thêm món ăn mới vào thực đơn',
@@ -177,10 +165,9 @@ const MenuManagementView: React.FC = () => {
                 setEditingItem(null);
                 fetchDishes();
             } else {
-                const errorData = await response.json();
                 showAlert(
                     'error',
-                    errorData.message || (isEditMode ? 'Không thể cập nhật món ăn' : 'Không thể tạo món ăn'),
+                    response.data.message || (isEditMode ? 'Không thể cập nhật món ăn' : 'Không thể tạo món ăn'),
                     'Lỗi hệ thống'
                 );
             }
@@ -197,20 +184,13 @@ const MenuManagementView: React.FC = () => {
         }
 
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`http://localhost:3000/dishes/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axiosClient.delete(`/dishes/${id}`);
 
-            if (response.ok) {
+            if (response.data) {
                 showAlert('success', 'Đã xóa món ăn khỏi thực đơn!', 'Thành công');
                 fetchDishes();
             } else {
-                const errorData = await response.json();
-                showAlert('error', errorData.message || 'Không thể xóa món ăn này', 'Lỗi hệ thống');
+                showAlert('error', response.data.message || 'Không thể xóa món ăn này', 'Lỗi hệ thống');
             }
         } catch (error) {
             console.error('Lỗi khi gọi API xóa:', error);
