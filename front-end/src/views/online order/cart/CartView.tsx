@@ -1,77 +1,170 @@
-import React, { useState } from 'react';
-import { ShoppingBag, ArrowLeft, Ticket } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingBag, Loader2 } from 'lucide-react';
+import axiosClient from '../../../api/axios';
 import EmptyState from '../../../components/EmptyState';
+import ConfirmModal from '../../../components/ConfirmModal';
 import CartItemList from './CartItemList';
 import CartItem from './CartItem';
 import PromoCodeInput from './PromoCodeInput';
 import OrderSummary from './OrderSummary';
 import './CartView.css';
 
-const MOCK_CART_ITEMS = [
-    {
-        id: 'item-1',
-        name: 'Phở Đuôi Bò Thượng Hạng Hòa Hảo',
-        image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=200&auto=format&fit=crop',
-        options: 'Size Lớn, Thêm trứng chần, Ít bánh phở',
-        price: 115000,
-        quantity: 2
-    },
-    {
-        id: 'item-2',
-        name: 'Nem Rán Hà Nội (Phần 3 cuốn)',
-        image: 'https://images.unsplash.com/photo-1625398407796-82650a8c135f?q=80&w=200&auto=format&fit=crop',
-        options: 'Nước mắm chua ngọt',
-        price: 45000,
-        quantity: 1
-    }
-];
+interface ICartItemUI {
+    id: number;
+    name: string;
+    image: string;
+    price: number;
+    quantity: number;
+}
 
 const CartView: React.FC = () => {
-    const [cartItems, setCartItems] = useState(MOCK_CART_ITEMS);
-
+    const [cartItems, setCartItems] = useState<ICartItemUI[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
     const [promoError, setPromoError] = useState<string | null>(null);
     const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
     const [isCheckingPromo, setIsCheckingPromo] = useState(false);
-
     const [discountAmount, setDiscountAmount] = useState(0);
+    const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
+
+    const navigate = useNavigate();
 
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 0 ? 15000 : 0; // Phí ship tượng trưng 15k
-    const total = subtotal + shippingFee;
+    const shippingFee = subtotal > 0 ? 15000 : 0;
 
-    const handleUpdateQuantity = (id: string, newQuantity: number) => {
-        setCartItems(cartItems.map(item =>
-            item.id === id ? { ...item, quantity: newQuantity } : item
-        ));
+    const transformCartData = (backendItems: any[]): ICartItemUI[] => {
+        return backendItems.map(item => {
+            const mainImage = item.dish?.images?.find((img: any) => img.isMain)?.imageUrl
+                || item.dish?.images?.[0]?.imageUrl
+                || 'https://via.placeholder.com/200?text=No+Image';
+
+            return {
+                id: item.id,
+                name: item.dish?.name || 'Món ăn',
+                image: mainImage,
+                price: item.dish?.price || 0,
+                quantity: item.quantity
+            };
+        });
     };
 
-    const handleRemoveItem = (id: string) => {
-        setCartItems(cartItems.filter(item => item.id !== id));
+    const resetPromotionState = () => {
+        setDiscountAmount(0);
+        setPromoSuccess(null);
+        setPromoError(null);
+        setAppliedPromoCode(null);
     };
 
-    const handleApplyPromo = (code: string) => {
+    const handleRequestRemove = (id: number) => {
+        setDeleteItemId(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteItemId) return;
+
+        try {
+            await axiosClient.delete(`/cart-item/${deleteItemId}`);
+            setCartItems(prev => prev.filter(item => item.id !== deleteItemId));
+            resetPromotionState();
+        } catch (err) {
+            console.error('Lỗi khi xóa món ăn:', err);
+            alert('Xóa thất bại. Vui lòng thử lại!');
+        } finally {
+            setIsDeleteModalOpen(false);
+            setDeleteItemId(null);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartItems();
+    }, []);
+
+    const handleUpdateQuantity = async (id: number, newQuantity: number) => {
+        if (newQuantity < 1) return;
+
+        try {
+            await axiosClient.patch(`/cart-item/${id}`, { quantity: newQuantity });
+            setCartItems(prev =>
+                prev.map(item => item.id === id ? { ...item, quantity: newQuantity } : item)
+            );
+            resetPromotionState();
+        } catch (err) {
+            console.error('Lỗi cập nhật số lượng:', err);
+            alert('Không thể cập nhật số lượng. Vui lòng thử lại!');
+        }
+    };
+
+    const handleApplyPromo = async (code: string) => {
+        if (!code.trim()) {
+            setPromoError('Vui lòng nhập mã khuyến mãi.');
+            return;
+        }
+
         setIsCheckingPromo(true);
         setPromoError(null);
         setPromoSuccess(null);
 
-        // Giả lập gọi API kiểm tra mã
-        setTimeout(() => {
+        try {
+            const response = await axiosClient.get(`/promotions/code/${code}?total=${subtotal}`);
+
+            const data = response.data;
+            setDiscountAmount(data.discountAmount);
+            setAppliedPromoCode(data.code);
+            setPromoSuccess(`Áp dụng thành công! Giảm ${data.discountAmount.toLocaleString('vi-VN')} đ`);
+
+        } catch (err: any) {
+            console.error('Lỗi khi áp dụng mã:', err);
+            const errorMessage = err.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.';
+            setPromoError(errorMessage);
+            setDiscountAmount(0);
+            setAppliedPromoCode(null);
+        } finally {
             setIsCheckingPromo(false);
-            if (code === 'HOAHAO2026') {
-                setPromoSuccess('Áp dụng thành công! Giảm 10% tổng đơn.');
-                // (Tính toán lại state giảm giá ở đây)
-            } else {
-                setPromoError('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
-            }
-        }, 1000);
+        }
     };
 
     const handleProceedToCheckout = () => {
-        // Logic chuyển hướng sang trang thanh toán hoặc mở popup
         console.log('Đang chuyển hướng sang trang thanh toán...');
-        // window.location.href = '/checkout';
+        navigate('/checkout', {
+            state: { promoCode: appliedPromoCode }
+        });
     };
+
+    const fetchCartItems = async () => {
+        try {
+            setIsLoading(true);
+            const response = await axiosClient.get('/cart-item');
+            setCartItems(transformCartData(response.data));
+            setError(null);
+        } catch (err) {
+            console.error('Lỗi khi lấy giỏ hàng:', err);
+            setError('Không thể tải giỏ hàng. Vui lòng thử lại sau!');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="cart-view-page flex items-center justify-center h-screen">
+                <Loader2 size={32} className="animate-spin text-gray-500 mr-2" />
+                <span>Đang tải giỏ hàng...</span>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="cart-view-page flex items-center justify-center h-screen text-red-500">
+                <p>{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="cart-view-page">
@@ -89,13 +182,10 @@ const CartView: React.FC = () => {
                         title="Giỏ hàng đang trống"
                         message={`Có vẻ như bạn chưa chọn món nào.\nHãy khám phá thực đơn hấp dẫn của Hòa Hảo nhé!`}
                         actionText="Xem Thực Đơn Ngay"
-                        actionHref="/menu"
+                        actionHref="/"
                     />
                 ) : (
-                    /* --- BỐ CỤC GIỎ HÀNG (2 CỘT) --- */
                     <div className="cart-content-layout">
-
-                        {/* CỘT TRÁI: DANH SÁCH MÓN ĂN */}
                         <div className="cart-items-column">
                             <CartItemList>
                                 {cartItems.map(item => (
@@ -103,15 +193,13 @@ const CartView: React.FC = () => {
                                         key={item.id}
                                         item={item}
                                         onUpdateQuantity={handleUpdateQuantity}
-                                        onRemove={handleRemoveItem}
+                                        onRemove={handleRequestRemove}
                                     />
                                 ))}
                             </CartItemList>
                         </div>
 
-                        {/* CỘT PHẢI: TỔNG KẾT & KHUYẾN MÃI */}
                         <div className="cart-summary-column">
-
                             <PromoCodeInput
                                 onApply={handleApplyPromo}
                                 isLoading={isCheckingPromo}
@@ -126,11 +214,22 @@ const CartView: React.FC = () => {
                                 discount={discountAmount}
                                 onCheckout={handleProceedToCheckout}
                             />
-
                         </div>
                     </div>
                 )}
             </main>
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title="Xác nhận xóa món ăn"
+                message="Bạn có chắc chắn muốn xóa món này khỏi giỏ hàng?"
+                confirmLabel="Xóa"
+                cancelLabel="Hủy"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => {
+                    setIsDeleteModalOpen(false);
+                    setDeleteItemId(null);
+                }}
+            />
         </div>
     );
 };

@@ -75,12 +75,12 @@
     overflow: hidden;
 }
 
-.section-header {
+.dashboard-section-header {
     padding: 20px 24px;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.section-header h3 {
+.dashboard-section-header h3 {
     margin: 0;
     font-size: 1.1rem;
     color: #262626;

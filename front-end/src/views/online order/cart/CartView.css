@@ -8,7 +8,7 @@
 .cart-main-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px 80px 20px;
+    padding: 20px 20px 80px 20px;
     width: 100%;
     flex: 1;
 }
@@ -19,7 +19,6 @@
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 30px;
-    padding-bottom: 16px;
 }
 
 .cart-page-title {

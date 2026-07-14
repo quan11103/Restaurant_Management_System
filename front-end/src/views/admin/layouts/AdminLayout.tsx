@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Layers, Utensils, Archive, Users, Smile } from 'lucide-react';
+import { LayoutDashboard, Layers, Utensils, Archive, Users, Smile, Tag } from 'lucide-react';
 import Logo from '../../../components/Logo';
 import './AdminLayout.css';
 
@@ -11,6 +11,7 @@ const MENU_ITEMS = [
     { path: '/manager/inventory', name: 'Kho & Vật tư', icon: Archive },
     { path: '/manager/staff', name: 'Nhân sự', icon: Users },
     { path: '/manager/customers', name: 'Khách hàng', icon: Smile },
+    { path: '/manager/promotions', name: 'Khuyến mãi', icon: Tag },
 ];
 
 const AdminLayout: React.FC = () => {

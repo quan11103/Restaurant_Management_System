@@ -1,47 +1,46 @@
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsDate, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreatePromotionDto {
-    @IsString({ message: 'Mã khuyến mãi phải là chuỗi.' })
-    @IsNotEmpty({ message: 'Mã khuyến mãi (code) không được để trống.' })
-    code: string; // VD: "SUMMER2026", "FREESHIP"
+    @IsString()
+    @IsNotEmpty({ message: 'Mã khuyến mãi không được để trống' })
+    code: string;
 
-    @IsString({ message: 'Loại khuyến mãi phải là chuỗi.' })
-    @IsNotEmpty({ message: 'Loại khuyến mãi (type) không được để trống.' })
-    type: string; // VD: "PERCENTAGE" (phần trăm) hoặc "FIXED_AMOUNT" (trừ thẳng tiền)
+    @IsString()
+    @IsNotEmpty({ message: 'Loại khuyến mãi không được để trống' })
+    type: string;
 
-    @IsNumber({}, { message: 'Giá trị khuyến mãi phải là số.' })
-    @Min(0, { message: 'Giá trị không được âm.' })
+    @IsNumber()
+    @Min(0, { message: 'Giá trị khuyến mãi phải lớn hơn hoặc bằng 0' })
+    @IsNotEmpty({ message: 'Giá trị khuyến mãi không được để trống' })
     value: number;
 
     @IsString()
     @IsOptional()
     description?: string;
 
+    @IsDate({ message: 'Ngày bắt đầu không đúng định dạng' })
     @Type(() => Date)
-    @IsDate({ message: 'Ngày bắt đầu phải đúng định dạng thời gian.' })
-    @IsNotEmpty({ message: 'Ngày bắt đầu không được để trống.' })
+    @IsNotEmpty({ message: 'Ngày bắt đầu không được để trống' })
     startDate: Date;
 
+    @IsDate({ message: 'Ngày kết thúc không đúng định dạng' })
     @Type(() => Date)
-    @IsDate({ message: 'Ngày kết thúc phải đúng định dạng thời gian.' })
-    @IsNotEmpty({ message: 'Ngày kết thúc không được để trống.' })
+    @IsNotEmpty({ message: 'Ngày kết thúc không được để trống' })
     endDate: Date;
 
-    @IsNumber({}, { message: 'Giá trị đơn hàng tối thiểu phải là số.' })
+    @IsNumber()
+    @Min(0, { message: 'Giá trị đơn hàng tối thiểu phải lớn hơn hoặc bằng 0' })
     @IsOptional()
-    @Min(0)
     minOrderValue?: number;
 
-    @IsNumber({}, { message: 'Mức giảm tối đa phải là số.' })
+    @IsNumber()
+    @Min(0, { message: 'Số tiền giảm tối đa phải lớn hơn hoặc bằng 0' })
     @IsOptional()
-    @Min(0)
     maxDiscount?: number;
 
-    @IsInt({ message: 'Giới hạn số lần sử dụng phải là số nguyên.' })
+    @IsInt()
+    @Min(1, { message: 'Giới hạn sử dụng phải lớn hơn hoặc bằng 1' })
     @IsOptional()
-    @Min(1)
     usageLimit?: number;
-
-    // Lưu ý: Không đưa usedCount vào đây vì nó do hệ thống tự đếm, user không được nhập.
 }

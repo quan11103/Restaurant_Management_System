@@ -11,6 +11,7 @@ import LoginView from './views/auth/login/LoginView';
 import AdminLayout from './views/admin/layouts/AdminLayout';
 import DashboardView from './views/admin/dashboard/DashboardView';
 import MenuManagementView from './views/admin/menu/MenuManagementView';
+import PromotionManagementView from './views/admin/promotions/PromotionManagementView';
 import CustomerHeader from './components/CustomerHeader';
 import CustomerFooter from './components/CustomerFooter';
 import HomeView from './views/online order/home/HomeView'
@@ -72,6 +73,7 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardView />} />
             <Route path="menu" element={<MenuManagementView />} />
+            <Route path="promotions" element={<PromotionManagementView />} />
           </Route>
 
           <Route

@@ -59,6 +59,13 @@ export class PromotionService {
   async update(id: number, updatePromotionDto: UpdatePromotionDto) {
     const promotion = await this.findOne(id); // Đảm bảo tồn tại
 
+    const finalStartDate = updatePromotionDto.startDate ? new Date(updatePromotionDto.startDate) : promotion.startDate;
+    const finalEndDate = updatePromotionDto.endDate ? new Date(updatePromotionDto.endDate) : promotion.endDate;
+
+    if (finalStartDate >= finalEndDate) {
+      throw new BadRequestException('Ngày bắt đầu phải diễn ra trước ngày kết thúc!');
+    }
+
     // Kiểm tra xem code mới có bị trùng với chương trình khác không
     if (updatePromotionDto.code && updatePromotionDto.code !== promotion.code) {
       const existCode = await this.prisma.promotion.findUnique({
@@ -85,8 +92,7 @@ export class PromotionService {
     return { message: `Đã xóa chương trình khuyến mãi thành công!` };
   }
 
-  // getPromotionByCode
-  async applyPromotionCode(code: string, currentOrderTotal: number) {
+  async validateAndCalculate(code: string, currentOrderTotal: number) {
     const promotion = await this.prisma.promotion.findUnique({
       where: { code: code }
     });
@@ -105,7 +111,7 @@ export class PromotionService {
     }
 
     if (promotion.minOrderValue && currentOrderTotal < promotion.minOrderValue) {
-      throw new BadRequestException(`Đơn hàng phải đạt tối thiểu ${promotion.minOrderValue} để áp dụng mã này!`);
+      throw new BadRequestException(`Đơn hàng phải đạt tối thiểu ${promotion.minOrderValue.toLocaleString('vi-VN')} đ để áp dụng mã này!`);
     }
 
     // Tính toán số tiền được giảm
@@ -123,6 +129,8 @@ export class PromotionService {
     return {
       promotionId: promotion.id,
       code: promotion.code,
+      type: promotion.type,
+      value: promotion.value,
       discountAmount: discountAmount,
       finalTotal: Math.max(0, currentOrderTotal - discountAmount) // Đảm bảo tổng tiền không bị âm
     };

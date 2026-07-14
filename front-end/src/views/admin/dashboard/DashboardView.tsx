@@ -111,7 +111,7 @@ const DashboardView: React.FC = () => {
 
             {/* 2. Khu vực Bảng xếp hạng món ăn theo doanh thu */}
             <div className="dashboard-table-section">
-                <div className="section-header">
+                <div className="dashboard-section-header">
                     <h3>Top món ăn theo doanh thu</h3>
                 </div>
 

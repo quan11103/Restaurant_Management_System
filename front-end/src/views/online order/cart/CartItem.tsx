@@ -3,18 +3,17 @@ import { Trash2 } from 'lucide-react';
 import QuantitySelector from '../../../components/QuantitySelector';
 
 export interface CartItemType {
-    id: string;
+    id: number;
     name: string;
     image: string;
-    options: string;
     price: number;
     quantity: number;
 }
 
 interface CartItemProps {
     item: CartItemType;
-    onUpdateQuantity: (id: string, newQuantity: number) => void;
-    onRemove: (id: string) => void;
+    onUpdateQuantity: (id: number, newQuantity: number) => void;
+    onRemove: (id: number) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemove }) => {

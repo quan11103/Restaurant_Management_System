@@ -1,21 +1,22 @@
 .cart-item-list-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 6px;
 }
 
 .cart-list-header {
     display: grid;
-    grid-template-columns: 2fr 120px 88px 100px 40px;
+    grid-template-columns: 2fr 120px 80px 100px 40px;
     gap: 20px;
-    padding: 0 20px 12px 20px;
+    padding: 0 20px;
     color: #7f8fa6;
     font-size: 0.9rem;
     font-weight: 600;
 }
 
 .header-col-product,
-.header-col-qty {
+.header-col-qty,
+.header-col-total {
     text-align: center;
 }
 
@@ -32,7 +33,7 @@
     align-items: center;
     background-color: white;
     border-radius: 12px;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
@@ -64,7 +65,6 @@
     font-weight: 700;
 }
 
-.cart-item-price-col,
 .cart-item-total-col {
     font-weight: 700;
     color: #2f3640;
@@ -77,7 +77,7 @@
 .cart-item-remove-btn {
     background: none;
     border: none;
-    color: #dcdde1;
+    color: #e2795f;
     cursor: pointer;
     padding: 8px;
     display: flex;

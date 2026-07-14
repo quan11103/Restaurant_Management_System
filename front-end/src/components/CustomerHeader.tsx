@@ -85,14 +85,6 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
                     />
                 </div>
 
-                <div className="header-address hidden-mobile">
-                    <MapPin size={22} className="text-highlight" />
-                    <div className="address-info">
-                        <span className="address-label">Giao đến:</span>
-                        <span className="address-text">Vui lòng chọn địa chỉ giao hàng...</span>
-                    </div>
-                </div>
-
                 <div className="header-actions">
 
                     <div className="user-action-wrapper" ref={userPopupRef}>
