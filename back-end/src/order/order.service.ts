@@ -189,7 +189,6 @@ export class OrderService {
           orderId: newOrder.id,
           paymentMethod: paymentMethod,
           discount: discount,            // Số tiền được giảm được cập nhật chính xác tại đây
-          total: finalTotal,             // Giá sau giảm lưu vào đây
           promotionId: promotionId,      // Khóa ngoại ID của Promotion đã được xử lý thành công!
         },
       });
