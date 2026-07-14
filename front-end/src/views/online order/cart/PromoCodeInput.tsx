@@ -20,7 +20,7 @@ const PromoCodeInput: React.FC<PromoCodeInputProps> = ({
     const [code, setCode] = useState('');
 
     const handleApplyClick = () => {
-        const trimmedCode = code.trim();
+        const trimmedCode = code.trim().toUpperCase();
         if (trimmedCode) {
             onApply(trimmedCode);
         }
@@ -42,7 +42,6 @@ const PromoCodeInput: React.FC<PromoCodeInputProps> = ({
             <div className="promo-input-group">
                 <input
                     type="text"
-                    placeholder="Nhập mã giảm giá..."
                     className="promo-input"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}

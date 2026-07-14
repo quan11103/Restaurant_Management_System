@@ -1,0 +1,213 @@
+.client-checkout-layout {
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.checkout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.checkout-header h2 {
+    margin: 0;
+    color: #2d3748;
+}
+
+/* ==================== NỘI DUNG CHÍNH (2 CỘT) ==================== */
+.checkout-content {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* --- Cột trái: Form thông tin --- */
+.recipient-form-section {
+    height: fit-content;
+    flex: 6;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.recipient-form-section h3 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    color: #2d3748;
+    font-size: 1.25rem;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 1px #3182ce;
+}
+
+/* --- Cột phải: Thanh toán --- */
+.payment-section {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.summary-block,
+.payment-methods {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.order-details-block h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+.ordered-items-mini-list {
+    margin-bottom: 16px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.mini-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.mini-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mini-item-name {
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.mini-item-qty {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.mini-item-subtotal {
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    color: #4a5568;
+}
+
+.total-row {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 16px;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #2d3748;
+    margin-bottom: 0;
+}
+
+.final-price {
+    color: #3182ce;
+}
+
+.applied-promo-row {
+    font-weight: 500;
+    padding: 8px 0;
+    margin-top: 12px;
+    align-items: center;
+}
+
+.promo-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.promo-value {
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.action-buttons {
+    display: flex;
+    margin-top: auto;
+}
+
+.btn-pay {
+    flex: 1;
+    background: #38a169;
+    border: none;
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(56, 161, 105, 0.2);
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-pay:hover {
+    background: #2f855a;
+}

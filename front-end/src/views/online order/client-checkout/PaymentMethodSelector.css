@@ -1,0 +1,43 @@
+.payment-methods-container {
+    width: 100%;
+}
+
+.payment-methods-container h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.method-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #718096;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.method-btn:hover {
+    border-color: #cbd5e0;
+    background: #f7fafc;
+}
+
+.method-btn.active {
+    border-color: #3182ce;
+    background: #ebf8ff;
+    color: #3182ce;
+    box-shadow: 0 2px 4px rgba(49, 130, 206, 0.1);
+}

@@ -1,39 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, BadRequestException } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { ClientCheckoutDto } from './dto/client-checkout.dto'; // Import DTO mới
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@Controller('order')
+@Controller('orders') // Đổi 'order' thành 'orders' (số nhiều) theo chuẩn RESTful API
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.orderService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
-  }
-
-  @Post()
+  /**
+   * 1. Luồng dành cho nhân viên: Đặt món tại bàn (DINE_IN)
+   * Endpoint: POST /api/orders/dine-in
+   */
+  @Post('dine-in')
   createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
+  }
+
+  /**
+   * 2. Luồng dành cho khách hàng: Thanh toán Online (DELIVERY)
+   * Endpoint: POST /api/orders/client-checkout
+   */
+  @Post('client-checkout')
+  @UseGuards(JwtAuthGuard)
+  clientCheckout(
+    @Request() req: any,
+    @Body() clientCheckoutDto: ClientCheckoutDto
+  ) {
+    const clientId = req.user?.sub;
+    if (!clientId) {
+      throw new BadRequestException('Client ID not found in token');
+    }
+    return this.orderService.clientCheckout(Number(clientId), clientCheckoutDto);
   }
 }

@@ -45,7 +45,10 @@ export class CartItemService {
             id: true,
             name: true,
             price: true,
-            images: true,
+            images: {
+              where: { isMain: true },
+              take: 1
+            },
           },
         },
       },
@@ -81,6 +84,12 @@ export class CartItemService {
 
     return this.prisma.cartItem.delete({
       where: { id },
+    });
+  }
+
+  async clearCart(clientId: number) {
+    return this.prisma.cartItem.deleteMany({
+      where: { clientId },
     });
   }
 }

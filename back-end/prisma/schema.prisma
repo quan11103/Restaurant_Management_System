@@ -149,7 +149,6 @@ model OrderedDish {
   dateAndTime DateTime @default(now())
   price       Float
   quantity    Int
-  subTotal    Float
 
   order       Order    @relation(fields: [orderId], references: [id])
   dish        Dish     @relation(fields: [dishId], references: [id])
@@ -204,7 +203,6 @@ model Bill {
   paymentTime   DateTime   @default(now())
   paymentMethod String
   discount      Float      @default(0.0)
-  total         Float
 
   order         Order      @relation(fields: [orderId], references: [id])
   cashier       User?      @relation("CashierBills", fields: [cashierId], references: [id])
@@ -247,7 +245,6 @@ model GoodsBill {
   id               Int      @id @default(autoincrement())
   warehouseStaffId Int
   receivedTime     DateTime @default(now())
-  total            Float    @default(0.0)
 
   warehouseStaff   User     @relation("WarehouseGoodsBills", fields: [warehouseStaffId], references: [id])
   goodsBillDetails GoodsBillDetail[]
@@ -261,7 +258,6 @@ model GoodsBillDetail {
   dateAndTime          DateTime           @default(now())
   price                Float
   quantity             Float
-  subTotal             Float
 
   goodsBill            GoodsBill          @relation(fields: [goodsBillId], references: [id])
   ingredientSupplier   IngredientSupplier @relation(fields: [ingredientSupplierId], references: [id])

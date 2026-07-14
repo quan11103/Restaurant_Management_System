@@ -45,4 +45,10 @@ export class CartItemController {
     const clientId = req.user.id;
     return this.cartItemService.remove(+id, clientId);
   }
+
+  @Delete('clear')
+  clearCart(@Req() req: any) {
+    const clientId = req.user.sub;
+    return this.cartItemService.clearCart(clientId);
+  }
 }

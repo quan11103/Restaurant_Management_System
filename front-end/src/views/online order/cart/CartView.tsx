@@ -34,7 +34,7 @@ const CartView: React.FC = () => {
 
     const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 0 ? 15000 : 0;
+    const shippingFee = subtotal > 0 ? 0 : 0;
 
     const transformCartData = (backendItems: any[]): ICartItemUI[] => {
         return backendItems.map(item => {
@@ -130,8 +130,8 @@ const CartView: React.FC = () => {
 
     const handleProceedToCheckout = () => {
         console.log('Đang chuyển hướng sang trang thanh toán...');
-        navigate('/checkout', {
-            state: { promoCode: appliedPromoCode }
+        navigate('/client-checkout', {
+            state: { promoCode: appliedPromoCode, discountAmount: discountAmount }
         });
     };
 

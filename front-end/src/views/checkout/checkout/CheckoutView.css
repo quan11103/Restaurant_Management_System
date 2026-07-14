@@ -2,7 +2,6 @@
     box-sizing: border-box;
     padding: 24px;
     background-color: #f0f2f5;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -20,25 +19,6 @@
     color: #2d3748;
 }
 
-.btn-back {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: none;
-    border: none;
-    color: #4a5568;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.btn-back:hover {
-    background-color: #e2e8f0;
-}
-
 /* ==================== NỘI DUNG CHÍNH (2 CỘT) ==================== */
 .checkout-content {
     display: flex;
@@ -49,6 +29,7 @@
 
 /* --- Cột trái: Chi tiết món --- */
 .order-details-section {
+    height: fit-content;
     flex: 6;
     background: white;
     border-radius: 12px;

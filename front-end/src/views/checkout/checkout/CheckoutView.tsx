@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import DiscountApplier, { type AppliedDiscount } from './DiscountApplier';
 import PaymentMethodSelector, { type PaymentMethod } from './PaymentMethodSelector';
 import BillSummary, { type BillModel } from './BillSummary';
@@ -67,10 +67,6 @@ const CheckOutView: React.FC = () => {
     return (
         <div className="checkout-layout">
             <div className="checkout-header">
-                <button className="btn-back">
-                    <ArrowLeft size={20} />
-                    Quay lại
-                </button>
                 <h2>Thanh toán - {MOCK_ORDER_DATA.orderTables[0]?.table.name}</h2>
                 <div style={{ width: 100 }}></div> {/* Spacer để căn giữa tiêu đề */}
             </div>
