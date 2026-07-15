@@ -83,7 +83,6 @@ export class CheckoutService {
           promotionId: promotionId || null,
           paymentMethod: paymentMethod,
           discount: discountAmount,
-          total: finalTotal,
         }
       });
 

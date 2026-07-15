@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../../api/axios';
+import { useAlert } from '../../../components/Alert';
 import { MapPin, Phone, User, Mail, Loader2, Tag } from 'lucide-react';
 import PaymentMethodSelector, { type PaymentMethod } from './PaymentMethodSelector';
 import './ClientCheckoutView.css';
@@ -16,6 +18,9 @@ interface CartItem {
 }
 
 const ClientCheckoutView: React.FC = () => {
+    const { showAlert } = useAlert();
+    const navigate = useNavigate();
+
     const location = useLocation();
     const appliedPromoCode = location.state?.promoCode || null;
     const discountAmount = location.state?.discountAmount || 0;
@@ -47,7 +52,7 @@ const ClientCheckoutView: React.FC = () => {
                 }
             } catch (error) {
                 console.error('Lỗi khi tải dữ liệu thanh toán:', error);
-                alert('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                showAlert('error', 'Không thể tải dữ liệu. Vui lòng thử lại sau.', 'Lỗi');
             } finally {
                 setIsLoading(false);
             }
@@ -63,12 +68,12 @@ const ClientCheckoutView: React.FC = () => {
 
     const handleOrder = async () => {
         if (!formData.fullName || !formData.phone || !formData.address) {
-            alert('Vui lòng điền đầy đủ các thông tin bắt buộc (Tên, SĐT, Địa chỉ)!');
+            showAlert('warning', 'Vui lòng điền đầy đủ các thông tin bắt buộc');
             return;
         }
 
         if (cartItems.length === 0) {
-            alert('Giỏ hàng của bạn đang trống!');
+            showAlert('warning', 'Giỏ hàng của bạn đang trống!');
             return;
         }
 
@@ -84,15 +89,28 @@ const ClientCheckoutView: React.FC = () => {
             const result = await response.data;
 
             if (result.success) {
-                alert('Đặt hàng thành công!');
-                // Redirect người dùng về trang chủ hoặc trang cảm ơn
-                window.location.href = '/order-success';
+                if (paymentMethod == 'CASH') {
+                    showAlert('success', 'Đặt hàng thành công! Vui lòng thanh toán khi nhận hàng');
+
+                    navigate('/order-success', {
+                        state: {
+                            orderId: result.data.orderId,
+                            totalPay: result.data.totalPay,
+                            receiverName: formData.fullName,
+                            receiverPhone: formData.phone,
+                            shippingAddress: formData.address,
+                            paymentMethod: paymentMethod
+                        }
+                    });
+                } else {
+                    navigate('/order-success2');
+                }
             } else {
-                alert(`Lỗi đặt hàng: ${result.message || 'Vui lòng thử lại sau.'}`);
+                showAlert('error', `Lỗi đặt hàng: ${result.message || 'Vui lòng thử lại sau.'}`);
             }
         } catch (error) {
             console.error('Lỗi hệ thống khi đặt hàng:', error);
-            alert('Có lỗi xảy ra trong quá trình xử lý. Vui lòng thử lại.');
+            showAlert('error', 'Có lỗi xảy ra trong quá trình xử lý. Vui lòng thử lại.');
         } finally {
             setIsSubmitting(false);
         }
@@ -203,7 +221,7 @@ const ClientCheckoutView: React.FC = () => {
                     </div>
 
                     {/* Phương thức thanh toán */}
-                    <div className="payment-methods">
+                    <div className="checkout-payment-methods">
                         <PaymentMethodSelector
                             selectedMethod={paymentMethod}
                             onSelect={setPaymentMethod}

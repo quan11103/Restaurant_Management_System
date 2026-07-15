@@ -18,6 +18,7 @@ import HomeView from './views/online order/home/HomeView'
 import ProductDetailView from './views/online order/product detail/ProductDetailView';
 import CartView from './views/online order/cart/CartView';
 import ClientCheckoutView from './views/online order/client-checkout/ClientCheckoutView';
+import OrderSuccessView from './views/online order/client-checkout/ThankYouView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -90,6 +91,8 @@ function App() {
             <Route path="/product/:id" element={<ProductDetailView />} />
             <Route path="/cart" element={<CartView />} />
             <Route path="/client-checkout" element={<ClientCheckoutView />} />
+            <Route path="/order-success" element={<OrderSuccessView />} />
+            <Route path="/order-success2" element={<OrderSuccessView />} />
           </Route>
 
           {/* Route 404 */}

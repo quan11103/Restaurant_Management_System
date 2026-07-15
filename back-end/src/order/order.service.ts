@@ -177,7 +177,6 @@ export class OrderService {
               dishId: item.dishId,
               price: item.dish.price,
               quantity: item.quantity,
-              subTotal: item.dish.price * item.quantity, // Thành tiền từng món
             })),
           },
         },

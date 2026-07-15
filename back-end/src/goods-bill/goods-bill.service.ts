@@ -51,7 +51,6 @@ export class GoodsBillService {
       const newGoodsBill = await tx.goodsBill.create({
         data: {
           warehouseStaffId: warehouseStaffId,
-          total: totalAmount,
         },
       });
 

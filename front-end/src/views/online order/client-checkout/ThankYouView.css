@@ -1,0 +1,220 @@
+/* Định nghĩa biến màu để bạn dễ tùy chỉnh nếu muốn đổi màu thương hiệu */
+:root {
+    --primary-color: #059669;
+    /* Xanh lá dễ chịu, tạo cảm giác an tâm */
+    --primary-hover: #047857;
+    --bg-light: #f4fbf7;
+    --text-dark: #1f2937;
+    --text-muted: #4b5563;
+    --border-color: #e5e7eb;
+}
+
+/* Khung ngoài cùng */
+.ty-container {
+    min-height: 100vh;
+    background-color: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Card chứa nội dung */
+.ty-card {
+    background: #ffffff;
+    max-width: 550px;
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    padding: 40px;
+    border: 1px solid var(--border-color);
+    animation: tySlideUp 0.6s ease-out;
+}
+
+/* Hiệu ứng mượt mà khi load trang */
+@keyframes tySlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Phần icon thành công */
+.ty-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.ty-icon-box {
+    width: 72px;
+    height: 72px;
+    background-color: var(--bg-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+}
+
+.ty-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--primary-color);
+    stroke-width: 2.5;
+}
+
+.ty-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
+}
+
+.ty-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 20px;
+    margin: 0;
+}
+
+/* Thông tin tóm tắt đơn hàng */
+.ty-summary {
+    background-color: #fafafa;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.ty-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.ty-row:last-child {
+    margin-bottom: 0;
+}
+
+.ty-label {
+    color: #6b7280;
+}
+
+.ty-val {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.ty-badge {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* Đường gạch đứt phân tách tinh tế */
+.ty-divider {
+    border: none;
+    border-top: 1px dashed var(--border-color);
+    margin: 16px 0;
+}
+
+.ty-total-label {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.ty-total-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Phần thông tin người nhận */
+.ty-delivery-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.ty-delivery-details {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 16px;
+    margin-bottom: 30px;
+}
+
+.ty-delivery-item {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+}
+
+.ty-delivery-item:last-child {
+    margin-bottom: 0;
+}
+
+.ty-delivery-item strong {
+    color: var(--text-dark);
+}
+
+/* Group các nút bấm hành động */
+.ty-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.ty-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-align: center;
+}
+
+.ty-btn-outline {
+    background-color: #ffffff;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.ty-btn-outline:hover {
+    background-color: #f9fafb;
+    color: var(--text-dark);
+}
+
+.ty-btn-fill {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.ty-btn-fill:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Giao diện khi truy cập sai luồng (Không có Order) */
+.ty-error-card {
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+}
