@@ -1,7 +1,8 @@
 import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { ClientCheckoutDto } from './dto/client-checkout.dto'; // Bạn cần tạo DTO này cho luồng online
+import { ClientCheckoutDto } from './dto/client-checkout.dto';
+import { OrderStatus, PaymentStatus } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
@@ -165,13 +166,12 @@ export class OrderService {
         data: {
           clientId: clientId,
           totalQuantity: totalQuantity,
-          total: finalTotal,             // Lưu số tiền cuối cùng khách phải trả
-          orderType: 'DELIVERY',         // Mặc định Khách đặt qua Web là Delivery
-          shippingAddress: address,       // Map đúng các cột trong DB của bạn
+          total: finalTotal,
+          orderType: 'DELIVERY',
+          shippingAddress: address,
           receiverPhone: phone,
           receiverName: fullName,
           status: 'PENDING',
-          // Tạo hàng loạt các món ăn trong đơn hàng thông qua lớp liên kết
           orderedDishes: {
             create: cartItems.map((item) => ({
               dishId: item.dishId,
@@ -210,13 +210,62 @@ export class OrderService {
       });
 
       return {
-        success: true,
-        message: 'Đặt hàng và tạo hóa đơn thành công!',
-        data: {
-          orderId: newOrder.id,
-          totalPay: finalTotal,
-        },
+        orderId: newOrder.id,
+        totalPay: newOrder.total,
+        paymentMethod: paymentMethod,
       };
+    });
+  }
+
+  // Tìm kiếm đơn hàng theo ID
+  async findOrderById(id: number | string) {
+    return await this.prisma.order.findUnique({
+      where: { id: Number(id) },
+      include: {
+        bill: true,
+      }
+    });
+  }
+
+  // Cập nhật trạng thái đơn hàng
+  async updateOrderStatus(id: number | string, status: OrderStatus) {
+    return await this.prisma.order.update({
+      where: { id: Number(id) },
+      data: { status },
+    });
+  }
+
+  async updateBillForOrder(
+    orderId: string | number,
+    data: {
+      paymentStatus: PaymentStatus,
+      paymentTransactionNo?: string | null, // Cho phép null/undefined nếu giao dịch lỗi
+      paymentBankCode?: string | null
+    }
+  ) {
+    const numericOrderId = Number(orderId);
+
+    // Sử dụng upsert để "chấp hết" mọi tình huống: có hay chưa có Bill đều chạy được
+    return await this.prisma.bill.upsert({
+      where: {
+        orderId: numericOrderId // Lưu ý: Trường orderId trong model Bill phải có @unique nhé!
+      },
+      // Nếu ĐÃ TỒN TẠI Bill trước đó: Chỉ cập nhật các trường liên quan đến thanh toán
+      update: {
+        paymentStatus: data.paymentStatus,
+        paymentTransactionNo: data.paymentTransactionNo ?? null,
+        paymentBankCode: data.paymentBankCode ?? null,
+      },
+      // Nếu CHƯA CÓ Bill (Ví dụ luồng tạo đơn quên tạo Bill đi kèm): Tạo mới luôn hóa đơn này
+      create: {
+        orderId: numericOrderId,
+        paymentStatus: data.paymentStatus,
+        paymentTransactionNo: data.paymentTransactionNo ?? null,
+        paymentBankCode: data.paymentBankCode ?? null,
+        paymentMethod: 'TRANSFER',
+        // Thêm các trường bắt buộc khác của model Bill nếu có (ví dụ: totalAmount, code, v.v...)
+        // totalAmount: 0 
+      },
     });
   }
 }

@@ -13,10 +13,12 @@ import { IngredientSupplierModule } from './ingredient-supplier/ingredient-suppl
 import { GoodsBillModule } from './goods-bill/goods-bill.module';
 import { DishImageModule } from './dish-image/dish-image.module';
 import { CartItemModule } from './cart-item/cart-item.module';
+import { VnpayService } from './vnpay/vnpay.service';
+import { BillModule } from './bill/bill.module';
 
 @Module({
-    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule],
+    imports: [AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule, BillModule],
     controllers: [],
-    providers: [PrismaService],
+    providers: [PrismaService, VnpayService],
 })
 export class AppModule { }

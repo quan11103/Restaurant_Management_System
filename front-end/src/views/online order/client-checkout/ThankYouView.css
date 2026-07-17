@@ -9,6 +9,13 @@
     --border-color: #e5e7eb;
 }
 
+/* 🌟 BỔ SUNG: Ghi đè màu sắc khi giao dịch lỗi */
+.ty-container.is-error {
+    --primary-color: #ef4444;
+    --primary-hover: #dc2626;
+    --bg-light: #fef2f2;
+}
+
 /* Khung ngoài cùng */
 .ty-container {
     min-height: 100vh;
@@ -113,20 +120,27 @@
     color: var(--text-dark);
 }
 
+/* 🌟 BỔ SUNG: Trạng thái badge */
 .ty-badge {
-    background-color: #e0f2fe;
-    color: #0369a1;
     font-size: 12px;
     padding: 2px 8px;
     border-radius: 12px;
     font-weight: 500;
 }
 
-/* Đường gạch đứt phân tách tinh tế */
-.ty-divider {
-    border: none;
-    border-top: 1px dashed var(--border-color);
-    margin: 16px 0;
+.ty-badge.success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.ty-badge.danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.ty-badge.pending {
+    background-color: #e0f2fe;
+    color: #0369a1;
 }
 
 .ty-total-label {

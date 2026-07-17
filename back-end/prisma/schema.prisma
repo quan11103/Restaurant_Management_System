@@ -35,6 +35,14 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
 model Restaurant {
   id          Int      @id @default(autoincrement())
   name        String
@@ -196,13 +204,16 @@ model Promotion {
 }
 
 model Bill {
-  id            Int        @id @default(autoincrement())
-  orderId       Int        @unique // Đảm bảo quan hệ 1-1 với Order
-  cashierId     Int?
-  promotionId   Int?
-  paymentTime   DateTime   @default(now())
-  paymentMethod String
-  discount      Float      @default(0.0)
+  id                    Int        @id @default(autoincrement())
+  orderId               Int        @unique // Đảm bảo quan hệ 1-1 với Order
+  cashierId             Int?
+  promotionId           Int?
+  paymentTime           DateTime   @default(now())
+  paymentMethod         String
+  discount              Float      @default(0.0)
+  paymentStatus         PaymentStatus?
+  paymentTransactionNo  String? 
+  paymentBankCode       String? 
 
   order         Order      @relation(fields: [orderId], references: [id])
   cashier       User?      @relation("CashierBills", fields: [cashierId], references: [id])

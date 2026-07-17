@@ -86,10 +86,12 @@ const ClientCheckoutView: React.FC = () => {
                 promoCode: appliedPromoCode
             });
 
-            const result = await response.data;
+            const result = response.data;
 
             if (result.success) {
-                if (paymentMethod == 'CASH') {
+                if (paymentMethod === 'TRANSFER' && result.paymentUrl) {
+                    window.location.href = result.paymentUrl;
+                } else {
                     showAlert('success', 'Đặt hàng thành công! Vui lòng thanh toán khi nhận hàng');
 
                     navigate('/order-success', {
@@ -102,16 +104,14 @@ const ClientCheckoutView: React.FC = () => {
                             paymentMethod: paymentMethod
                         }
                     });
-                } else {
-                    navigate('/order-success2');
                 }
             } else {
                 showAlert('error', `Lỗi đặt hàng: ${result.message || 'Vui lòng thử lại sau.'}`);
+                setIsSubmitting(false);
             }
         } catch (error) {
             console.error('Lỗi hệ thống khi đặt hàng:', error);
             showAlert('error', 'Có lỗi xảy ra trong quá trình xử lý. Vui lòng thử lại.');
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -236,7 +236,9 @@ const ClientCheckoutView: React.FC = () => {
                             disabled={isSubmitting || cartItems.length === 0}
                             style={{ opacity: (isSubmitting || cartItems.length === 0) ? 0.7 : 1 }}
                         >
-                            {isSubmitting ? 'Đang xử lý...' : `Đặt hàng (${finalTotal.toLocaleString('vi-VN')} đ)`}
+                            {isSubmitting
+                                ? (paymentMethod === 'TRANSFER' ? 'Đang chuyển hướng VNPAY...' : 'Đang xử lý...')
+                                : `Đặt hàng (${finalTotal.toLocaleString('vi-VN')} đ)`}
                         </button>
                     </div>
                 </div>
