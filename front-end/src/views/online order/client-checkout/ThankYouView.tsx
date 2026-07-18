@@ -25,29 +25,39 @@ interface FetchedOrderInfo {
     address?: string;
 }
 
+const handleRetryCheckout = async (orderId: number) => {
+    try {
+        const response = await axiosClient.post('/orders/retry-checkout', {
+            orderId: orderId
+        });
+
+        if (response.data && response.data.success && response.data.paymentUrl) {
+            window.location.href = response.data.paymentUrl;
+        }
+    } catch (error) {
+        console.error("Lỗi khi thanh toán lại đơn hàng:", error);
+    }
+};
+
 const ThankYouView: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-
-    // State lưu trữ thông tin lấy từ API cho luồng VNPAY
     const [fetchedOrderInfo, setFetchedOrderInfo] = useState<FetchedOrderInfo | null>(null);
 
-    // 1. Phân tích các tham số từ VNPAY trên URL
     const vnpResponseCode = searchParams.get('vnp_ResponseCode');
     const vnpTxnRef = searchParams.get('vnp_TxnRef');
     const vnpAmount = searchParams.get('vnp_Amount');
 
-    // Nếu trên URL có mã VNPAY thì đích thị là luồng VNPAY
+    // Nếu trên URL có mã VNPAY thì đây là luồng VNPAY
     const isVnpayFlow = vnpResponseCode !== null;
 
-    // Nếu là VNPAY, thành công khi mã = '00'. Nếu là COD, mặc định vào được đây là thành công.
     const isSuccess = isVnpayFlow ? vnpResponseCode === '00' : true;
 
-    // 2. Lấy dữ liệu nội bộ (Dành cho COD)
+    // Lấy dữ liệu nội bộ (Dành cho COD)
     const orderData = location.state as OrderState | null;
 
-    // 3. Hợp nhất dữ liệu hiển thị giữa VNPAY và COD
+    // Hợp nhất dữ liệu hiển thị giữa VNPAY và COD
     const finalOrderId = isVnpayFlow ? vnpTxnRef : orderData?.orderId;
 
     useEffect(() => {
@@ -99,18 +109,16 @@ const ThankYouView: React.FC = () => {
         ? (vnpAmount ? Number(vnpAmount) / 100 : 0)
         : (orderData?.order?.totalAmount || orderData?.totalPay || 0);
 
-    // CẬP NHẬT LẠI CÁC BIẾN NÀY ĐỂ ƯU TIÊN DỮ LIỆU TỪ API (nếu có)
+    // Cập nhật lại các biến này để ưu tiên dữ liệu từ API (nếu có)
     const finalReceiverName = orderData?.order?.fullName || orderData?.receiverName || fetchedOrderInfo?.fullName || 'Đang cập nhật...';
     const finalPhone = orderData?.order?.phone || orderData?.receiverPhone || fetchedOrderInfo?.phone || 'Đang cập nhật...';
     const finalAddress = orderData?.order?.address || orderData?.shippingAddress || fetchedOrderInfo?.address || 'Đang cập nhật...';
     const methodDisplay = isVnpayFlow ? 'Thanh toán trực tuyến (VNPAY)' : 'Thanh toán khi nhận hàng (COD)';
 
     return (
-        /* Thêm class is-error nếu isSuccess = false để tự động đổi màu UI sang đỏ */
         <div className={`ty-container ${!isSuccess ? 'is-error' : ''}`}>
             <div className="ty-card">
 
-                {/* Phần đầu chúc mừng hoặc báo lỗi */}
                 <div className="ty-header">
                     <div className="ty-icon-box">
                         {isSuccess ? (
@@ -145,7 +153,7 @@ const ThankYouView: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Thông tin hóa đơn đơn giản */}
+                {/* Tóm tắt thông tin hóa đơn */}
                 <div className="ty-summary">
                     <div className="ty-row">
                         <span className="ty-label">Mã đơn hàng:</span>
@@ -176,11 +184,11 @@ const ThankYouView: React.FC = () => {
                     </>
                 )}
 
-                {/* Nút điều hướng thông minh */}
+                {/* Nút điều hướng */}
                 <div className="ty-actions">
                     {!isSuccess ? (
                         <>
-                            <button onClick={() => navigate('/client-checkout')} className="ty-btn ty-btn-fill">
+                            <button onClick={() => handleRetryCheckout(Number(finalOrderId))} className="ty-btn ty-btn-fill">
                                 Thử thanh toán lại
                             </button>
                             <button onClick={() => navigate('/')} className="ty-btn ty-btn-outline">

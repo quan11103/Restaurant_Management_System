@@ -23,7 +23,7 @@ export class VnpayService {
             vnp_TxnRef: orderId,
             vnp_OrderInfo: orderInfo,
             vnp_OrderType: 'other',
-            vnp_Amount: amount * 100, // VNPAY bắt buộc nhân 100 để quy đổi xu thành VNĐ
+            vnp_Amount: amount * 100, // VNPAY bắt buộc nhân 100 để quy đổi thành VNĐ xu
             vnp_ReturnUrl: this.returnUrl,
             vnp_IpAddr: ipAddress,
             vnp_CreateDate: createDate,
@@ -46,6 +46,25 @@ export class VnpayService {
         return `${this.vnpUrl}?${qs.stringify(sortedParams, { encode: false })}`;
     }
 
+    // Kiểm tra tính hợp lệ của dữ liệu IPN từ VNPAY
+    verifyIpn(query: Record<string, any>): boolean {
+        const vnp_SecureHash = query['vnp_SecureHash'];
+
+        // Clone object để xóa các trường chữ ký cũ tránh làm lệch chuỗi băm
+        const vnp_Params = { ...query };
+        delete vnp_Params['vnp_SecureHash'];
+        delete vnp_Params['vnp_SecureHashType'];
+
+        // Sắp xếp lại và tiến hành băm đối chiếu
+        const sortedParams = this.sortObject(vnp_Params);
+        const signData = qs.stringify(sortedParams, { encode: false });
+
+        const hmac = crypto.createHmac('sha512', this.secretKey);
+        const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+
+        return vnp_SecureHash === signed;
+    }
+
     // Hàm sắp xếp các key của Object theo Alphabet và Encode từng value chuẩn VNPAY
     private sortObject(obj: Record<string, any>): Record<string, any> {
         const sorted: Record<string, any> = {};
@@ -53,7 +72,6 @@ export class VnpayService {
 
         for (const key of keys) {
             if (obj[key] !== null && obj[key] !== undefined && obj[key].toString().trim() !== '') {
-                // Encode key và value, chuyển dấu cách thành '+' theo đúng chuẩn băm bảo mật của VNPAY
                 const encodedKey = encodeURIComponent(key);
                 const encodedValue = encodeURIComponent(obj[key].toString()).replace(/%20/g, '+');
                 sorted[encodedKey] = encodedValue;
@@ -64,7 +82,6 @@ export class VnpayService {
 
     // Định dạng thời gian theo chuẩn yyyyMMddHHmmss của GMT+7 (Việt Nam)
     private formatDateToVnpay(date: Date): string {
-        // Đảm bảo đưa về múi giờ GMT+7 kể cả khi Server deploy ở nước ngoài (AWS, Heroku...)
         const utc = date.getTime() + date.getTimezoneOffset() * 60000;
         const vietnamTime = new Date(utc + 3600000 * 7);
 
@@ -78,26 +95,5 @@ export class VnpayService {
         const seconds = pad(vietnamTime.getSeconds());
 
         return `${year}${month}${day}${hours}${minutes}${seconds}`;
-    }
-
-    // Kiểm tra tính hợp lệ của dữ liệu IPN từ VNPAY
-    verifyIpn(query: Record<string, any>): boolean {
-        const vnp_SecureHash = query['vnp_SecureHash'];
-
-        // Clone object để không làm thay đổi object gốc, sau đó xóa các trường chữ ký đi để băm lại
-        const vnp_Params = { ...query };
-        delete vnp_Params['vnp_SecureHash'];
-        delete vnp_Params['vnp_SecureHashType'];
-
-        // Sắp xếp lại theo chuẩn
-        const sortedParams = this.sortObject(vnp_Params);
-        const signData = qs.stringify(sortedParams, { encode: false });
-
-        // Tạo lại mã băm từ dữ liệu nhận được
-        const hmac = crypto.createHmac('sha512', this.secretKey);
-        const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-
-        // So sánh mã băm tạo ra với mã băm VNPAY gửi sang
-        return vnp_SecureHash === signed;
     }
 }

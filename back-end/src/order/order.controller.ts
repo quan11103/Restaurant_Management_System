@@ -5,7 +5,6 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { ClientCheckoutDto } from './dto/client-checkout.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { VnpayService } from 'src/vnpay/vnpay.service';
-import { PaymentStatus } from '@prisma/client';
 
 @Controller('orders')
 export class OrderController {
@@ -32,12 +31,12 @@ export class OrderController {
       throw new BadRequestException('Client ID not found in token');
     }
 
-    // Lưu đơn hàng vào Database thông qua OrderService
+    // Lưu đơn hàng
     const orderResult = await this.orderService.clientCheckout(Number(clientId), clientCheckoutDto);
 
     if (clientCheckoutDto.paymentMethod === 'TRANSFER') {
 
-      // Lấy địa chỉ IP của Client
+      // Lấy địa chỉ IP
       let ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
       if (ipAddress === '::1') {
         ipAddress = '127.0.0.1';
@@ -57,6 +56,10 @@ export class OrderController {
         order: orderResult,
         paymentUrl: paymentUrl,
       };
+    } else if (clientCheckoutDto.paymentMethod === 'CASH') {
+      await this.orderService.updateBillForOrder(orderResult.orderId, {
+        paymentStatus: 'UNPAID',
+      });
     }
 
     return {
@@ -69,52 +72,35 @@ export class OrderController {
   // Nhận thông báo IPN từ VNPAY
   @Get('vnpay-ipn')
   async vnpayIpn(@Query() query: any) {
-    console.log("====== [VNPAY IPN] CÓ REQUEST GỌI VỀ ======");
-    console.log("👉 Toàn bộ Query nhận được:", JSON.stringify(query, null, 2));
-
     try {
-      // 1. Kiểm tra chữ ký
+      // Kiểm tra chữ ký
       const isValidSignature = this.vnpayService.verifyIpn(query);
-      // const isValidSignature = true;
-      console.log("👉 Kiểm tra chữ ký hợp lệ?:", isValidSignature);
       if (!isValidSignature) {
-        console.log("❌ Bị chặn ở: Checksum failed (Sai chữ ký)");
         return { RspCode: '97', Message: 'Checksum failed' };
       }
 
       const orderId = query['vnp_TxnRef'];
       const vnpAmount = Number(query['vnp_Amount']);
       const responseCode = query['vnp_ResponseCode'];
-
-      // Đảm bảo viết đúng từng chữ Hoa/Thường
       const transactionNo = query['vnp_TransactionNo'];
       const bankCode = query['vnp_BankCode'];
 
-      console.log(`👉 Bóc tách dữ liệu: orderId=${orderId}, vnpAmount=${vnpAmount}, transactionNo=${transactionNo}, bankCode=${bankCode}`);
-
-      // 2. Tìm đơn hàng
+      // Tìm đơn hàng
       const order = await this.orderService.findOrderById(orderId);
       if (!order) {
-        console.log("❌ Bị chặn ở: Không tìm thấy đơn hàng tương ứng mã:", orderId);
         return { RspCode: '01', Message: 'Order not found' };
       }
 
-      console.log(`👉 Đơn hàng gốc trong DB: Tổng tiền=${order.total}, Trạng thái=${order.status}`);
-
-      // 3. Kiểm tra số tiền (Tạm thời log ra để đối chiếu xem khớp không)
-      console.log(`👉 So sánh số tiền: Gốc (${order.total * 100}) vs VNPAY (${vnpAmount})`);
+      // Kiểm tra số tiền
       if (order.total * 100 !== vnpAmount) {
-        console.log("❌ Bị chặn ở: Số tiền không khớp!");
         return { RspCode: '04', Message: 'Invalid amount' };
       }
 
-      // 4. Cập nhật khi thành công
+      // Cập nhật khi thành công
       if (responseCode === '00') {
-        console.log("🚀 Luồng chạy hợp lệ! Bắt đầu gọi hàm updateBillForOrder...");
-
         const dbResult = await this.orderService.updateBillForOrder(orderId, {
           paymentStatus: 'PAID',
-          paymentTransactionNo: transactionNo, // Kiểm tra xem biến này trên log có bị undefined không
+          paymentTransactionNo: transactionNo,
           paymentBankCode: bankCode
         });
 
@@ -147,5 +133,45 @@ export class OrderController {
       throw new ForbiddenException('Bạn không có quyền xem đơn hàng này');
     }
     return order;
+  }
+
+  @Post('retry-checkout')
+  @UseGuards(JwtAuthGuard)
+  async retryCheckout(@Request() req: any, @Body() body: { orderId: string }) {
+    // Tìm đơn hàng kèm thông tin Bill
+    const order = await this.orderService.findOrderById(body.orderId);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // Kiểm tra quyền sở hữu đơn hàng
+    const currentUserId = req.user?.sub;
+    if (order.clientId !== Number(currentUserId)) {
+      throw new ForbiddenException('Bạn không có quyền xem đơn hàng này');
+    }
+
+    if (order.bill?.paymentStatus === 'PAID') {
+      throw new BadRequestException('Đơn hàng này đã được thanh toán thành công trước đó.');
+    }
+
+    let ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    if (ipAddress === '::1') {
+      ipAddress = '127.0.0.1';
+    }
+
+    const finalAmount = order.total;
+
+    // Tạo lại URL thanh toán VNPAY mới
+    const paymentUrl = this.vnpayService.createPaymentUrl(
+      ipAddress.toString(),
+      order.id.toString(),
+      finalAmount,
+      `Thanh toan lai don hang #${order.id}`,
+    );
+
+    return {
+      success: true,
+      paymentUrl
+    };
   }
 }

@@ -85,7 +85,7 @@ export class OrderService {
   async clientCheckout(clientId: number, dto: ClientCheckoutDto) {
     const { fullName, phone, address, paymentMethod, promoCode } = dto;
 
-    // 1. LẤY GIỎ HÀNG CỦA CLIENT (Kèm thông tin giá món ăn)
+    // Lấy giỏ hàng của client (Kèm thông tin giá món ăn)
     const cartItems = await this.prisma.cartItem.findMany({
       where: { clientId },
       include: { dish: true },
@@ -95,7 +95,6 @@ export class OrderService {
       throw new BadRequestException('Giỏ hàng của bạn đang trống!');
     }
 
-    // 2. TÍNH TỔNG SỐ LƯỢNG VÀ TIỀN GỐC (TẠM TÍNH)
     let subTotal = 0;
     let totalQuantity = 0;
 
@@ -107,7 +106,7 @@ export class OrderService {
     let discount = 0.0;
     let promotionId: number | null = null;
 
-    // 3. KIỂM TRA VÀ TÍNH TOÁN MÃ GIẢM GIÁ (PROMOTION)
+    // Kiểm tra và tính toán mã giảm giá
     if (promoCode) {
       const promotion = await this.prisma.promotion.findUnique({
         where: { code: promoCode },
@@ -138,7 +137,6 @@ export class OrderService {
       // Tính toán số tiền được giảm
       if (promotion.type === 'PERCENTAGE') {
         discount = (subTotal * promotion.value) / 100;
-        // Chặn nếu vượt quá số tiền giảm tối đa cho phép
         if (promotion.maxDiscount && discount > promotion.maxDiscount) {
           discount = promotion.maxDiscount;
         }
@@ -146,22 +144,20 @@ export class OrderService {
         discount = promotion.value;
       }
 
-      // Đảm bảo số tiền giảm không vượt quá tổng giá trị đơn hàng
       if (discount > subTotal) {
         discount = subTotal;
       }
 
-      // Lấy được ID để lát lưu vào Bill
+      // Lấy ID để lưu vào Bill
       promotionId = promotion.id;
     }
 
-    // Tiền cuối cùng khách phải trả
     const finalTotal = subTotal - discount;
 
-    // 4. TIẾN HÀNH TRANSACTION VÀO DATABASE
+    // Tiến hành transaction vào database
     return await this.prisma.$transaction(async (tx) => {
 
-      // Bước 4.1: Tạo đơn hàng (Order)
+      // Tạo đơn hàng
       const newOrder = await tx.order.create({
         data: {
           clientId: clientId,
@@ -182,17 +178,18 @@ export class OrderService {
         },
       });
 
-      // Bước 4.2: Tạo hóa đơn (Bill) - Quan hệ 1-1 kết nối qua orderId
+      // Tạo hóa đơn
       await tx.bill.create({
         data: {
           orderId: newOrder.id,
           paymentMethod: paymentMethod,
-          discount: discount,            // Số tiền được giảm được cập nhật chính xác tại đây
-          promotionId: promotionId,      // Khóa ngoại ID của Promotion đã được xử lý thành công!
+          discount: discount,
+          promotionId: promotionId,
+          paymentStatus: 'UNPAID',
         },
       });
 
-      // Bước 4.3: Tăng lượt sử dụng mã giảm giá (Nếu có áp mã)
+      // Tăng lượt sử dụng mã giảm giá
       if (promotionId) {
         await tx.promotion.update({
           where: { id: promotionId },
@@ -204,7 +201,7 @@ export class OrderService {
         });
       }
 
-      // Bước 4.4: Xóa toàn bộ sản phẩm trong giỏ hàng (CartItem) của Client sau khi đặt xong
+      // Xóa toàn bộ sản phẩm trong giỏ hàng
       await tx.cartItem.deleteMany({
         where: { clientId: clientId },
       });
@@ -239,32 +236,30 @@ export class OrderService {
     orderId: string | number,
     data: {
       paymentStatus: PaymentStatus,
-      paymentTransactionNo?: string | null, // Cho phép null/undefined nếu giao dịch lỗi
+      paymentTransactionNo?: string | null,
       paymentBankCode?: string | null
     }
   ) {
     const numericOrderId = Number(orderId);
 
-    // Sử dụng upsert để "chấp hết" mọi tình huống: có hay chưa có Bill đều chạy được
+    // Sử dụng upsert để xử lí mọi tình huống
     return await this.prisma.bill.upsert({
       where: {
-        orderId: numericOrderId // Lưu ý: Trường orderId trong model Bill phải có @unique nhé!
+        orderId: numericOrderId
       },
-      // Nếu ĐÃ TỒN TẠI Bill trước đó: Chỉ cập nhật các trường liên quan đến thanh toán
+      // Nếu tồn tại Bill: Chỉ cập nhật các trường liên quan đến thanh toán
       update: {
         paymentStatus: data.paymentStatus,
         paymentTransactionNo: data.paymentTransactionNo ?? null,
         paymentBankCode: data.paymentBankCode ?? null,
       },
-      // Nếu CHƯA CÓ Bill (Ví dụ luồng tạo đơn quên tạo Bill đi kèm): Tạo mới luôn hóa đơn này
+      // Nếu chưa có Bill: Tạo mới luôn hóa đơn này
       create: {
         orderId: numericOrderId,
         paymentStatus: data.paymentStatus,
         paymentTransactionNo: data.paymentTransactionNo ?? null,
         paymentBankCode: data.paymentBankCode ?? null,
         paymentMethod: 'TRANSFER',
-        // Thêm các trường bắt buộc khác của model Bill nếu có (ví dụ: totalAmount, code, v.v...)
-        // totalAmount: 0 
       },
     });
   }
