@@ -7,7 +7,7 @@ export class VnpayService {
     private readonly tmnCode = process.env.VNPAY_TMN_CODE;
     private readonly secretKey = process.env.VNPAY_HASH_SECRET;
     private readonly vnpUrl = process.env.VNPAY_PAYMENT_URL || 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
-    private readonly returnUrl = process.env.VNPAY_RETURN_URL || 'http://localhost:5173/order-success2';
+    private readonly returnUrl = process.env.VNPAY_RETURN_URL || 'http://localhost:5173/order-success';
 
     createPaymentUrl(ipAddress: string, orderId: string, amount: number, orderInfo: string): string {
         const date = new Date();

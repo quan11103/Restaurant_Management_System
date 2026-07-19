@@ -99,6 +99,7 @@ export class OrderController {
       // Cập nhật khi thành công
       if (responseCode === '00') {
         const dbResult = await this.orderService.updateBillForOrder(orderId, {
+          paymentMethod: 'TRANSFER',
           paymentStatus: 'PAID',
           paymentTransactionNo: transactionNo,
           paymentBankCode: bankCode
@@ -119,6 +120,32 @@ export class OrderController {
       console.error('❌ QUÁ TRÌNH XỬ LÝ BỊ CRASH LỖI:', error);
       return { RspCode: '99', Message: 'Unknown error' };
     }
+  }
+
+  // ----------------------------------------------------------------------
+  // API MỚI: Lấy danh sách lịch sử đơn hàng của khách hàng (Có phân trang)
+  // Bắt buộc phải đặt TRƯỚC @Get(':id')
+  // ----------------------------------------------------------------------
+  @Get('history')
+  @UseGuards(JwtAuthGuard)
+  async getClientHistory(
+    @Request() req: any,
+    @Query() query: { status?: string; search?: string; page?: string; limit?: string }
+  ) {
+    const clientId = req.user?.sub;
+    if (!clientId) {
+      throw new BadRequestException('Không tìm thấy thông tin khách hàng trong token');
+    }
+
+    // Chuyển đổi page, limit từ string sang number để service xử lý
+    const page = query.page ? Number(query.page) : 1;
+    const limit = query.limit ? Number(query.limit) : 10;
+
+    return this.orderService.getClientOrderHistory(Number(clientId), {
+      ...query,
+      page,
+      limit,
+    });
   }
 
   @Get(':id')

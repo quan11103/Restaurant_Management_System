@@ -1,0 +1,77 @@
+.order-history-container {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.order-history-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .order-history-toolbar {
+        flex-direction: row;
+    }
+}
+
+.toolbar-search {
+    width: 100%;
+}
+
+.toolbar-filter {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .toolbar-search {
+        width: 33.333333%;
+    }
+
+    .toolbar-filter {
+        width: 25%;
+    }
+}
+
+.loading-state {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 0;
+    color: #6b7280;
+}
+
+/* Ẩn hiện view theo thiết bị */
+.desktop-view {
+    display: none;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.mobile-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .desktop-view {
+        display: block;
+    }
+
+    .mobile-view {
+        display: none;
+    }
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+}

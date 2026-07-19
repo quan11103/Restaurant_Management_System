@@ -4,17 +4,19 @@ import './Button.css';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     children: ReactNode;
     variant?: 'primary' | 'secondary' | 'outline';
+    size?: 'sm' | 'md' | 'lg';
     fullWidth?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
     children,
     variant = 'primary',
+    size = 'md',
     fullWidth = false,
     className = '',
     ...rest
 }) => {
-    const buttonClass = `btn btn-${variant} ${fullWidth ? 'btn-full-width' : ''} ${className}`;
+    const buttonClass = `btn btn-${variant} btn-${size} ${fullWidth ? 'btn-full-width' : ''} ${className}`;
 
     return (
         <button className={buttonClass.trim()} {...rest}>

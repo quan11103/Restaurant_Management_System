@@ -11,7 +11,6 @@ interface PageHeaderProps {
     title: string;
     showBackButton?: boolean;
     onBack?: () => void;
-    breadcrumbs?: BreadcrumbItem[];
     extraActions?: React.ReactNode; // Các nút bấm/hành động bên phải (tùy chọn)
 }
 
@@ -19,24 +18,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     title,
     showBackButton = false,
     onBack,
-    breadcrumbs,
     extraActions
 }) => {
     return (
         <div className="page-header-container">
             {/* Khối bên trái: Gồm Breadcrumbs và Tiêu đề */}
             <div className="ph-left-section">
-                {/* Hiển thị Breadcrumbs nếu có truyền vào */}
-                {breadcrumbs && breadcrumbs.length > 0 && (
-                    <div className="ph-breadcrumbs">
-                        {breadcrumbs.map((crumb, index) => (
-                            <span key={index} className="ph-breadcrumb-item">
-                                {crumb.label}
-                                {index < breadcrumbs.length - 1 && <span className="ph-separator">/</span>}
-                            </span>
-                        ))}
-                    </div>
-                )}
 
                 <div className="ph-title-wrapper">
                     {showBackButton && (

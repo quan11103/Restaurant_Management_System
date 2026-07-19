@@ -1,0 +1,91 @@
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 0;
+}
+
+.pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Base style cho tất cả các nút trong phân trang */
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background-color: transparent;
+    color: #4b5563;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled):not(.active) {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.pagination-btn:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Nút nav (Trái / Phải) */
+.pagination-nav {
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+}
+
+.pagination-nav:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.pagination-nav:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f3f4f6;
+}
+
+/* Trạng thái trang đang chọn (Active) */
+.pagination-number.active {
+    background-color: #3b82f6;
+    /* Đổi màu xanh primary này cho hợp với theme web của bạn */
+    color: #ffffff;
+    border-color: #3b82f6;
+    font-weight: 600;
+}
+
+/* Dấu ba chấm */
+.pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    color: #9ca3af;
+    user-select: none;
+}
+
+/* Responsive cho màn hình nhỏ */
+@media (max-width: 480px) {
+    .pagination-container {
+        gap: 0.25rem;
+    }
+
+    .pagination-btn {
+        min-width: 1.75rem;
+        height: 1.75rem;
+        font-size: 0.8rem;
+    }
+}

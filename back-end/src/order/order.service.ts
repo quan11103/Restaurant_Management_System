@@ -216,12 +216,23 @@ export class OrderService {
 
   // Tìm kiếm đơn hàng theo ID
   async findOrderById(id: number | string) {
-    return await this.prisma.order.findUnique({
+    const order = await this.prisma.order.findUnique({
       where: { id: Number(id) },
       include: {
         bill: true,
+        orderedDishes: {
+          include: {
+            dish: true, // Lấy thông tin món ăn (tên, ảnh, v.v.)
+          }
+        }
       }
     });
+
+    if (!order) {
+      throw new NotFoundException('Không tìm thấy đơn hàng!');
+    }
+
+    return order;
   }
 
   // Cập nhật trạng thái đơn hàng
@@ -235,6 +246,7 @@ export class OrderService {
   async updateBillForOrder(
     orderId: string | number,
     data: {
+      paymentMethod?: string,
       paymentStatus: PaymentStatus,
       paymentTransactionNo?: string | null,
       paymentBankCode?: string | null
@@ -249,6 +261,7 @@ export class OrderService {
       },
       // Nếu tồn tại Bill: Chỉ cập nhật các trường liên quan đến thanh toán
       update: {
+        paymentMethod: data.paymentMethod,
         paymentStatus: data.paymentStatus,
         paymentTransactionNo: data.paymentTransactionNo ?? null,
         paymentBankCode: data.paymentBankCode ?? null,
@@ -262,5 +275,68 @@ export class OrderService {
         paymentMethod: 'TRANSFER',
       },
     });
+  }
+
+  // Lấy lịch sử mua hàng của Client (Có phân trang, lọc, tìm kiếm)
+  async getClientOrderHistory(
+    clientId: number,
+    query: { status?: string; search?: string; page?: number; limit?: number }
+  ) {
+    const { status, search, page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    // Xây dựng điều kiện truy vấn (where clause)
+    const where: any = {
+      clientId: clientId,
+    };
+
+    // Lọc theo trạng thái (bỏ qua nếu là 'ALL')
+    if (status && status !== 'ALL') {
+      where.status = status as OrderStatus;
+    }
+
+    // Tìm kiếm theo mã đơn hàng (ID)
+    if (search) {
+      const searchLike = `%${search}%`;
+
+      // Chỉ dùng SQL thuần để lấy danh sách ID khớp điều kiện
+      // Thêm luôn clientId vào đây để tăng tốc độ quét của Database
+      const matchedOrders: { id: number }[] = await this.prisma.$queryRaw`
+      SELECT id FROM "Order" 
+      WHERE "clientId" = ${clientId} AND CAST(id AS TEXT) LIKE ${searchLike}
+    `;
+
+      // Chuyển mảng object [{id: 7}, {id: 70}] thành mảng số [7, 70]
+      const matchedIds = matchedOrders.map(order => order.id);
+
+      // Đưa vào điều kiện "in" của Prisma
+      // Nếu gõ chữ "abc" -> matchedIds = [] -> Prisma tự hiểu và trả về danh sách rỗng (Quá chuẩn!)
+      where.id = { in: matchedIds };
+    }
+
+    // Chạy song song 2 query: Lấy data và Đếm tổng số lượng (để chia trang)
+    const [orders, totalRecords] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where,
+        include: {
+          bill: true, // Frontend cần field này để hiện nút "Thanh toán"
+        },
+        orderBy: {
+          orderTime: 'desc', // Đơn mới nhất xếp lên đầu
+        },
+        skip,
+        take: Number(limit),
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders,
+      pagination: {
+        currentPage: Number(page),
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+      }
+    };
   }
 }

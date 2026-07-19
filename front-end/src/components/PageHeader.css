@@ -14,26 +14,6 @@
     gap: 18px;
 }
 
-/* Breadcrumbs */
-.ph-breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
-    color: #7f8fa6;
-}
-
-.ph-breadcrumb-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ph-separator {
-    color: #cbd5e1;
-    font-size: 0.8rem;
-}
-
 /* Tiêu đề & Nút quay lại */
 .ph-title-wrapper {
     display: flex;
