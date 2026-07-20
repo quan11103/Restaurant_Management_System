@@ -122,10 +122,7 @@ export class OrderController {
     }
   }
 
-  // ----------------------------------------------------------------------
-  // API MỚI: Lấy danh sách lịch sử đơn hàng của khách hàng (Có phân trang)
-  // Bắt buộc phải đặt TRƯỚC @Get(':id')
-  // ----------------------------------------------------------------------
+  // Lấy danh sách lịch sử đơn hàng của khách hàng (Có phân trang)
   @Get('history')
   @UseGuards(JwtAuthGuard)
   async getClientHistory(
@@ -137,7 +134,7 @@ export class OrderController {
       throw new BadRequestException('Không tìm thấy thông tin khách hàng trong token');
     }
 
-    // Chuyển đổi page, limit từ string sang number để service xử lý
+    // Chuyển đổi page, limit từ string sang number
     const page = query.page ? Number(query.page) : 1;
     const limit = query.limit ? Number(query.limit) : 10;
 

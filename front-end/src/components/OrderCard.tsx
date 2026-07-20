@@ -46,7 +46,7 @@ export default function OrderCard({ order, onActionClick }: OrderCardProps) {
                 </Button>
                 {order.status === 'PENDING' && order.bill?.paymentStatus === 'UNPAID' && (
                     <Button variant="primary" onClick={() => onActionClick('RETRY_PAYMENT', order.id)}>
-                        Thanh toán lại
+                        Thanh toán
                     </Button>
                 )}
             </div>

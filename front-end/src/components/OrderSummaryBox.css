@@ -1,0 +1,74 @@
+.summary-box-container {
+    background-color: #f9fafb;
+    /* Nền xám rất nhạt để làm nổi bật khối tính tiền */
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-box-title {
+    margin: 0 0 1.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.summary-box-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    /* Khoảng cách đều giữa các dòng */
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.summary-label {
+    color: #4b5563;
+    /* Màu xám trung tính cho nhãn */
+}
+
+.summary-value {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* Style riêng cho dòng giảm giá */
+.discount-row .summary-label,
+.discount-row .summary-value {
+    color: #10b981;
+    /* Chữ màu xanh lá cho cảm giác tích cực */
+}
+
+/* Dòng tổng tiền chốt hạ */
+.total-row {
+    align-items: flex-start;
+    /* Căn lên trên vì phần value bên phải có 2 dòng */
+}
+
+.total-row .summary-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-top: 0.25rem;
+}
+
+.summary-total-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* Căn phải */
+}
+
+.summary-total-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ef4444;
+    /* Đỏ nổi bật đặc trưng của e-commerce Việt Nam */
+}

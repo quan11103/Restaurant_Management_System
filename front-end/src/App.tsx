@@ -20,6 +20,7 @@ import CartView from './views/online order/cart/CartView';
 import ClientCheckoutView from './views/online order/client-checkout/ClientCheckoutView';
 import OrderSuccessView from './views/online order/client-checkout/ThankYouView';
 import OrderHistoryView from './views/online order/order history/OrderHistoryView';
+import OrderDetailView from './views/online order/order detail/OrderDetailView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -94,6 +95,7 @@ function App() {
             <Route path="/client-checkout" element={<ClientCheckoutView />} />
             <Route path="/order-success" element={<OrderSuccessView />} />
             <Route path="/order-history" element={<OrderHistoryView />} />
+            <Route path="/order-detail/:id" element={<OrderDetailView />} />
           </Route>
 
           {/* Route 404 */}

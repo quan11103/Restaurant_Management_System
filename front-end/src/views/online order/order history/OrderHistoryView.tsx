@@ -22,6 +22,7 @@ interface OrderRecord {
     status: string;
     bill?: {
         paymentStatus: string;
+        paymentMethod: string;
     };
 }
 
@@ -152,9 +153,9 @@ export default function OrderHistoryView() {
             render: (order) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Button size="sm" variant="outline" onClick={() => handleOrderAction('VIEW', order.id)}>
-                        Xem
+                        Xem chi tiết
                     </Button>
-                    {order.status === 'PENDING' && order.bill?.paymentStatus === 'UNPAID' && (
+                    {order.bill?.paymentMethod === 'TRANSFER' && order.status === 'PENDING' && order.bill?.paymentStatus === 'UNPAID' && (
                         <Button size="sm" variant="primary" onClick={() => handleOrderAction('RETRY_PAYMENT', order.id)}>
                             Thanh toán
                         </Button>

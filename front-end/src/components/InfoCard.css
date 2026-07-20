@@ -1,0 +1,72 @@
+.info-card-container {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    /* Viền xám nhạt */
+    border-radius: 8px;
+    /* Bo góc mềm mại */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    /* Đổ bóng nhẹ tạo chiều sâu */
+    overflow: hidden;
+    /* Đảm bảo nội dung không tràn ra ngoài viền bo góc */
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background-color: #f9fafb;
+    /* Nền xám thật nhạt cho phần header để phân biệt với nội dung */
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    /* Xám đậm */
+}
+
+/* Nút hành động (Ví dụ: nút "Sửa") */
+.info-card-action-btn {
+    background: transparent;
+    border: none;
+    color: #3b82f6;
+    /* Màu xanh primary */
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.info-card-action-btn:hover {
+    background-color: #eff6ff;
+    /* Nền xanh nhạt khi hover */
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.info-card-body {
+    padding: 1.25rem;
+    color: #4b5563;
+    /* Màu chữ chuẩn cho nội dung */
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/* 
+  Reset margin cho các phần tử con trực tiếp bên trong body để 
+  đảm bảo khoảng cách không bị đẩy ra quá rộng 
+*/
+.info-card-body>p:first-child {
+    margin-top: 0;
+}
+
+.info-card-body>p:last-child {
+    margin-bottom: 0;
+}

@@ -48,8 +48,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                     </div>
                 )}
 
-                <div className="summary-divider"></div>
-
                 <div className="summary-row total-row">
                     <span className="summary-label">Tổng cộng</span>
                     <span className="total-amount">{formatCurrency(total)}</span>
