@@ -1,4 +1,3 @@
-import React from 'react';
 import { ClipboardList, Package, Truck, CheckCircle2, XCircle } from 'lucide-react';
 import './OrderTimeline.css';
 
@@ -49,7 +48,6 @@ export default function OrderTimeline({ currentStatus }: OrderTimelineProps) {
                     </div>
                     <div className="step-content">
                         <span className="step-label">Đơn hàng đã bị hủy</span>
-                        <span className="step-description">Tiến trình bị gián đoạn</span>
                     </div>
                 </div>
             ) : (

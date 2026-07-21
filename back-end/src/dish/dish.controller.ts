@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
-import { DishService } from './dish.service';
+import { DishService, DishQueryDto } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -13,34 +13,37 @@ export class DishController {
 
   @Post()
   @Auth(Role.MANAGER) // Chỉ Quản lý mới được thêm món vào Menu
+  @ApiOperation({ summary: 'Tạo món ăn mới (Chỉ Manager)' })
   create(@Body() createDishDto: CreateDishDto) {
     return this.dishService.create(createDishDto);
   }
 
   @Get()
-  findAll() {
-    return this.dishService.findAll();
+  @ApiOperation({ summary: 'Lấy danh sách món ăn (Phân trang, lọc, tìm kiếm)' })
+  findAll(@Query() query: DishQueryDto) {
+    return this.dishService.findAll(query);
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Lấy chi tiết món ăn theo ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.findOne(id);
   }
 
   @Patch(':id')
   @Auth(Role.MANAGER) // Chỉ Quản lý mới được sửa giá hoặc tên món
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDishDto: UpdateDishDto) {
+  @ApiOperation({ summary: 'Cập nhật món ăn (Chỉ Manager)' })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDishDto: UpdateDishDto,
+  ) {
     return this.dishService.update(id, updateDishDto);
   }
 
   @Delete(':id')
   @Auth(Role.MANAGER)
+  @ApiOperation({ summary: 'Xóa món ăn (Chỉ Manager)' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.remove(id);
-  }
-
-  @Get('search')
-  searchDish(@Query('keyword') keyword: string) {
-    return this.dishService.searchDish(keyword);
   }
 }

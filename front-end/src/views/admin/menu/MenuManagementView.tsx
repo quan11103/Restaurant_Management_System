@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosClient from '../../../api/axios';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useAlert } from '../../../components/Alert';
@@ -7,6 +7,7 @@ import DataTable, { type Column } from '../../../components/DataTable';
 import Modal from '../../../components/Modal';
 import Badge from '../../../components/Badge';
 import ConfirmModal from '../../../components/ConfirmModal';
+import Pagination from '../../../components/Pagination';
 import MenuFilterBar from './MenuFilterBar';
 import MenuForm, { type DishImageInput, type MenuFormData } from './MenuForm';
 import './MenuManagementView.css';
@@ -57,24 +58,51 @@ const MenuManagementView: React.FC = () => {
         images: [],
     });
 
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const itemsPerPage = 10;
+
+    useEffect(() => {
+        fetchDishes();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCategory, currentPage, searchTerm]);
+
     const fetchDishes = async () => {
         setIsLoading(true);
         try {
-            const response = await axiosClient.get('/dishes');
-            if (response.data) {
-                const data = response.data;
+            const response = await axiosClient.get('/dishes', {
+                params: {
+                    search: searchTerm,
+                    type: selectedCategory !== 'Tất cả' ? selectedCategory : undefined,
+                    page: currentPage,
+                    limit: itemsPerPage,
+                },
+            });
 
-                const formattedData: MenuItem[] = data.map((item: any) => ({
+            if (response.data) {
+                // Xử lý linh hoạt cấu trúc trả về từ backend
+                const rawData = Array.isArray(response.data)
+                    ? response.data
+                    : response.data.data || response.data.dishes || response.data.items || [];
+
+                const formattedData: MenuItem[] = rawData.map((item: any) => ({
                     id: item.id,
                     name: item.name,
                     category: item.type,
                     price: item.price,
                     isAvailable: item.isAvailable !== false ? 'Có thể gọi' : 'Tạm ngừng',
                     description: item.description || '',
-                    images: item.images || []
+                    images: item.images || [],
                 }));
 
                 setMenuItems(formattedData);
+
+                if (response.data.pagination) {
+                    setCurrentPage(response.data.pagination.currentPage || currentPage);
+                    setTotalPages(response.data.pagination.totalPages || 1);
+                } else {
+                    setTotalPages(response.data.totalPages || 1);
+                }
             } else {
                 showAlert('error', 'Không thể tải dữ liệu thực đơn', 'Lỗi');
             }
@@ -86,27 +114,9 @@ const MenuManagementView: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        fetchDishes();
-    }, []);
-
-    const filteredMenuItems = useMemo(() => {
-        return menuItems.filter((item) => {
-            const idString = String(item.id || '');
-            const matchesSearch =
-                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                idString.toLowerCase().includes(searchTerm.toLowerCase());
-
-            const matchesCategory =
-                selectedCategory === 'Tất cả' || item.category === selectedCategory;
-
-            return matchesSearch && matchesCategory;
-        });
-    }, [searchTerm, selectedCategory, menuItems]);
-
     const handleOpenAddModal = () => {
         setEditingItem(null);
-        setFormData({ name: '', category: 'Đồ ăn nhanh', price: '', isAvailable: 'Có thể gọi', description: '', images: [] });
+        setFormData({ name: '', category: 'Món chính', price: '', isAvailable: 'Có thể gọi', description: '', images: [] });
         setIsModalOpen(true);
     };
 
@@ -144,9 +154,7 @@ const MenuManagementView: React.FC = () => {
         };
 
         const isEditMode = !!editingItem;
-        const url = isEditMode
-            ? `/dishes/${editingItem.id}`
-            : '/dishes';
+        const url = isEditMode ? `/dishes/${editingItem.id}` : '/dishes';
         const method = isEditMode ? 'patch' : 'post';
 
         try {
@@ -246,18 +254,32 @@ const MenuManagementView: React.FC = () => {
 
             <MenuFilterBar
                 searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
+                onSearchChange={(val) => {
+                    setSearchTerm(val);
+                    setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+                }}
                 selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
+                onCategoryChange={(val) => {
+                    setSelectedCategory(val);
+                    setCurrentPage(1); // Reset về trang 1 khi lọc danh mục
+                }}
                 categoryOptions={categoryOptions}
             />
 
             <div className="view-content">
                 <DataTable
                     columns={columns}
-                    data={filteredMenuItems}
-                    emptyMessage={isLoading ? "Đang tải dữ liệu..." : "Không tìm thấy món ăn nào khớp với bộ lọc"}
+                    data={menuItems}
+                    emptyMessage={isLoading ? 'Đang tải dữ liệu...' : 'Không tìm thấy món ăn nào khớp với bộ lọc'}
                 />
+
+                <div className="pagination-wrapper">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
             </div>
 
             <Modal
@@ -269,8 +291,12 @@ const MenuManagementView: React.FC = () => {
                 title={editingItem ? 'Cập Nhật Món Ăn' : 'Thêm Món Ăn Mới'}
                 footer={
                     <>
-                        <button className="btn-form-cancel" onClick={() => { setIsModalOpen(false); setEditingItem(null); }}>Hủy bỏ</button>
-                        <button className="btn-form-submit" onClick={handleSaveItem}>Lưu thông tin</button>
+                        <button className="btn-form-cancel" onClick={() => { setIsModalOpen(false); setEditingItem(null); }}>
+                            Hủy bỏ
+                        </button>
+                        <button className="btn-form-submit" onClick={handleSaveItem}>
+                            Lưu thông tin
+                        </button>
                     </>
                 }
                 maxWidth="550px"

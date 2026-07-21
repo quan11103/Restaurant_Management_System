@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'
 import axiosClient from '../../../api/axios';
 import { Package } from 'lucide-react';
@@ -13,7 +13,6 @@ import Pagination from '../../../components/Pagination';
 import OrderCard from '../../../components/OrderCard';
 import './OrderHistoryView.css';
 
-// Định nghĩa interface cho Order để DataTable kiểm soát kiểu dữ liệu tốt hơn
 interface OrderRecord {
     id: string;
     orderTime: string;
@@ -63,7 +62,6 @@ export default function OrderHistoryView() {
                 }
             });
 
-            // Map data từ response backend
             setOrders(response.data.data);
             setCurrentPage(response.data.pagination.currentPage);
             setTotalPages(response.data.pagination.totalPages || 1);
@@ -100,12 +98,11 @@ export default function OrderHistoryView() {
         window.history.back();
     };
 
-    // Cấu hình các cột đã được cập nhật theo cấu trúc mới của DataTable
     const tableColumns: Column<OrderRecord>[] = [
         {
             key: 'id',
-            title: 'Mã ĐH', // Thay label thành title
-            render: (order) => <strong>#{order.id}</strong> // Nhận nguyên object order làm tham số
+            title: 'Mã ĐH',
+            render: (order) => <strong>#{order.id}</strong>
         },
         {
             key: 'orderTime',
@@ -199,7 +196,6 @@ export default function OrderHistoryView() {
                 <div className="loading-state">Đang tải dữ liệu...</div>
             ) : (
                 <>
-                    {/* Chỉ bật tắt vùng hiển thị nội dung/EmptyState tùy theo số lượng đơn hàng */}
                     {orders.length === 0 ? (
                         <EmptyState
                             icon={<Package size={40} strokeWidth={1.5} />}
@@ -226,11 +222,10 @@ export default function OrderHistoryView() {
                         </>
                     )}
 
-                    {/* Đưa thanh phân trang ra hẳn bên ngoài để không bị biến mất khi trang trống */}
                     <div className="pagination-wrapper">
                         <Pagination
                             currentPage={currentPage}
-                            totalPages={totalPages} // Đã đổi thành state động
+                            totalPages={totalPages}
                             onPageChange={setCurrentPage}
                         />
                     </div>

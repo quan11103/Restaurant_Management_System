@@ -6,7 +6,7 @@ interface InfoCardProps {
     children: ReactNode;
     actionLabel?: string; // Tùy chọn: Chữ cho nút hành động ở góc phải (VD: "Sửa", "Chi tiết")
     onActionClick?: () => void; // Tùy chọn: Hàm xử lý khi bấm vào nút hành động
-    className?: string; // Cho phép truyền thêm class từ bên ngoài để tùy biến margin/padding nếu cần
+    className?: string;
 }
 
 export default function InfoCard({

@@ -21,6 +21,7 @@ import ClientCheckoutView from './views/online order/client-checkout/ClientCheck
 import OrderSuccessView from './views/online order/client-checkout/ThankYouView';
 import OrderHistoryView from './views/online order/order history/OrderHistoryView';
 import OrderDetailView from './views/online order/order detail/OrderDetailView';
+import OrderManagementView from './views/admin/orders/OrderManagementView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -78,6 +79,7 @@ function App() {
             <Route path="dashboard" element={<DashboardView />} />
             <Route path="menu" element={<MenuManagementView />} />
             <Route path="promotions" element={<PromotionManagementView />} />
+            <Route path="orders" element={<OrderManagementView />} />
           </Route>
 
           <Route

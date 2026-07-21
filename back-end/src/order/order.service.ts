@@ -214,6 +214,82 @@ export class OrderService {
     });
   }
 
+  // Lấy danh sách toàn bộ đơn hàng trên hệ thống (Có phân trang, lọc, tìm kiếm)
+  async getAllOrders(query: {
+    status?: string;
+    orderType?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    limit?: number
+  }) {
+    const { status, orderType, search, startDate, endDate, page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    // 1. Lọc theo trạng thái
+    if (status && status !== 'ALL') {
+      where.status = status as OrderStatus;
+    }
+
+    // 2. Lọc theo loại đơn hàng (DINE_IN hoặc DELIVERY)
+    if (orderType && orderType !== 'ALL') {
+      where.orderType = orderType;
+    }
+
+    // 3. Lọc theo khoảng thời gian
+    if (startDate || endDate) {
+      where.orderTime = {}; // Lưu ý thay 'orderTime' bằng field lưu thời gian tạo đơn thực tế của bạn (vd: createdAt)
+      if (startDate) where.orderTime.gte = new Date(startDate);
+      if (endDate) where.orderTime.lte = new Date(endDate);
+    }
+
+    // 4. Tìm kiếm đa năng (theo ID đơn, tên người nhận, số điện thoại)
+    if (search) {
+      const searchConditions: any[] = [
+        { receiverName: { contains: search, mode: 'insensitive' } },
+        { receiverPhone: { contains: search } },
+      ];
+
+      // Nếu search là một con số hợp lệ, tìm thêm theo ID đơn hàng
+      if (!isNaN(Number(search))) {
+        searchConditions.push({ id: Number(search) });
+      }
+
+      where.OR = searchConditions;
+    }
+
+    // Chạy song song query lấy data và đếm tổng
+    const [orders, totalRecords] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where,
+        include: {
+          bill: true,
+          // Có thể join thêm Client hoặc Table để hiển thị trên Dashboard
+          orderTables: { include: { table: true } },
+          // client: { select: { fullName: true, phone: true } } 
+        },
+        orderBy: {
+          orderTime: 'desc', // Hoặc createdAt tùy schema của bạn
+        },
+        skip,
+        take: Number(limit),
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders,
+      pagination: {
+        currentPage: Number(page),
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+      }
+    };
+  }
+
   // Tìm kiếm đơn hàng theo ID
   async findOrderById(id: number | string) {
     const order = await this.prisma.order.findUnique({
@@ -285,26 +361,22 @@ export class OrderService {
     const { status, search, page = 1, limit = 10 } = query;
     const skip = (page - 1) * limit;
 
-    // Xây dựng điều kiện truy vấn (where clause)
     const where: any = {
       clientId: clientId,
     };
 
-    // Lọc theo trạng thái (bỏ qua nếu là 'ALL')
     if (status && status !== 'ALL') {
       where.status = status as OrderStatus;
     }
 
-    // Tìm kiếm theo mã đơn hàng (ID)
     if (search) {
       const searchLike = `%${search}%`;
 
       // Chỉ dùng SQL thuần để lấy danh sách ID khớp điều kiện
-      // Thêm luôn clientId vào đây để tăng tốc độ quét của Database
       const matchedOrders: { id: number }[] = await this.prisma.$queryRaw`
-      SELECT id FROM "Order" 
-      WHERE "clientId" = ${clientId} AND CAST(id AS TEXT) LIKE ${searchLike}
-    `;
+        SELECT id FROM "Order" 
+        WHERE "clientId" = ${clientId} AND CAST(id AS TEXT) LIKE ${searchLike}
+      `;
 
       // Chuyển mảng object [{id: 7}, {id: 70}] thành mảng số [7, 70]
       const matchedIds = matchedOrders.map(order => order.id);
@@ -319,10 +391,10 @@ export class OrderService {
       this.prisma.order.findMany({
         where,
         include: {
-          bill: true, // Frontend cần field này để hiện nút "Thanh toán"
+          bill: true,
         },
         orderBy: {
-          orderTime: 'desc', // Đơn mới nhất xếp lên đầu
+          orderTime: 'desc',
         },
         skip,
         take: Number(limit),
@@ -337,6 +409,103 @@ export class OrderService {
         totalPages: Math.ceil(totalRecords / limit),
         totalRecords,
       }
+    };
+  }
+
+  // ==========================================
+  // HỦY ĐƠN HÀNG
+  // ==========================================
+
+  /**
+   * 1. Dành cho Khách hàng (Client)
+   * Khách hàng thường chỉ được phép hủy khi đơn hàng mới được tạo (PENDING)
+   */
+  async cancelOrderByClient(clientId: number, orderId: number | string) {
+    return await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: Number(orderId), clientId: clientId },
+        include: { bill: true, orderTables: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Không tìm thấy đơn hàng của bạn!');
+      }
+
+      if (order.status !== 'PENDING') {
+        throw new BadRequestException('Bạn chỉ có thể hủy khi đơn hàng đang chờ xác nhận!');
+      }
+
+      return await this.processOrderCancellation(tx, order);
+    });
+  }
+
+  /**
+   * 2. Dành cho Quản lý (Manager)
+   * Quản lý có quyền hủy ở nhiều giai đoạn hơn, ngoại trừ đơn đã hoàn thành hoặc đã hủy.
+   */
+  async cancelOrderByManager(orderId: number | string) {
+    return await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: Number(orderId) },
+        include: { bill: true, orderTables: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Không tìm thấy đơn hàng!');
+      }
+
+      if (order.status === 'COMPLETED' || order.status === 'CANCELLED') {
+        throw new BadRequestException(`Không thể hủy đơn hàng đang ở trạng thái ${order.status}!`);
+      }
+
+      return await this.processOrderCancellation(tx, order);
+    });
+  }
+
+  /**
+   * Hàm helper dùng chung: Xử lý logic side-effects khi hủy đơn
+   */
+  private async processOrderCancellation(tx: any, order: any) {
+    // 1. Chuyển trạng thái đơn hàng thành CANCELLED
+    await tx.order.update({
+      where: { id: order.id },
+      data: { status: 'CANCELLED' },
+    });
+
+    // 2. Giải phóng bàn nếu là đơn tại quán (DINE_IN)
+    if (order.orderType === 'DINE_IN' && order.orderTables && order.orderTables.length > 0) {
+      const tableIds = order.orderTables.map((ot: any) => ot.tableId);
+      await tx.table.updateMany({
+        where: { id: { in: tableIds } },
+        data: { isOccupied: false },
+      });
+    }
+
+    // 3. Xử lý Hóa đơn (Bill)
+    if (order.bill) {
+      // Hoàn lại lượt sử dụng mã giảm giá (nếu có)
+      if (order.bill.promotionId) {
+        await tx.promotion.update({
+          where: { id: order.bill.promotionId },
+          data: { usedCount: { decrement: 1 } },
+        });
+      }
+
+      // Đổi trạng thái thanh toán
+      // Nếu đã thanh toán (PAID) -> Cần hoàn tiền (REFUNDED)
+      // Nếu chưa (UNPAID/PENDING) -> Thất bại (FAILED)
+      const newPaymentStatus = order.bill.paymentStatus === 'PAID' ? 'REFUNDED' : 'FAILED';
+
+      await tx.bill.update({
+        where: { id: order.bill.id },
+        data: { paymentStatus: newPaymentStatus },
+      });
+    }
+
+    return {
+      status: 'success',
+      message: 'Hủy đơn hàng thành công!',
+      orderId: order.id,
     };
   }
 }

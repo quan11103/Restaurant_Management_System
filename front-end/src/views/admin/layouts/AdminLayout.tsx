@@ -6,7 +6,7 @@ import './AdminLayout.css';
 
 const MENU_ITEMS = [
     { path: '/manager/dashboard', name: 'Dashboard', icon: LayoutDashboard },
-    { path: '/manager/orders', name: 'Đơn hàng & Bàn', icon: Layers },
+    { path: '/manager/orders', name: 'Đơn hàng', icon: Layers },
     { path: '/manager/menu', name: 'Thực đơn', icon: Utensils },
     { path: '/manager/inventory', name: 'Kho & Vật tư', icon: Archive },
     { path: '/manager/staff', name: 'Nhân sự', icon: Users },
@@ -51,7 +51,7 @@ const AdminLayout: React.FC = () => {
                         <span className="page-title">{pageTitle}</span>
                     </div>
                     <div className="header-right">
-                        <span className="user-profile">Xin chào quản trị viên</span>
+                        <span className="user-profile">Xin chào quản lí</span>
                     </div>
                 </header>
 
