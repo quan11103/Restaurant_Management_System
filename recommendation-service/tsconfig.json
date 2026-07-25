@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "types": [
+      "node"
+    ],
+    "outDir": "./dist"
+  },
+  "include": [
+    "dataset-generator/src/**/*.ts",
+    "src/generate-clients.ts",
+    "src/personas.ts",
+    "src/utils.ts"
+  ]
+}

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../../api/axios';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAlert } from '../../../components/Alert';
 import { ShoppingCart, Loader2 } from 'lucide-react';
 import QuantitySelector from '../../../components/QuantitySelector';
 import ProductImageGallery from './ProductImageGallery';
 import ProductInfo from './ProductInfo';
 import ReviewSection from './ReviewSection';
+import ProductSection from '../../../components/product/ProductSection';
 import './ProductDetailView.css';
 
 const MOCK_REVIEWS = [
@@ -24,12 +25,21 @@ interface DishDetail {
     reviewCount?: number;
 }
 
+interface MappedProduct {
+    id: string;
+    name: string;
+    price: number;
+    rating: number;
+    imageUrl: string;
+}
+
 const ProductDetailView: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-
     const { showAlert } = useAlert();
 
     const [product, setProduct] = useState<DishDetail | null>(null);
+    const [recommendedDishes, setRecommendedDishes] = useState<MappedProduct[]>([]);
+
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
@@ -43,8 +53,7 @@ const ProductDetailView: React.FC = () => {
                 if (!response.data) {
                     throw new Error('Không tìm thấy món ăn!');
                 }
-                const data = response.data;
-                setProduct(data);
+                setProduct(response.data);
             } catch (err) {
                 console.error(err);
                 setError('Có lỗi xảy ra khi tải dữ liệu món ăn.');
@@ -53,8 +62,46 @@ const ProductDetailView: React.FC = () => {
             }
         };
 
+        const fetchRecommendations = async (currentIdNum: number) => {
+            try {
+                const response = await axiosClient.post("/dishes/recommend", {
+                    history: [
+                        {
+                            dishId: currentIdNum,
+                            interaction: 1,
+                        },
+                    ],
+                    topK: 8,
+                });
+
+                const recommended = response.data.map((dish: DishDetail) => ({
+                    id: dish.id.toString(),
+                    name: dish.name,
+                    price: dish.price,
+                    rating: dish.rating ?? 4.8,
+                    imageUrl:
+                        dish.images?.find((img) => img.isMain)?.imageUrl ??
+                        dish.images?.[0]?.imageUrl ??
+                        "https://via.placeholder.com/300x200?text=No+Image",
+                }));
+
+                setRecommendedDishes(recommended);
+            } catch (err) {
+                console.error("Lỗi khi tải danh sách gợi ý:", err);
+                setRecommendedDishes([]);
+            }
+        };
+
         if (id) {
+            setQuantity(1);
+            window.scrollTo(0, 0);
+
             fetchProductDetail();
+
+            const currentIdNum = parseInt(id, 10);
+            if (!isNaN(currentIdNum)) {
+                fetchRecommendations(currentIdNum);
+            }
         }
     }, [id]);
 
@@ -127,10 +174,10 @@ const ProductDetailView: React.FC = () => {
                             className="add-to-cart-action-btn"
                             onClick={handleAddToCart}
                             type="button"
-                            disabled={isSubmitting} // Khóa nút khi đang gửi request
+                            disabled={isSubmitting}
                         >
                             {isSubmitting ? (
-                                <Loader2 size={20} className="animate-spin" /> // Spinner xoay tròn (nếu css của bạn hỗ trợ animate-spin)
+                                <Loader2 size={20} className="animate-spin" />
                             ) : (
                                 <ShoppingCart size={20} />
                             )}
@@ -146,6 +193,18 @@ const ProductDetailView: React.FC = () => {
                 reviews={MOCK_REVIEWS}
                 reviewCount={displayReviewCount}
             />
+
+            {/* Sản phẩm gợi ý */}
+            {recommendedDishes.length > 0 && (
+                <section className="home-section detail-container">
+                    <ProductSection
+                        title="Gợi ý dành riêng cho bạn"
+                        subtitle="Dựa trên sở thích và xu hướng đặt món hiện tại"
+                        products={recommendedDishes as any}
+                        isLoading={isLoading}
+                    />
+                </section>
+            )}
         </div>
     );
 };

@@ -2,6 +2,8 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
+import { RecommendationService } from 'src/recommendation/recommendation.service';
+import { RecommendNewUserDto } from 'src/recommendation/dto/recommend-new-user.dto';
 
 export interface DishQueryDto {
   search?: string;
@@ -13,7 +15,7 @@ export interface DishQueryDto {
 
 @Injectable()
 export class DishService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private readonly recommendationService: RecommendationService) { }
 
   /**
    * Tạo món ăn mới
@@ -223,5 +225,38 @@ export class DishService {
         message: 'Xóa món ăn thành công!',
       };
     });
+  }
+
+  async recommendForNewUser(dto: RecommendNewUserDto) {
+
+    const dishIds = await this.recommendationService.recommendNewUser(dto);
+
+    if (dishIds.length === 0) {
+      return [];
+    }
+
+    const dishes = await this.prisma.dish.findMany({
+      where: {
+        id: {
+          in: dishIds,
+        },
+        isAvailable: true,
+      },
+      include: {
+        images: true,
+      },
+    });
+
+    const order = new Map<number, number>();
+
+    dishIds.forEach((id, index) => {
+      order.set(id, index);
+    });
+
+    dishes.sort(
+      (a, b) => order.get(a.id)! - order.get(b.id)!
+    );
+
+    return dishes;
   }
 }

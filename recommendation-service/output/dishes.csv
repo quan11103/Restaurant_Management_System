@@ -1,0 +1,61 @@
+﻿dishId,name,price,category,description
+1,Phở bò tái,65000,Món chính,Phở bò truyền thống với nước dùng đậm đà và thịt bò tái mềm.
+2,Phở bò chín,65000,Món chính,Phở bò với thịt bò chín thái lát.
+3,Bún bò Huế,70000,Món chính,"Bún bò Huế cay nhẹ, thơm mùi sả."
+4,Bún chả Hà Nội,65000,Món chính,Bún ăn kèm chả nướng và nước mắm chua ngọt.
+5,Cơm tấm sườn,70000,Món chính,"Cơm tấm với sườn nướng, bì và chả."
+6,Cơm gà xối mỡ,75000,Món chính,Gà chiên giòn ăn cùng cơm và nước sốt.
+7,Cơm chiên hải sản,80000,Món chính,"Cơm chiên với tôm, mực và rau củ."
+8,Cơm chiên Dương Châu,75000,Món chính,Cơm chiên truyền thống nhiều nguyên liệu.
+9,Mì xào bò,70000,Món chính,Mì xào với thịt bò và rau cải.
+10,Mì Ý sốt bò bằm,85000,Món chính,Spaghetti sốt bò bằm kiểu Ý.
+11,Mì Ý sốt kem,90000,Món chính,Mì Ý sốt kem béo ngậy cùng thịt xông khói.
+12,Pizza Margherita,150000,Pizza,Pizza phô mai và sốt cà chua truyền thống.
+13,Pizza Hải sản,190000,Pizza,"Pizza với tôm, mực và phô mai."
+14,Pizza Pepperoni,180000,Pizza,Pizza xúc xích Pepperoni đậm vị.
+15,Pizza Bò BBQ,200000,Pizza,Pizza bò sốt BBQ thơm ngon.
+16,Burger bò,85000,Burger,Burger bò nướng cùng rau và phô mai.
+17,Burger gà,80000,Burger,Burger gà giòn sốt mayonnaise.
+18,Gà rán truyền thống,90000,Gà rán,Gà rán giòn rụm theo công thức đặc biệt.
+19,Gà rán cay,95000,Gà rán,Gà rán phủ sốt cay Hàn Quốc.
+20,Cánh gà BBQ,110000,Gà rán,Cánh gà nướng sốt BBQ.
+21,Khoai tây chiên,45000,Ăn kèm,Khoai tây chiên giòn.
+22,Khoai tây lắc phô mai,50000,Ăn kèm,Khoai tây chiên lắc bột phô mai.
+23,Xúc xích nướng,45000,Ăn kèm,Xúc xích nướng ăn kèm tương cà.
+24,Salad Caesar,70000,Salad,Salad rau xà lách với sốt Caesar.
+25,Salad cá ngừ,75000,Salad,Salad cá ngừ tươi cùng rau củ.
+26,Nem rán,60000,Khai vị,Nem rán giòn nhân thịt.
+27,Nem hải sản,70000,Khai vị,Nem rán nhân tôm và mực.
+28,Súp bí đỏ,50000,Khai vị,Súp bí đỏ kem mịn.
+29,Súp hải sản,65000,Khai vị,Súp hải sản nóng hổi.
+30,Bánh mì bơ tỏi,45000,Khai vị,Bánh mì nướng bơ tỏi thơm giòn.
+31,Coca-Cola,20000,Đồ uống,Nước ngọt Coca-Cola.
+32,Pepsi,20000,Đồ uống,Nước ngọt Pepsi.
+33,7Up,20000,Đồ uống,Nước ngọt vị chanh.
+34,Sprite,20000,Đồ uống,Nước ngọt có gas vị chanh.
+35,Fanta Cam,20000,Đồ uống,Nước ngọt vị cam.
+36,Trà đào cam sả,45000,Đồ uống,Trà đào kết hợp cam và sả.
+37,Trà chanh,30000,Đồ uống,Trà chanh tươi mát.
+38,Trà vải,40000,Đồ uống,Trà đen kết hợp quả vải.
+39,Trà sữa truyền thống,45000,Đồ uống,Trà sữa với trân châu đen.
+40,Trà sữa Matcha,50000,Đồ uống,Trà sữa vị Matcha.
+41,Cà phê đen,30000,Cà phê,Cà phê đen pha phin.
+42,Cà phê sữa,35000,Cà phê,Cà phê sữa truyền thống.
+43,Bạc xỉu,40000,Cà phê,Bạc xỉu nhiều sữa ít cà phê.
+44,Americano,45000,Cà phê,Cà phê Americano.
+45,Latte,55000,Cà phê,Latte với lớp sữa mịn.
+46,Cappuccino,55000,Cà phê,Cappuccino phủ bọt sữa.
+47,Nước cam ép,40000,Nước ép,Nước cam ép tươi.
+48,Nước dưa hấu ép,40000,Nước ép,Nước ép dưa hấu nguyên chất.
+49,Sinh tố bơ,50000,Sinh tố,Sinh tố bơ béo mịn.
+50,Sinh tố xoài,50000,Sinh tố,Sinh tố xoài chín.
+51,Kem vani,35000,Tráng miệng,Kem vị vani mát lạnh.
+52,Kem socola,35000,Tráng miệng,Kem vị socola đậm đà.
+53,Bánh flan,30000,Tráng miệng,Bánh flan mềm mịn.
+54,Tiramisu,55000,Tráng miệng,Bánh Tiramisu kiểu Ý.
+55,Cheesecake việt quất,60000,Tráng miệng,Bánh cheesecake phủ việt quất.
+56,Bánh mousse chanh dây,55000,Tráng miệng,Bánh mousse chanh dây thanh mát.
+57,Bánh su kem,35000,Tráng miệng,Bánh su nhân kem vani.
+58,Sữa chua trái cây,40000,Tráng miệng,Sữa chua ăn kèm trái cây tươi.
+59,Rau câu dừa,30000,Tráng miệng,Rau câu vị dừa mát lạnh.
+60,Trái cây theo mùa,50000,Tráng miệng,Đĩa trái cây tươi theo mùa.

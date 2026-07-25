@@ -5,6 +5,7 @@ import { UpdateDishDto } from './dto/update-dish.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { Role } from '@prisma/client';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { RecommendNewUserDto } from 'src/recommendation/dto/recommend-new-user.dto';
 
 @ApiTags('Dishes')
 @Controller('dishes')
@@ -45,5 +46,12 @@ export class DishController {
   @ApiOperation({ summary: 'Xóa món ăn (Chỉ Manager)' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.dishService.remove(id);
+  }
+
+  @Post('recommend')
+  recommendForNewUser(
+    @Body() dto: RecommendNewUserDto,
+  ) {
+    return this.dishService.recommendForNewUser(dto);
   }
 }

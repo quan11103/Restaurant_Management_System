@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosClient from '../../../api/axios'
 import PromoBannerSlider from './PromoBannerSlider';
 import CategoryGrid from './CategoryGrid';
-import ProductSection from './ProductSection';
+import ProductSection from '../../../components/product/ProductSection';
 import './HomeView.css';
 
 const MOCK_BANNERS = [
@@ -33,20 +33,28 @@ const HomeView: React.FC = () => {
     const [recommended, setRecommended] = useState<HomeProduct[]>([]);
 
     useEffect(() => {
-        const fetchRandomDishes = async () => {
+        const fetchSpecificDishes = async () => {
             setIsLoading(true);
             try {
-                const response = await axiosClient.get('/dishes');
+                // Các ID tĩnh bạn muốn lấy
+                const bestSellerIds = [1, 2, 3, 4, 5, 6, 7, 8];
+                const recommendedIds = [53, 54, 55, 56, 57, 58, 59, 60];
 
-                if (response.data) {
-                    const data = response.data;
+                // Hàm hỗ trợ fetch và format từng món ăn theo ID
+                const fetchAndFormatDish = async (id: number): Promise<HomeProduct | null> => {
+                    try {
+                        // Giả định endpoint của findOne là /dishes/:id
+                        const response = await axiosClient.get(`/dishes/${id}`);
 
-                    const formattedData: HomeProduct[] = data
-                        .filter((item: any) => item.isAvailable !== false)
-                        .map((item: any) => {
+                        if (response.data) {
+                            const item = response.data;
+
+                            // Bỏ qua nếu món ăn không khả dụng
+                            if (item.isAvailable === false) return null;
+
                             const mainImage = item.images?.find((img: any) => img.isMain === true);
-
                             let finalImageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+
                             if (mainImage) {
                                 finalImageUrl = mainImage.imageUrl;
                             } else if (item.images && item.images.length > 0) {
@@ -54,23 +62,30 @@ const HomeView: React.FC = () => {
                             }
 
                             return {
-                                id: item.id,
+                                id: item.id.toString(),
                                 name: item.name,
                                 price: item.price,
                                 rating: item.rating || Number((Math.random() * (5 - 4) + 4).toFixed(1)),
                                 imageUrl: finalImageUrl
                             };
-                        });
-
-                    // Thuật toán xáo trộn mảng ngẫu nhiên (Fisher-Yates Shuffle)
-                    for (let i = formattedData.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [formattedData[i], formattedData[j]] = [formattedData[j], formattedData[i]];
+                        }
+                        return null;
+                    } catch (error) {
+                        console.error(`Không thể lấy dữ liệu món ăn ID=${id}:`, error);
+                        return null; // Trả về null nếu món không tồn tại (tránh lỗi sập toàn bộ app)
                     }
+                };
 
-                    setBestSellers(formattedData.slice(0, 4));
-                    setRecommended(formattedData.slice(4, 8));
-                }
+                // Fetch song song (concurrent) tất cả các ID để tiết kiệm thời gian
+                const [bestSellersData, recommendedData] = await Promise.all([
+                    Promise.all(bestSellerIds.map(id => fetchAndFormatDish(id))),
+                    Promise.all(recommendedIds.map(id => fetchAndFormatDish(id)))
+                ]);
+
+                // Lọc bỏ các giá trị null (những món fetch lỗi hoặc isAvailable === false)
+                setBestSellers(bestSellersData.filter((item): item is HomeProduct => item !== null));
+                setRecommended(recommendedData.filter((item): item is HomeProduct => item !== null));
+
             } catch (error) {
                 console.error('Lỗi khi fetch data món ăn trang chủ:', error);
             } finally {
@@ -78,7 +93,7 @@ const HomeView: React.FC = () => {
             }
         };
 
-        fetchRandomDishes();
+        fetchSpecificDishes();
     }, []);
 
     return (

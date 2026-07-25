@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-import { type Product } from '../../../types';
-import ProductCard from '../../../components/product/ProductCard';
+import { type Product } from '../../types';
+import ProductCard from './ProductCard';
 import './ProductSection.css';
 
 interface ProductSectionProps {

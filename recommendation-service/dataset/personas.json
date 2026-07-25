@@ -1,0 +1,167 @@
+[
+  {
+    "id": 1,
+    "name": "Khách văn phòng",
+    "description": "Ăn trưa nhanh, ưu tiên món Việt truyền thống.",
+    "favoriteCategories": ["Món chính", "Đồ uống"],
+    "favoriteDishes": [1,2,3,4,5,6,31,32,37],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [8,20],
+    "drinkProbability": 0.8,
+    "dessertProbability": 0.05
+  },
+  {
+    "id": 2,
+    "name": "Người thích cơm",
+    "description": "Ưa các món cơm và nước ngọt.",
+    "favoriteCategories": ["Món chính","Đồ uống"],
+    "favoriteDishes": [5,6,7,8,31,32,35],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [6,15],
+    "drinkProbability": 0.7,
+    "dessertProbability": 0.1
+  },
+  {
+    "id": 3,
+    "name": "Tín đồ Pizza",
+    "description": "Thường gọi pizza kèm khoai tây và nước ngọt.",
+    "favoriteCategories": ["Pizza","Ăn kèm","Đồ uống"],
+    "favoriteDishes": [12,13,14,15,21,22,31,32,33],
+    "avgItemsPerOrder": 3,
+    "ordersPerMonth": [3,10],
+    "drinkProbability": 0.9,
+    "dessertProbability": 0.15
+  },
+  {
+    "id": 4,
+    "name": "Fan đồ ăn nhanh",
+    "description": "Burger, gà rán và khoai tây.",
+    "favoriteCategories": ["Burger","Gà rán","Ăn kèm","Đồ uống"],
+    "favoriteDishes": [16,17,18,19,20,21,22,31,32,34],
+    "avgItemsPerOrder": 3,
+    "ordersPerMonth": [4,12],
+    "drinkProbability": 0.95,
+    "dessertProbability": 0.2
+  },
+  {
+    "id": 5,
+    "name": "Người ăn healthy",
+    "description": "Ưu tiên salad, nước ép và trái cây.",
+    "favoriteCategories": ["Salad","Nước ép","Tráng miệng"],
+    "favoriteDishes": [24,25,47,48,58,60],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [4,12],
+    "drinkProbability": 0.8,
+    "dessertProbability": 0.5
+  },
+  {
+    "id": 6,
+    "name": "Tín đồ cà phê",
+    "description": "Thường đến chỉ để uống cà phê.",
+    "favoriteCategories": ["Cà phê","Tráng miệng"],
+    "favoriteDishes": [41,42,43,44,45,46,53,54,55],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [10,25],
+    "drinkProbability": 1.0,
+    "dessertProbability": 0.7
+  },
+  {
+    "id": 7,
+    "name": "Fan trà sữa",
+    "description": "Chủ yếu gọi trà sữa và đồ ngọt.",
+    "favoriteCategories": ["Đồ uống","Tráng miệng"],
+    "favoriteDishes": [39,40,51,52,53,54,57],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [8,20],
+    "drinkProbability": 1.0,
+    "dessertProbability": 0.8
+  },
+  {
+    "id": 8,
+    "name": "Gia đình cuối tuần",
+    "description": "Đặt nhiều món để chia sẻ.",
+    "favoriteCategories": ["Pizza","Món chính","Khai vị","Đồ uống","Tráng miệng"],
+    "favoriteDishes": [12,13,15,7,20,26,27,29,31,32,54,60],
+    "avgItemsPerOrder": 8,
+    "ordersPerMonth": [1,4],
+    "drinkProbability": 0.9,
+    "dessertProbability": 0.5
+  },
+  {
+    "id": 9,
+    "name": "Sinh viên",
+    "description": "Nhạy cảm về giá, ưu tiên món rẻ.",
+    "favoriteCategories": ["Ăn kèm","Đồ uống","Món chính"],
+    "favoriteDishes": [4,21,22,23,31,32,33,37],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [5,15],
+    "drinkProbability": 0.8,
+    "dessertProbability": 0.1
+  },
+  {
+    "id": 10,
+    "name": "Người thích món Việt",
+    "description": "Hiếm khi gọi đồ Tây.",
+    "favoriteCategories": ["Món chính","Khai vị"],
+    "favoriteDishes": [1,2,3,4,5,6,26,27,28,29],
+    "avgItemsPerOrder": 3,
+    "ordersPerMonth": [5,15],
+    "drinkProbability": 0.5,
+    "dessertProbability": 0.1
+  },
+  {
+    "id": 11,
+    "name": "Tín đồ đồ ngọt",
+    "description": "Ưa bánh và kem.",
+    "favoriteCategories": ["Tráng miệng"],
+    "favoriteDishes": [51,52,53,54,55,56,57,58,59,60],
+    "avgItemsPerOrder": 3,
+    "ordersPerMonth": [4,10],
+    "drinkProbability": 0.5,
+    "dessertProbability": 1.0
+  },
+  {
+    "id": 12,
+    "name": "Người thích mì",
+    "description": "Ưu tiên các món mì.",
+    "favoriteCategories": ["Món chính"],
+    "favoriteDishes": [9,10,11],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [5,12],
+    "drinkProbability": 0.7,
+    "dessertProbability": 0.1
+  },
+  {
+    "id": 13,
+    "name": "Khách đặt đồ uống",
+    "description": "Chủ yếu mua nước mang đi.",
+    "favoriteCategories": ["Đồ uống","Cà phê","Nước ép","Sinh tố"],
+    "favoriteDishes": [36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],
+    "avgItemsPerOrder": 2,
+    "ordersPerMonth": [10,30],
+    "drinkProbability": 1.0,
+    "dessertProbability": 0.05
+  },
+  {
+    "id": 14,
+    "name": "Khách thích khám phá",
+    "description": "Ít lặp lại món, thử nhiều danh mục.",
+    "favoriteCategories": ["Món chính","Pizza","Burger","Salad","Khai vị","Đồ uống"],
+    "favoriteDishes": [],
+    "avgItemsPerOrder": 3,
+    "ordersPerMonth": [4,10],
+    "drinkProbability": 0.8,
+    "dessertProbability": 0.3
+  },
+  {
+    "id": 15,
+    "name": "Khách trung thành",
+    "description": "Đến thường xuyên và có xu hướng gọi lặp lại một nhóm món quen thuộc.",
+    "favoriteCategories": ["Món chính","Đồ uống","Tráng miệng"],
+    "favoriteDishes": [1,5,12,16,31,36,42,53,54],
+    "avgItemsPerOrder": 3,
+    "ordersPerMonth": [15,30],
+    "drinkProbability": 0.9,
+    "dessertProbability": 0.4
+  }
+]
