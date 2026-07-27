@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { RecommendationService } from 'src/recommendation/recommendation.service';
+import { InteractionService } from 'src/interaction/interaction.service';
 import { RecommendNewUserDto } from 'src/recommendation/dto/recommend-new-user.dto';
 
 export interface DishQueryDto {
@@ -15,7 +16,11 @@ export interface DishQueryDto {
 
 @Injectable()
 export class DishService {
-  constructor(private prisma: PrismaService, private readonly recommendationService: RecommendationService) { }
+  constructor(
+    private prisma: PrismaService,
+    private readonly recommendationService: RecommendationService,
+    private readonly interactionService: InteractionService
+  ) { }
 
   /**
    * Tạo món ăn mới
@@ -128,7 +133,7 @@ export class DishService {
   /**
    * Tìm món ăn theo ID
    */
-  async findOne(id: number | string) {
+  async findOne(id: number | string, clientId?: number,) {
     const numericId = Number(id);
     if (isNaN(numericId)) {
       throw new BadRequestException('ID món ăn không hợp lệ!');
@@ -141,6 +146,13 @@ export class DishService {
 
     if (!dish) {
       throw new NotFoundException(`Không tìm thấy món ăn có ID = ${id}`);
+    }
+
+    if (clientId) {
+      await this.interactionService.viewDish(
+        clientId,
+        numericId,
+      );
     }
 
     return dish;
@@ -227,9 +239,24 @@ export class DishService {
     });
   }
 
-  async recommendForNewUser(dto: RecommendNewUserDto) {
+  async recommend(
+    clientId: number | undefined,
+    dto: RecommendNewUserDto,
+  ) {
+    let history;
 
-    const dishIds = await this.recommendationService.recommendNewUser(dto);
+    if (clientId) {
+      history =
+        await this.interactionService.getRecommendationHistory(clientId);
+    } else {
+      history = dto.history;
+    }
+
+    const dishIds =
+      await this.recommendationService.recommendNewUser({
+        history,
+        topK: dto.topK,
+      });
 
     if (dishIds.length === 0) {
       return [];

@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-
 import { firstValueFrom } from 'rxjs';
-
-import { RecommendUserDto } from './dto/recommend-user.dto';
 import { RecommendNewUserDto } from './dto/recommend-new-user.dto';
 
 @Injectable()
@@ -33,26 +30,6 @@ export class RecommendationService {
             return {
                 status: "error",
                 info: {}
-            };
-        }
-    }
-
-    async recommendUser(
-        dto: RecommendUserDto,
-    ) {
-        try {
-            const response = await firstValueFrom(
-                this.httpService.post(
-                    `${this.baseUrl}/recommend/user`,
-                    dto
-                )
-            );
-
-            return response.data;
-        } catch (error) {
-            console.error(error);
-            return {
-                dishIds: []
             };
         }
     }

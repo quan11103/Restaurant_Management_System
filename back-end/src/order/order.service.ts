@@ -3,10 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ClientCheckoutDto } from './dto/client-checkout.dto';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
+import { InteractionService } from '../interaction/interaction.service';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly interactionService: InteractionService,
+  ) { }
 
   // Đặt món tại quán
   async createOrder(createOrderDto: CreateOrderDto) {
@@ -39,7 +43,6 @@ export class OrderService {
           };
         });
 
-        // Tạo đơn hàng mới
         const newOrder = await tx.order.create({
           data: {
             waiterId: waiterId,
@@ -50,7 +53,6 @@ export class OrderService {
           },
         });
 
-        // Liên kết bàn ăn và cập nhật trạng thái bàn thành "Đang có khách"
         await tx.orderTable.create({
           data: {
             orderId: newOrder.id,
@@ -64,7 +66,6 @@ export class OrderService {
           data: { isOccupied: true }
         });
 
-        // Lưu danh sách món ăn chi tiết
         await tx.orderedDish.createMany({
           data: orderedDishesData.map(d => ({ ...d, orderId: newOrder.id })),
         });
@@ -84,8 +85,6 @@ export class OrderService {
   // Thanh toán online / Giao hàng
   async clientCheckout(clientId: number, dto: ClientCheckoutDto) {
     const { fullName, phone, address, paymentMethod, promoCode } = dto;
-
-    // Lấy giỏ hàng của client (Kèm thông tin giá món ăn)
     const cartItems = await this.prisma.cartItem.findMany({
       where: { clientId },
       include: { dish: true },
@@ -106,7 +105,6 @@ export class OrderService {
     let discount = 0.0;
     let promotionId: number | null = null;
 
-    // Kiểm tra và tính toán mã giảm giá
     if (promoCode) {
       const promotion = await this.prisma.promotion.findUnique({
         where: { code: promoCode },
@@ -148,7 +146,6 @@ export class OrderService {
         discount = subTotal;
       }
 
-      // Lấy ID để lưu vào Bill
       promotionId = promotion.id;
     }
 
@@ -206,6 +203,20 @@ export class OrderService {
         where: { clientId: clientId },
       });
 
+      for (const item of cartItems) {
+        await this.interactionService.increaseOrderedQuantity(
+          clientId,
+          item.dishId,
+          item.quantity,
+        );
+
+        await this.interactionService.syncCartQuantity(
+          clientId,
+          item.dishId,
+          0
+        );
+      }
+
       return {
         orderId: newOrder.id,
         totalPay: newOrder.total,
@@ -229,24 +240,21 @@ export class OrderService {
 
     const where: any = {};
 
-    // 1. Lọc theo trạng thái
     if (status && status !== 'ALL') {
       where.status = status as OrderStatus;
     }
 
-    // 2. Lọc theo loại đơn hàng (DINE_IN hoặc DELIVERY)
     if (orderType && orderType !== 'ALL') {
       where.orderType = orderType;
     }
 
-    // 3. Lọc theo khoảng thời gian
     if (startDate || endDate) {
       where.orderTime = {}; // Lưu ý thay 'orderTime' bằng field lưu thời gian tạo đơn thực tế của bạn (vd: createdAt)
       if (startDate) where.orderTime.gte = new Date(startDate);
       if (endDate) where.orderTime.lte = new Date(endDate);
     }
 
-    // 4. Tìm kiếm đa năng (theo ID đơn, tên người nhận, số điện thoại)
+    // Tìm kiếm đa năng (theo ID đơn, tên người nhận, số điện thoại)
     if (search) {
       const searchConditions: any[] = [
         { receiverName: { contains: search, mode: 'insensitive' } },
@@ -272,7 +280,7 @@ export class OrderService {
           // client: { select: { fullName: true, phone: true } } 
         },
         orderBy: {
-          orderTime: 'desc', // Hoặc createdAt tùy schema của bạn
+          orderTime: 'desc',
         },
         skip,
         take: Number(limit),
@@ -298,7 +306,7 @@ export class OrderService {
         bill: true,
         orderedDishes: {
           include: {
-            dish: true, // Lấy thông tin món ăn (tên, ảnh, v.v.)
+            dish: true,
           }
         }
       }
@@ -412,14 +420,7 @@ export class OrderService {
     };
   }
 
-  // ==========================================
-  // HỦY ĐƠN HÀNG
-  // ==========================================
-
-  /**
-   * 1. Dành cho Khách hàng (Client)
-   * Khách hàng thường chỉ được phép hủy khi đơn hàng mới được tạo (PENDING)
-   */
+  // Hủy đơn hàng (dành cho khách hàng)
   async cancelOrderByClient(clientId: number, orderId: number | string) {
     return await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
@@ -439,10 +440,7 @@ export class OrderService {
     });
   }
 
-  /**
-   * 2. Dành cho Quản lý (Manager)
-   * Quản lý có quyền hủy ở nhiều giai đoạn hơn, ngoại trừ đơn đã hoàn thành hoặc đã hủy.
-   */
+  // Hủy đơn hàng (dành cho quản lý)
   async cancelOrderByManager(orderId: number | string) {
     return await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
@@ -462,17 +460,15 @@ export class OrderService {
     });
   }
 
-  /**
-   * Hàm helper dùng chung: Xử lý logic side-effects khi hủy đơn
-   */
+  // Hàm helper dùng chung: Xử lý logic side-effects khi hủy đơn
   private async processOrderCancellation(tx: any, order: any) {
-    // 1. Chuyển trạng thái đơn hàng thành CANCELLED
+    // Chuyển trạng thái đơn hàng thành CANCELLED
     await tx.order.update({
       where: { id: order.id },
       data: { status: 'CANCELLED' },
     });
 
-    // 2. Giải phóng bàn nếu là đơn tại quán (DINE_IN)
+    // Giải phóng bàn nếu là đơn tại quán (DINE_IN)
     if (order.orderType === 'DINE_IN' && order.orderTables && order.orderTables.length > 0) {
       const tableIds = order.orderTables.map((ot: any) => ot.tableId);
       await tx.table.updateMany({
@@ -481,9 +477,9 @@ export class OrderService {
       });
     }
 
-    // 3. Xử lý Hóa đơn (Bill)
+    // Xử lý Hóa đơn
     if (order.bill) {
-      // Hoàn lại lượt sử dụng mã giảm giá (nếu có)
+      // Hoàn lại lượt sử dụng mã giảm giá
       if (order.bill.promotionId) {
         await tx.promotion.update({
           where: { id: order.bill.promotionId },
@@ -492,8 +488,6 @@ export class OrderService {
       }
 
       // Đổi trạng thái thanh toán
-      // Nếu đã thanh toán (PAID) -> Cần hoàn tiền (REFUNDED)
-      // Nếu chưa (UNPAID/PENDING) -> Thất bại (FAILED)
       const newPaymentStatus = order.bill.paymentStatus === 'PAID' ? 'REFUNDED' : 'FAILED';
 
       await tx.bill.update({

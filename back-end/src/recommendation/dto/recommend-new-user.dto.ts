@@ -1,9 +1,14 @@
-class HistoryDto {
-    dishId: number;
-    interaction: number;
-}
+import { IsArray, IsInt, IsOptional } from 'class-validator';
 
 export class RecommendNewUserDto {
-    history: HistoryDto[];
-    topK: number;
+    @IsOptional()
+    @IsArray()
+    history?: {
+        dishId: number;
+        interaction: number;
+    }[];
+
+    @IsOptional()
+    @IsInt()
+    topK?: number = 8;
 }

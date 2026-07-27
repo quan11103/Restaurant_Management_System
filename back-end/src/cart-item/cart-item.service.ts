@@ -2,15 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { InteractionService } from 'src/interaction/interaction.service';
 
 @Injectable()
 export class CartItemService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly interactionService: InteractionService,
+  ) { }
 
   async create(clientId: number, createCartItemDto: CreateCartItemDto) {
     const { dishId, quantity = 1 } = createCartItemDto;
 
-    // Kiểm tra xem món ăn này đã có trong giỏ hàng của user chưa
     const existingCartItem = await this.prisma.cartItem.findUnique({
       where: {
         clientId_dishId: {
@@ -20,20 +23,32 @@ export class CartItemService {
       },
     });
 
+    let cartItem;
+
     if (existingCartItem) {
-      return this.prisma.cartItem.update({
+      cartItem = await this.prisma.cartItem.update({
         where: { id: existingCartItem.id },
-        data: { quantity: existingCartItem.quantity + quantity },
+        data: {
+          quantity: existingCartItem.quantity + quantity,
+        },
+      });
+    } else {
+      cartItem = await this.prisma.cartItem.create({
+        data: {
+          clientId,
+          dishId,
+          quantity,
+        },
       });
     }
 
-    return this.prisma.cartItem.create({
-      data: {
-        clientId,
-        dishId,
-        quantity,
-      },
-    });
+    await this.interactionService.syncCartQuantity(
+      clientId,
+      dishId,
+      quantity
+    );
+
+    return cartItem;
   }
 
   async findAll(clientId: number) {
@@ -69,27 +84,81 @@ export class CartItemService {
     return cartItem;
   }
 
-  async update(id: number, clientId: number, updateCartItemDto: UpdateCartItemDto) {
-    await this.findOne(id, clientId);
+  async update(
+    id: number,
+    clientId: number,
+    updateCartItemDto: UpdateCartItemDto,
+  ) {
 
-    return this.prisma.cartItem.update({
+    const cartItem = await this.findOne(id, clientId);
+
+    const updated = await this.prisma.cartItem.update({
       where: { id },
-      data: { quantity: updateCartItemDto.quantity },
+      data: {
+        quantity: updateCartItemDto.quantity,
+      },
     });
+
+    await this.interactionService.syncCartQuantity(
+      clientId,
+      cartItem.dishId,
+      updateCartItemDto.quantity,
+    );
+
+    return updated;
   }
 
-  async remove(id: number, clientId: number) {
-    // Đảm bảo quyền sở hữu trước khi xóa
-    await this.findOne(id, clientId);
+  async remove(
+    id: number,
+    clientId: number,
+  ) {
 
-    return this.prisma.cartItem.delete({
-      where: { id },
+    const cartItem = await this.findOne(id, clientId);
+
+    await this.prisma.cartItem.delete({
+      where: {
+        id,
+      },
     });
+
+    await this.interactionService.syncCartQuantity(
+      clientId,
+      cartItem.dishId,
+      0,
+    );
+
+    return {
+      message: 'Đã xóa món khỏi giỏ hàng.',
+    };
   }
 
   async clearCart(clientId: number) {
-    return this.prisma.cartItem.deleteMany({
-      where: { clientId },
+
+    const cartItems = await this.prisma.cartItem.findMany({
+      where: {
+        clientId,
+      },
+      select: {
+        dishId: true,
+      },
     });
+
+    await this.prisma.cartItem.deleteMany({
+      where: {
+        clientId,
+      },
+    });
+
+    for (const item of cartItems) {
+      await this.interactionService.syncCartQuantity(
+        clientId,
+        item.dishId,
+        0
+      );
+    }
+
+    return {
+      message: 'Đã xóa toàn bộ giỏ hàng.',
+    };
   }
 }

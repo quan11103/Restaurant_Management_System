@@ -44,7 +44,7 @@ const HomeView: React.FC = () => {
                 const fetchAndFormatDish = async (id: number): Promise<HomeProduct | null> => {
                     try {
                         // Giả định endpoint của findOne là /dishes/:id
-                        const response = await axiosClient.get(`/dishes/${id}`);
+                        const response = await axiosClient.get(`dishes/${id}`);
 
                         if (response.data) {
                             const item = response.data;

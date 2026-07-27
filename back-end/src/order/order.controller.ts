@@ -1,20 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, BadRequestException, Query, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, BadRequestException, Query, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import { Req } from '@nestjs/common';
+import { Request } from 'express';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from '@prisma/client';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { ClientCheckoutDto } from './dto/client-checkout.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { VnpayService } from 'src/vnpay/vnpay.service';
 import { OrderStatus } from '@prisma/client';
+import { InteractionService } from 'src/interaction/interaction.service';
 
 @Controller('orders')
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly vnpayService: VnpayService,
+    private readonly interactionService: InteractionService,
   ) { }
 
   // Luồng dành cho nhân viên: đặt món tại bàn (DINE_IN)
+  @Auth(Role.MANAGER, Role.WAITER)
   @Post('dine-in')
   createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
@@ -24,16 +32,14 @@ export class OrderController {
   @Post('client-checkout')
   @UseGuards(JwtAuthGuard)
   async clientCheckout(
-    @Request() req: any,
-    @Body() clientCheckoutDto: ClientCheckoutDto
+    @CurrentUser() user: JwtPayload,
+    @Req() req: Request,
+    @Body() clientCheckoutDto: ClientCheckoutDto,
   ) {
-    const clientId = req.user?.sub;
-    if (!clientId) {
-      throw new BadRequestException('Client ID not found in token');
-    }
+    const clientId = user.sub;
 
     // Lưu đơn hàng
-    const orderResult = await this.orderService.clientCheckout(Number(clientId), clientCheckoutDto);
+    const orderResult = await this.orderService.clientCheckout(clientId, clientCheckoutDto);
 
     if (clientCheckoutDto.paymentMethod === 'TRANSFER') {
       // Lấy địa chỉ IP
@@ -72,14 +78,17 @@ export class OrderController {
   // Thử lại thanh toán VNPAY cho đơn hàng thất bại/chưa trả tiền
   @Post('retry-checkout')
   @UseGuards(JwtAuthGuard)
-  async retryCheckout(@Request() req: any, @Body() body: { orderId: string }) {
+  async retryCheckout(
+    @CurrentUser() user: JwtPayload,
+    @Req() req: Request,
+    @Body() body: { orderId: string },
+  ) {
     const order = await this.orderService.findOrderById(body.orderId);
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
-    const currentUserId = req.user?.sub;
-    if (order.clientId !== Number(currentUserId)) {
+    if (order.clientId !== user.sub) {
       throw new ForbiddenException('Bạn không có quyền xem đơn hàng này');
     }
 
@@ -165,18 +174,20 @@ export class OrderController {
   @Get('history')
   @UseGuards(JwtAuthGuard)
   async getClientHistory(
-    @Request() req: any,
-    @Query() query: { status?: string; search?: string; page?: string; limit?: string }
+    @CurrentUser() user: JwtPayload,
+    @Query() query: {
+      status?: string;
+      search?: string;
+      page?: string;
+      limit?: string;
+    },
   ) {
-    const clientId = req.user?.sub;
-    if (!clientId) {
-      throw new BadRequestException('Không tìm thấy thông tin khách hàng trong token');
-    }
+    const clientId = user.sub;
 
     const page = query.page ? Number(query.page) : 1;
     const limit = query.limit ? Number(query.limit) : 10;
 
-    return this.orderService.getClientOrderHistory(Number(clientId), {
+    return this.orderService.getClientOrderHistory(clientId, {
       ...query,
       page,
       limit,
@@ -184,8 +195,8 @@ export class OrderController {
   }
 
   // Lấy toàn bộ đơn hàng hệ thống (Dành cho Admin / Manager / Staff)
+  @Auth(Role.MANAGER, Role.WAITER, Role.CASHIER)
   @Get()
-  @UseGuards(JwtAuthGuard) // Nên thêm RolesGuard nếu bạn có phân quyền (vd: @Roles('ADMIN', 'STAFF'))
   async getAllOrders(
     @Query() query: {
       status?: string;
@@ -210,19 +221,28 @@ export class OrderController {
   // Lấy chi tiết đơn hàng theo ID
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async getOrderById(@Param('id') id: string, @Request() req: any) {
+  async getOrderById(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
     const order = await this.orderService.findOrderById(id);
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-    const currentUserId = req.user?.sub;
-    if (order.clientId !== Number(currentUserId)) {
+
+    const currentUserId = user.sub;
+    if (
+      user.role === Role.CLIENT &&
+      order.clientId !== user.sub
+    ) {
       throw new ForbiddenException('Bạn không có quyền xem đơn hàng này');
     }
+
     return order;
   }
 
   //Cập nhật trạng thái đơn hàng (Dành cho Admin/Quản lý/Nhân viên)
+  @Auth(Role.MANAGER, Role.WAITER, Role.CASHIER)
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
   async updateOrderStatus(
@@ -240,18 +260,16 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   async cancelOrderByClient(
     @Param('id') id: string,
-    @Request() req: any,
+    @CurrentUser() user: JwtPayload,
   ) {
-    const clientId = req.user?.sub;
-    if (!clientId) {
-      throw new BadRequestException('Không tìm thấy thông tin khách hàng trong token');
-    }
-    return this.orderService.cancelOrderByClient(Number(clientId), id);
+    const clientId = user.sub;
+
+    return this.orderService.cancelOrderByClient(clientId, id);
   }
 
   //Quản lý/Admin hủy đơn hàng
+  @Auth(Role.MANAGER)
   @Patch(':id/cancel-manager')
-  @UseGuards(JwtAuthGuard)
   async cancelOrderByManager(@Param('id') id: string) {
     return this.orderService.cancelOrderByManager(id);
   }

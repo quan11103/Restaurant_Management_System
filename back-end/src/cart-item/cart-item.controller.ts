@@ -1,54 +1,79 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { CartItemService } from './cart-item.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @Controller('cart-item')
 @UseGuards(JwtAuthGuard)
 export class CartItemController {
-  constructor(private readonly cartItemService: CartItemService) { }
+  constructor(
+    private readonly cartItemService: CartItemService,
+  ) { }
 
   @Post()
-  create(@Req() req: any, @Body() createCartItemDto: CreateCartItemDto) {
-    // Lấy id của user đang đăng nhập từ token (passport/jwt tự động gán vào req.user)
-    const clientId = req.user.sub;
-    return this.cartItemService.create(clientId, createCartItemDto);
+  create(
+    @CurrentUser() user: JwtPayload,
+    @Body() createCartItemDto: CreateCartItemDto,
+  ) {
+    return this.cartItemService.create(
+      user.sub,
+      createCartItemDto,
+    );
   }
 
   @Get()
-  findAll(@Req() req: any) {
-    // Chỉ lấy các món trong giỏ hàng của chính user đang gọi API
-    const clientId = req.user.id;
-    return this.cartItemService.findAll(clientId);
+  findAll(
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.cartItemService.findAll(
+      user.sub,
+    );
   }
 
   @Get(':id')
-  findOne(@Req() req: any, @Param('id') id: string) {
-    // Kiểm tra xem món này có đúng là thuộc giỏ hàng của user này không
-    const clientId = req.user.id;
-    return this.cartItemService.findOne(+id, clientId);
+  findOne(
+    @CurrentUser() user: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.cartItemService.findOne(
+      id,
+      user.sub,
+    );
   }
 
   @Patch(':id')
   update(
-    @Req() req: any,
-    @Param('id') id: string,
-    @Body() updateCartItemDto: UpdateCartItemDto
+    @CurrentUser() user: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCartItemDto: UpdateCartItemDto,
   ) {
-    const clientId = req.user.id;
-    return this.cartItemService.update(+id, clientId, updateCartItemDto);
+    return this.cartItemService.update(
+      id,
+      user.sub,
+      updateCartItemDto,
+    );
   }
 
   @Delete(':id')
-  remove(@Req() req: any, @Param('id') id: string) {
-    const clientId = req.user.id;
-    return this.cartItemService.remove(+id, clientId);
+  remove(
+    @CurrentUser() user: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.cartItemService.remove(
+      id,
+      user.sub,
+    );
   }
 
   @Delete('clear')
-  clearCart(@Req() req: any) {
-    const clientId = req.user.sub;
-    return this.cartItemService.clearCart(clientId);
+  clearCart(
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.cartItemService.clearCart(
+      user.sub,
+    );
   }
 }

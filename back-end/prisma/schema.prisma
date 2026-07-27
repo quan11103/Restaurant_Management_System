@@ -79,6 +79,7 @@ model User {
   goodsBillsCreated GoodsBill[]   @relation("WarehouseGoodsBills")
   clientReviews     Review[]      @relation("ClientReviews")
   cartItems         CartItem[]    @relation("ClientCart")
+  interactions      Interaction[]
 }
 
 model Table {
@@ -107,6 +108,7 @@ model Dish {
   images       DishImage[]
   reviews      Review[]
   cartItems    CartItem[]
+  interactions Interaction[]
 }
 
 model DishImage {
@@ -273,4 +275,24 @@ model GoodsBillDetail {
 
   goodsBill            GoodsBill          @relation(fields: [goodsBillId], references: [id])
   ingredientSupplier   IngredientSupplier @relation(fields: [ingredientSupplierId], references: [id])
+}
+
+model Interaction {
+    clientId Int
+    dishId   Int
+
+    viewCount       Int @default(0)
+
+    cartQuantity    Int @default(0)
+
+    orderedQuantity Int @default(0)
+
+    reviewScore     Int?
+
+    updatedAt DateTime @updatedAt
+
+    client User   @relation(fields: [clientId], references: [id])
+    dish   Dish   @relation(fields: [dishId], references: [id])
+
+    @@id([clientId, dishId])
 }

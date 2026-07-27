@@ -2,10 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query 
 import { DishService, DishQueryDto } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
-import { Auth } from '../auth/decorators/auth.decorator';
-import { Role } from '@prisma/client';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import { UseGuards } from '@nestjs/common';
+import { OptionalJwtGuard } from 'src/auth/guards/optional-jwt.guard';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { RecommendNewUserDto } from 'src/recommendation/dto/recommend-new-user.dto';
+import { Role } from '@prisma/client';
+import { RecommendNewUserDto } from '../recommendation/dto/recommend-new-user.dto';
 
 @ApiTags('Dishes')
 @Controller('dishes')
@@ -25,10 +29,17 @@ export class DishController {
     return this.dishService.findAll(query);
   }
 
+  @UseGuards(OptionalJwtGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Lấy chi tiết món ăn theo ID' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.dishService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user?: JwtPayload,
+  ) {
+    return this.dishService.findOne(
+      id,
+      user?.sub,
+    );
   }
 
   @Patch(':id')
@@ -49,9 +60,11 @@ export class DishController {
   }
 
   @Post('recommend')
-  recommendForNewUser(
+  @UseGuards(OptionalJwtGuard)
+  recommend(
+    @CurrentUser() user: JwtPayload | undefined,
     @Body() dto: RecommendNewUserDto,
   ) {
-    return this.dishService.recommendForNewUser(dto);
+    return this.dishService.recommend(user?.sub, dto);
   }
 }
