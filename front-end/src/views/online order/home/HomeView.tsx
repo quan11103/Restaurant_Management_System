@@ -35,59 +35,62 @@ const HomeView: React.FC = () => {
     useEffect(() => {
         const fetchSpecificDishes = async () => {
             setIsLoading(true);
+
             try {
-                // Các ID tĩnh bạn muốn lấy
-                const bestSellerIds = [1, 2, 3, 4, 5, 6, 7, 8];
-                const recommendedIds = [53, 54, 55, 56, 57, 58, 59, 60];
+                // Lấy món bán chạy từ API
+                const response = await axiosClient.get("/dishes/popular?limit=8");
 
-                // Hàm hỗ trợ fetch và format từng món ăn theo ID
-                const fetchAndFormatDish = async (id: number): Promise<HomeProduct | null> => {
-                    try {
-                        // Giả định endpoint của findOne là /dishes/:id
-                        const response = await axiosClient.get(`dishes/${id}`);
+                const bestSellersData = response.data.map((item: any) => {
+                    const mainImage = item.images?.find((img: any) => img.isMain);
 
-                        if (response.data) {
-                            const item = response.data;
+                    return {
+                        id: item.id.toString(),
+                        name: item.name,
+                        price: item.price,
+                        rating: item.rating ?? 4.8,
+                        imageUrl:
+                            mainImage?.imageUrl ??
+                            item.images?.[0]?.imageUrl ??
+                            "https://via.placeholder.com/300x200?text=No+Image",
+                    };
+                });
 
-                            // Bỏ qua nếu món ăn không khả dụng
-                            if (item.isAvailable === false) return null;
+                setBestSellers(bestSellersData);
 
-                            const mainImage = item.images?.find((img: any) => img.isMain === true);
-                            let finalImageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+                // Lấy gợi ý từ recommender
+                const token = localStorage.getItem("access_token");
 
-                            if (mainImage) {
-                                finalImageUrl = mainImage.imageUrl;
-                            } else if (item.images && item.images.length > 0) {
-                                finalImageUrl = item.images[0].imageUrl;
-                            }
-
-                            return {
-                                id: item.id.toString(),
-                                name: item.name,
-                                price: item.price,
-                                rating: item.rating || Number((Math.random() * (5 - 4) + 4).toFixed(1)),
-                                imageUrl: finalImageUrl
-                            };
-                        }
-                        return null;
-                    } catch (error) {
-                        console.error(`Không thể lấy dữ liệu món ăn ID=${id}:`, error);
-                        return null; // Trả về null nếu món không tồn tại (tránh lỗi sập toàn bộ app)
-                    }
+                const recommendBody: any = {
+                    topK: 8,
                 };
 
-                // Fetch song song (concurrent) tất cả các ID để tiết kiệm thời gian
-                const [bestSellersData, recommendedData] = await Promise.all([
-                    Promise.all(bestSellerIds.map(id => fetchAndFormatDish(id))),
-                    Promise.all(recommendedIds.map(id => fetchAndFormatDish(id)))
-                ]);
+                if (!token) {
+                    recommendBody.history = [];
+                }
 
-                // Lọc bỏ các giá trị null (những món fetch lỗi hoặc isAvailable === false)
-                setBestSellers(bestSellersData.filter((item): item is HomeProduct => item !== null));
-                setRecommended(recommendedData.filter((item): item is HomeProduct => item !== null));
+                const recommendResponse = await axiosClient.post(
+                    "/dishes/recommend",
+                    recommendBody
+                );
 
+                const recommendedData = recommendResponse.data.map((item: any) => {
+                    const mainImage = item.images?.find((img: any) => img.isMain);
+
+                    return {
+                        id: item.id.toString(),
+                        name: item.name,
+                        price: item.price,
+                        rating: item.rating ?? 4.8,
+                        imageUrl:
+                            mainImage?.imageUrl ??
+                            item.images?.[0]?.imageUrl ??
+                            "https://via.placeholder.com/300x200?text=No+Image",
+                    };
+                });
+
+                setRecommended(recommendedData);
             } catch (error) {
-                console.error('Lỗi khi fetch data món ăn trang chủ:', error);
+                console.error("Lỗi khi fetch data trang chủ:", error);
             } finally {
                 setIsLoading(false);
             }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../../api/axios';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAlert } from '../../../components/Alert';
 import { ShoppingCart, Loader2 } from 'lucide-react';
 import QuantitySelector from '../../../components/QuantitySelector';
@@ -64,15 +64,27 @@ const ProductDetailView: React.FC = () => {
 
         const fetchRecommendations = async (currentIdNum: number) => {
             try {
-                const response = await axiosClient.post("/dishes/recommend", {
-                    history: [
+                const token = localStorage.getItem("access_token");
+
+                const body: any = {
+                    topK: 8,
+                    excludeDishIds: [currentIdNum],
+                };
+
+                // Chỉ khách chưa đăng nhập mới gửi history
+                if (!token) {
+                    body.history = [
                         {
                             dishId: currentIdNum,
                             interaction: 1,
                         },
-                    ],
-                    topK: 8,
-                });
+                    ];
+                }
+
+                const response = await axiosClient.post(
+                    "/dishes/recommend",
+                    body
+                );
 
                 const recommended = response.data.map((dish: DishDetail) => ({
                     id: dish.id.toString(),
@@ -93,15 +105,20 @@ const ProductDetailView: React.FC = () => {
         };
 
         if (id) {
-            setQuantity(1);
-            window.scrollTo(0, 0);
+            const loadData = async () => {
+                setQuantity(1);
+                window.scrollTo(0, 0);
 
-            fetchProductDetail();
+                await fetchProductDetail();
 
-            const currentIdNum = parseInt(id, 10);
-            if (!isNaN(currentIdNum)) {
-                fetchRecommendations(currentIdNum);
-            }
+                const currentIdNum = parseInt(id, 10);
+
+                if (!isNaN(currentIdNum)) {
+                    await fetchRecommendations(currentIdNum);
+                }
+            };
+
+            loadData().catch(console.error);
         }
     }, [id]);
 

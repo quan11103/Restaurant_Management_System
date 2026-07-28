@@ -239,6 +239,62 @@ export class DishService {
     });
   }
 
+  async getPopular(limit = 8) {
+
+    const ordered = await this.prisma.orderedDish.groupBy({
+      by: ["dishId"],
+      _sum: {
+        quantity: true,
+      },
+      orderBy: {
+        _sum: {
+          quantity: "desc",
+        },
+      },
+      take: limit,
+    });
+
+    // Chưa có đơn hàng
+    if (ordered.length === 0) {
+      return this.prisma.dish.findMany({
+        where: {
+          isAvailable: true,
+        },
+        include: {
+          images: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+        take: limit,
+      });
+    }
+
+    const ids = ordered.map(x => x.dishId);
+
+    const dishes = await this.prisma.dish.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        isAvailable: true,
+      },
+      include: {
+        images: true,
+      },
+    });
+
+    const order = new Map<number, number>();
+
+    ids.forEach((id, index) => order.set(id, index));
+
+    dishes.sort(
+      (a, b) => order.get(a.id)! - order.get(b.id)!
+    );
+
+    return dishes;
+  }
+
   async recommend(
     clientId: number | undefined,
     dto: RecommendNewUserDto,
@@ -256,6 +312,7 @@ export class DishService {
       await this.recommendationService.recommendNewUser({
         history,
         topK: dto.topK,
+        excludeDishIds: dto.excludeDishIds
       });
 
     if (dishIds.length === 0) {

@@ -11,4 +11,8 @@ export class RecommendNewUserDto {
     @IsOptional()
     @IsInt()
     topK?: number = 8;
+
+    @IsOptional()
+    @IsArray()
+    excludeDishIds?: number[];
 }

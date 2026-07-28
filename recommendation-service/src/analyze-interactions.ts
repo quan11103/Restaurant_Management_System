@@ -9,15 +9,28 @@ const outputDir = path.join(__dirname, "../output");
 
 const dishMap = new Map<number, string>();
 
-const dishLines = fs
+const dishFile = fs
     .readFileSync(path.join(outputDir, "dishes.csv"), "utf8")
     .trim()
-    .split("\n")
-    .slice(1);
+    .split("\n");
 
-for (const line of dishLines) {
-    const [id, name] = line.split(",");
-    dishMap.set(Number(id), name);
+const dishHeaders = dishFile[0].split(",");
+
+const dishIdIndex = dishHeaders.indexOf("dishId");
+const nameIndex = dishHeaders.indexOf("name");
+
+if (dishIdIndex === -1 || nameIndex === -1) {
+    throw new Error(
+        "dishes.csv phải chứa các cột 'dishId' và 'name'."
+    );
+}
+
+for (const line of dishFile.slice(1)) {
+    const cols = line.split(",");
+    dishMap.set(
+        Number(cols[dishIdIndex]),
+        cols[nameIndex]
+    );
 }
 
 const ITEM_COUNT = dishMap.size;
@@ -32,7 +45,7 @@ const itemUserCount = new Map<number, number>();
 let interactionCount = 0;
 
 const interactionLines = fs
-    .readFileSync(path.join(outputDir, "interactions.csv"), "utf8")
+    .readFileSync(path.join(outputDir, "train_interactions.csv"), "utf8")
     .trim()
     .split("\n")
     .slice(1);

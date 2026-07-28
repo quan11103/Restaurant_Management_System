@@ -40,6 +40,7 @@ def recommend_existing_user(request: RecommendRequest):
     dish_ids = recommender.recommend_existing_user(
         client_id=request.clientId,
         top_k=request.topK,
+        exclude_dish_ids=request.excludeDishIds,
     )
 
     return RecommendResponse(
@@ -61,6 +62,7 @@ def recommend_new_user(request: NewUserRequest):
     dish_ids = recommender.recommend_new_user(
         history=history,
         top_k=request.topK,
+        exclude_dish_ids=request.excludeDishIds,
     )
 
     return RecommendResponse(

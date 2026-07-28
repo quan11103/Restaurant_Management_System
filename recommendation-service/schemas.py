@@ -4,7 +4,8 @@ from typing import List
 
 class RecommendRequest(BaseModel):
     clientId: int
-    topK: int = 10
+    topK: int = 8
+    excludeDishIds: list[int] = []
 
 
 class HistoryItem(BaseModel):
@@ -14,7 +15,8 @@ class HistoryItem(BaseModel):
 
 class NewUserRequest(BaseModel):
     history: List[HistoryItem]
-    topK: int = 10
+    topK: int = 8
+    excludeDishIds: list[int] = []
 
 
 class RecommendResponse(BaseModel):

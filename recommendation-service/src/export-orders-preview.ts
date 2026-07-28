@@ -56,17 +56,30 @@ interface Order {
 
 const dishes = new Map<number, string>();
 
-const dishLines = fs
+const dishFile = fs
     .readFileSync(path.join(outputDir, "dishes.csv"), "utf8")
     .trim()
-    .split("\n")
-    .slice(1);
+    .split("\n");
 
-for (const line of dishLines) {
+const dishHeaders = dishFile[0].split(",");
 
-    const [id, name] = line.split(",");
+const dishIdIndex = dishHeaders.indexOf("dishId");
+const nameIndex = dishHeaders.indexOf("name");
 
-    dishes.set(Number(id), name);
+if (dishIdIndex === -1 || nameIndex === -1) {
+    throw new Error(
+        "dishes.csv phải chứa các cột 'dishId' và 'name'."
+    );
+}
+
+for (const line of dishFile.slice(1)) {
+
+    const cols = line.split(",");
+
+    dishes.set(
+        Number(cols[dishIdIndex]),
+        cols[nameIndex]
+    );
 
 }
 

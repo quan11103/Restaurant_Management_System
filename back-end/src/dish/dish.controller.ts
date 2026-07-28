@@ -29,6 +29,11 @@ export class DishController {
     return this.dishService.findAll(query);
   }
 
+  @Get("popular")
+  getPopular(@Query("limit", new ParseIntPipe({ optional: true })) limit = 8) {
+    return this.dishService.getPopular(limit);
+  }
+
   @UseGuards(OptionalJwtGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Lấy chi tiết món ăn theo ID' })

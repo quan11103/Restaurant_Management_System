@@ -61,7 +61,8 @@ class ALSRecommender:
     def recommend_existing_user(
         self,
         client_id: int,
-        top_k: int = 10,
+        top_k: int = 8,
+        exclude_dish_ids: list[int] | None = None,
     ) -> list[int]:
 
         if client_id not in self.user_to_index:
@@ -69,22 +70,33 @@ class ALSRecommender:
 
         user_index = self.user_to_index[client_id]
 
+        exclude_dish_ids = set(exclude_dish_ids or [])
+
         item_indexes, _ = self.model.recommend(
             userid=user_index,
             user_items=self.user_item_matrix[user_index],
-            N=top_k,
+            N=top_k + len(exclude_dish_ids),
             filter_already_liked_items=True,
         )
 
-        return [
+        dish_ids = [
             self.index_to_item[item_index]
             for item_index in item_indexes
         ]
 
+        dish_ids = [
+            dish_id
+            for dish_id in dish_ids
+            if dish_id not in exclude_dish_ids
+        ]
+
+        return dish_ids[:top_k]
+
     def recommend_new_user(
         self,
         history: list[tuple[int, float]],
-        top_k: int = 10,
+        top_k: int = 8,
+        exclude_dish_ids: list[int] | None = None,
     ) -> list[int]:
 
         row = sparse.lil_matrix(
@@ -107,18 +119,28 @@ class ALSRecommender:
 
         row = row.tocsr()
 
+        exclude_dish_ids = set(exclude_dish_ids or [])
+
         item_indexes, _ = self.model.recommend(
             userid=0,
             user_items=row,
-            N=top_k,
+            N=top_k + len(exclude_dish_ids),
             filter_already_liked_items=True,
             recalculate_user=True,
         )
 
-        return [
+        dish_ids = [
             self.index_to_item[item_index]
             for item_index in item_indexes
         ]
+
+        dish_ids = [
+            dish_id
+            for dish_id in dish_ids
+            if dish_id not in exclude_dish_ids
+        ]
+
+        return dish_ids[:top_k]
 
     def info(self):
 
