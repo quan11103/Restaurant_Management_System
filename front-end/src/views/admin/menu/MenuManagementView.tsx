@@ -31,8 +31,6 @@ const categoryOptions: SelectOption[] = [
     { label: 'Ăn kèm', value: 'Ăn kèm' },
     { label: 'Salad', value: 'Salad' },
     { label: 'Khai vị', value: 'Khai vị' },
-    { label: 'Cháo', value: 'Cháo' },
-    { label: 'Canh', value: 'Canh' },
     { label: 'Đồ uống', value: 'Đồ uống' },
     { label: 'Cà phê', value: 'Cà phê' },
     { label: 'Nước ép', value: 'Nước ép' },

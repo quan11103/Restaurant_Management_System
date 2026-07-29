@@ -128,26 +128,26 @@ console.log("=======================================");
 console.log("Recommendation Dataset Analysis");
 console.log("=======================================\n");
 
-console.log(`Users                  : ${USER_COUNT}`);
-console.log(`Items                  : ${ITEM_COUNT}`);
-console.log(`Interactions           : ${interactionCount}`);
-console.log(`Density                : ${density.toFixed(2)} %`);
+console.log(`Users                             : ${USER_COUNT}`);
+console.log(`Items                             : ${ITEM_COUNT}`);
+console.log(`Unique User-Item Interactions     : ${interactionCount}`);
+console.log(`Density                           : ${density.toFixed(2)} %`);
 
 console.log("");
 
 console.log("Per User");
 console.log("------------------------------");
-console.log(`Average interactions   : ${avgUser.toFixed(2)}`);
-console.log(`Minimum interactions   : ${minUser}`);
-console.log(`Maximum interactions   : ${maxUser}`);
+console.log(`Average interactions              : ${avgUser.toFixed(2)}`);
+console.log(`Minimum interactions              : ${minUser}`);
+console.log(`Maximum interactions              : ${maxUser}`);
 
 console.log("");
 
 console.log("Per Item");
 console.log("------------------------------");
-console.log(`Average users          : ${avgItem.toFixed(2)}`);
-console.log(`Minimum users          : ${minItem}`);
-console.log(`Maximum users          : ${maxItem}`);
+console.log(`Average unique users per item     : ${avgItem.toFixed(2)}`);
+console.log(`Minimum users                     : ${minItem}`);
+console.log(`Maximum users                     : ${maxItem}`);
 
 console.log("");
 

@@ -3,108 +3,120 @@ export const COMPANION_DISHES: Record<number, number[]> = {
     // =========================
     // Phở
     // =========================
-    1: [39, 57], // Phở bò tái -> Gỏi cuốn, Trà chanh
-    2: [39, 57], // Phở bò chín
-    3: [39, 57], // Phở gà
+    1: [59], // Phở bò tái -> Gỏi cuốn
+    2: [57], // Phở bò chín -> Nem rán
+    3: [64], // Phở gà -> Trà chanh
 
     // =========================
     // Bún
     // =========================
-    4: [34, 57], // Bún bò Huế -> Kim chi, Trà chanh
-    5: [39, 57], // Bún chả
-    6: [39, 57], // Bún riêu
+    4: [53], // Bún bò Huế -> Xúc xích nướng
+    5: [59], // Bún chả -> Gỏi cuốn
+    6: [57], // Bún riêu -> Nem rán
+    10: [59], // Bún cá
+    11: [54], // Bún mắm
+    14: [59], // Bún mọc
+    15: [53], // Bún Thái
+    16: [57], // Bún cá rô đồng
 
     // =========================
-    // Hủ tiếu - Mì
+    // Hủ tiếu - Miến - Bánh canh
     // =========================
-    7: [39, 57], // Hủ tiếu Nam Vang
-    8: [39, 57], // Mì Quảng
-    9: [39, 57], // Bánh canh cua
+    7: [64], // Hủ tiếu Nam Vang
+    8: [59], // Mì Quảng
+    9: [54], // Bánh canh cua
+    12: [64], // Miến gà
+    13: [57], // Hoành thánh nước
+    17: [59], // Bánh canh giò heo
+    18: [53], // Hủ tiếu bò kho
+    19: [64], // Miến vịt
 
     // =========================
     // Cơm
     // =========================
-    10: [47, 51], // Cơm tấm -> Canh chua, Coca
-    11: [48, 67], // Cơm gà -> Canh cải, Nước cam
-    12: [49, 51], // Cơm chiên hải sản
-    13: [48, 51], // Cơm chiên Dương Châu
-    14: [48, 52], // Cơm rang dưa bò
-    15: [47, 61], // Cơm bò lúc lắc
-    16: [48, 57], // Cơm cá kho
+    20: [54], // Cơm tấm
+    21: [73], // Cơm gà xối mỡ
+    22: [63], // Cơm chiên hải sản
+    23: [64], // Cơm chiên Dương Châu
+    24: [53], // Cơm rang dưa bò
+    25: [67], // Cơm bò lúc lắc
+    26: [64], // Cơm cá kho tộ
+    27: [54], // Cơm sườn mật ong
+    28: [73], // Cơm gà nướng
+    29: [67], // Cơm bò tiêu đen
+    30: [74], // Cơm Teriyaki
+    31: [73], // Cơm gà Hải Nam
+    32: [64], // Cơm thịt kho trứng
+    33: [53], // Cơm sườn BBQ
+    34: [67], // Cơm gà sốt tiêu đen
+    35: [67], // Cơm bò xào hành
+    36: [64], // Cơm cá chiên nước mắm
 
     // =========================
-    // Mì cay - Lẩu
+    // Mì xào - Mì cay - Lẩu
     // =========================
-    17: [34, 51], // Mì xào bò
-    18: [34, 55], // Mì cay -> Kim chi, Fanta
-    19: [34, 51], // Lẩu Thái -> Kim chi, Coca
+    37: [54], // Mì xào bò
+    38: [66], // Mì cay -> Trà sữa Matcha
+    39: [63], // Lẩu Thái -> Trà đào cam sả
 
     // =========================
     // Mì Ý
     // =========================
-    20: [42, 61, 74], // Mì Ý bò -> Bánh mì, Cafe đen, Tiramisu
-    21: [42, 65, 75], // Mì Ý kem -> Bánh mì, Latte, Cheesecake
+    40: [77], // Mì Ý bò bằm -> Tiramisu
+    41: [78], // Mì Ý sốt kem -> Cheesecake
 
     // =========================
     // Pizza
     // =========================
-    22: [31, 51, 74], // Margherita
-    23: [31, 51, 74], // Hải sản
-    24: [31, 52, 75], // Pepperoni
-    25: [31, 51, 75], // BBQ
+    42: [51], // Pizza -> Khoai tây chiên
+    43: [51],
+    44: [51],
+    45: [51],
 
     // =========================
     // Burger
     // =========================
-    26: [31, 51], // Burger bò
-    27: [32, 52], // Burger gà
+    46: [51], // Burger bò
+    47: [52], // Burger gà
 
     // =========================
     // Gà rán
     // =========================
-    28: [31, 51], // Gà truyền thống
-    29: [34, 55], // Gà cay
-    30: [31, 51], // Cánh gà BBQ
-
-    // =========================
-    // Cháo
-    // =========================
-    43: [57], // Cháo thịt bằm
-    44: [57], // Cháo gà
-    45: [57], // Cháo dinh dưỡng
-    46: [57], // Cháo lòng
+    48: [51], // Gà rán
+    49: [53], // Gà cay -> Kim chi
+    50: [51], // Cánh gà BBQ
 
     // =========================
     // Salad
     // =========================
-    35: [67], // Salad Caesar -> Nước cam
-    36: [68], // Salad cá ngừ -> Nước dưa hấu
+    55: [73], // Caesar -> Nước cam ép
+    56: [74], // Salad cá ngừ -> Nước dưa hấu ép
 
     // =========================
-    // Cafe
+    // Cà phê
     // =========================
-    61: [73, 77], // Cafe đen -> Flan, Su kem
-    62: [73, 74], // Cafe sữa
-    63: [73],     // Bạc xỉu
-    64: [74, 75], // Americano
-    65: [74, 75], // Latte
-    66: [74, 75], // Cappuccino
+    67: [77], // Cafe đen -> Tiramisu
+    68: [77], // Cafe sữa
+    69: [78], // Bạc xỉu
+    70: [78], // Americano
+    71: [78], // Latte
+    72: [79], // Cappuccino -> Mousse
 
     // =========================
-    // Trà sữa
+    // Trà
     // =========================
-    59: [73, 77], // Trà sữa truyền thống
-    60: [73, 77], // Matcha
+    65: [79], // Trà sữa truyền thống
+    66: [79], // Trà sữa Matcha
 
     // =========================
     // Nước ép
     // =========================
-    67: [71], // Nước cam -> Kem vani
-    68: [72], // Nước dưa hấu -> Kem socola
+    73: [80], // Cam ép -> Trái cây
+    74: [80], // Dưa hấu ép -> Trái cây
 
     // =========================
     // Sinh tố
     // =========================
-    69: [73], // Sinh tố bơ -> Flan
-    70: [76]  // Sinh tố xoài -> Mousse chanh dây
+    75: [78], // Sinh tố bơ -> Cheesecake
+    76: [79]  // Sinh tố xoài -> Mousse
 };

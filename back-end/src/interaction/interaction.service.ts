@@ -123,9 +123,9 @@ export class InteractionService {
       .map((item) => ({
         dishId: item.dishId,
         interaction:
-          item.viewCount * 1 +
-          item.cartQuantity * 3 +
-          item.orderedQuantity * 5,
+          item.viewCount * 50 +
+          item.cartQuantity * 60 +
+          item.orderedQuantity * 70,
       }))
       .filter((item) => item.interaction > 0);
   }

@@ -10,7 +10,7 @@ const outputFile = path.join(inputDir, "order_dishes.csv");
 // Đọc clients.csv
 // ==============================
 
-const customerPersona = new Map<number, number>();
+const clientPersona = new Map<number, number>();
 
 const clientLines = fs
     .readFileSync(path.join(inputDir, "clients.csv"), "utf8")
@@ -19,9 +19,9 @@ const clientLines = fs
     .slice(1);
 
 for (const line of clientLines) {
-    const [customerId, personaId] = line.split(",").map(Number);
+    const [clientId, personaId] = line.split(",").map(Number);
 
-    customerPersona.set(customerId, personaId);
+    clientPersona.set(clientId, personaId);
 }
 
 // ==============================
@@ -43,7 +43,7 @@ function randomInt(min: number, max: number): number {
 }
 
 function randomDish(): number {
-    return randomInt(1, 60);
+    return randomInt(1, 80);
 }
 
 function randomQuantity(): number {
@@ -66,13 +66,16 @@ function randomItemCount(): number {
 
 for (const line of orderLines) {
 
-    const [orderId, customerId] = line.split(",").map(Number);
+    const [orderId, clientId] = line.split(",").map(Number);
 
-    const personaId = customerPersona.get(customerId)!;
+    const personaId = clientPersona.get(clientId)!;
 
     const persona = PERSONAS.find(p => p.id === personaId)!;
 
     const selected = new Set<number>();
+
+    // Lưu các món được thêm bởi companion
+    const companionItems = new Set<number>();
 
     const itemCount = randomItemCount();
 
@@ -80,7 +83,7 @@ for (const line of orderLines) {
 
         let dishId: number;
 
-        if (Math.random() < 0.8) {
+        if (Math.random() < 0.95) {
 
             const favorites = persona.favoriteDishes;
 
@@ -102,16 +105,32 @@ for (const line of orderLines) {
 
         if (
             companions &&
-            Math.random() < 0.35 &&
+            Math.random() < 0.05 &&
             selected.size < itemCount
         ) {
+
             const companion =
                 companions[randomInt(0, companions.length - 1)];
 
-            selected.add(companion);
-        }
+            if (
+                !selected.has(companion) &&
+                selected.size < itemCount
+            ) {
+                selected.add(companion);
 
-        csv += `${orderId},${dishId},${randomQuantity()}\n`;
+                // Đánh dấu đây là món companion
+                companionItems.add(companion);
+            }
+        }
+    }
+
+    for (const dishId of selected) {
+
+        const quantity = companionItems.has(dishId)
+            ? 1
+            : randomQuantity();
+
+        csv += `${orderId},${dishId},${quantity}\n`;
     }
 }
 

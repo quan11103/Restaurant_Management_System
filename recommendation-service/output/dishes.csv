@@ -8,74 +8,74 @@
 7,1,Hủ tiếu Nam Vang,Món chính,70000,"Hủ tiếu Nam Vang với tôm, thịt bằm và trứng cút.",true
 8,1,Mì Quảng,Món chính,70000,Mì Quảng gà với nước dùng đậm vị miền Trung.,true
 9,1,Bánh canh cua,Món chính,75000,"Bánh canh cua với chả cua, tôm và trứng cút.",true
-10,1,Cơm tấm sườn,Món chính,70000,"Cơm tấm với sườn nướng, bì và chả.",true
-11,1,Cơm gà xối mỡ,Món chính,75000,Gà chiên giòn ăn cùng cơm và nước sốt.,true
-12,1,Cơm chiên hải sản,Món chính,80000,"Cơm chiên với tôm, mực và rau củ.",true
-13,1,Cơm chiên Dương Châu,Món chính,75000,Cơm chiên truyền thống nhiều nguyên liệu.,true
-14,1,Cơm rang dưa bò,Món chính,75000,Cơm rang với thịt bò và dưa cải chua.,true
-15,1,Cơm bò lúc lắc,Món chính,90000,Cơm trắng ăn kèm bò lúc lắc và salad.,true
-16,1,Cơm cá kho tộ,Món chính,80000,Cơm nóng ăn cùng cá kho tộ đậm đà.,true
-17,1,Mì xào bò,Món chính,70000,Mì xào với thịt bò và rau cải.,true
-18,1,Mì cay,Món chính,75000,Mì cay Hàn Quốc với hải sản và rau nấm.,true
-19,1,Lẩu Thái,Món chính,220000,Lẩu Thái chua cay với hải sản và rau tươi.,true
-20,1,Mì Ý sốt bò bằm,Món chính,85000,Spaghetti sốt bò bằm kiểu Ý.,true
-21,1,Mì Ý sốt kem,Món chính,90000,Mì Ý sốt kem béo ngậy cùng thịt xông khói.,true
-22,1,Pizza Margherita,Pizza,150000,Pizza phô mai và sốt cà chua truyền thống.,true
-23,1,Pizza Hải sản,Pizza,190000,"Pizza với tôm, mực và phô mai.",true
-24,1,Pizza Pepperoni,Pizza,180000,Pizza xúc xích Pepperoni đậm vị.,true
-25,1,Pizza Bò BBQ,Pizza,200000,Pizza bò sốt BBQ thơm ngon.,true
-26,1,Burger bò,Burger,85000,Burger bò nướng cùng rau và phô mai.,true
-27,1,Burger gà,Burger,80000,Burger gà giòn sốt mayonnaise.,true
-28,1,Gà rán truyền thống,Gà rán,90000,Gà rán giòn rụm theo công thức đặc biệt.,true
-29,1,Gà rán cay,Gà rán,95000,Gà rán phủ sốt cay Hàn Quốc.,true
-30,1,Cánh gà BBQ,Gà rán,110000,Cánh gà nướng sốt BBQ.,true
-31,1,Khoai tây chiên,Ăn kèm,45000,Khoai tây chiên giòn.,true
-32,1,Khoai tây lắc phô mai,Ăn kèm,50000,Khoai tây chiên lắc bột phô mai.,true
-33,1,Xúc xích nướng,Ăn kèm,45000,Xúc xích nướng ăn kèm tương cà.,true
-34,1,Kim chi,Ăn kèm,30000,Kim chi cải thảo lên men kiểu Hàn Quốc.,true
-35,1,Salad Caesar,Salad,70000,Salad rau xà lách với sốt Caesar.,true
-36,1,Salad cá ngừ,Salad,75000,Salad cá ngừ tươi cùng rau củ.,true
-37,1,Nem rán,Khai vị,60000,Nem rán giòn nhân thịt.,true
-38,1,Nem hải sản,Khai vị,70000,Nem rán nhân tôm và mực.,true
-39,1,Gỏi cuốn,Khai vị,55000,Gỏi cuốn tôm thịt ăn kèm nước chấm đậu phộng.,true
-40,1,Súp bí đỏ,Khai vị,50000,Súp bí đỏ kem mịn.,true
-41,1,Súp hải sản,Khai vị,65000,Súp hải sản nóng hổi.,true
-42,1,Bánh mì bơ tỏi,Khai vị,45000,Bánh mì nướng bơ tỏi thơm giòn.,true
-43,1,Cháo thịt bằm,Cháo,50000,Cháo nóng với thịt bằm và hành lá.,true
-44,1,Cháo gà,Cháo,55000,Cháo gà ta xé phay thơm ngon.,true
-45,1,Cháo dinh dưỡng,Cháo,50000,Cháo dinh dưỡng với rau củ và thịt bằm.,true
-46,1,Cháo lòng,Cháo,60000,"Cháo lòng với dồi, gan và tim.",true
-47,1,Canh chua cá,Canh,70000,"Canh chua cá với dứa, cà chua và bạc hà.",true
-48,1,Canh cải thịt bằm,Canh,55000,Canh cải xanh nấu thịt bằm thanh ngọt.,true
-49,1,Canh rong biển,Canh,50000,Canh rong biển nấu thịt bò.,true
-50,1,Canh bí đỏ hầm xương,Canh,60000,Canh bí đỏ hầm xương ngọt thanh.,true
-51,1,Coca-Cola,Đồ uống,20000,Nước ngọt Coca-Cola.,true
-52,1,Pepsi,Đồ uống,20000,Nước ngọt Pepsi.,true
-53,1,7Up,Đồ uống,20000,Nước ngọt vị chanh.,true
-54,1,Sprite,Đồ uống,20000,Nước ngọt có gas vị chanh.,true
-55,1,Fanta Cam,Đồ uống,20000,Nước ngọt vị cam.,true
-56,1,Trà đào cam sả,Đồ uống,45000,Trà đào kết hợp cam và sả.,true
-57,1,Trà chanh,Đồ uống,30000,Trà chanh tươi mát.,true
-58,1,Trà vải,Đồ uống,40000,Trà đen kết hợp quả vải.,true
-59,1,Trà sữa truyền thống,Đồ uống,45000,Trà sữa với trân châu đen.,true
-60,1,Trà sữa Matcha,Đồ uống,50000,Trà sữa vị Matcha.,true
-61,1,Cà phê đen,Cà phê,30000,Cà phê đen pha phin.,true
-62,1,Cà phê sữa,Cà phê,35000,Cà phê sữa truyền thống.,true
-63,1,Bạc xỉu,Cà phê,40000,Bạc xỉu nhiều sữa ít cà phê.,true
-64,1,Americano,Cà phê,45000,Cà phê Americano.,true
-65,1,Latte,Cà phê,55000,Latte với lớp sữa mịn.,true
-66,1,Cappuccino,Cà phê,55000,Cappuccino phủ bọt sữa.,true
-67,1,Nước cam ép,Nước ép,40000,Nước cam ép tươi.,true
-68,1,Nước dưa hấu ép,Nước ép,40000,Nước ép dưa hấu nguyên chất.,true
-69,1,Sinh tố bơ,Sinh tố,50000,Sinh tố bơ béo mịn.,true
-70,1,Sinh tố xoài,Sinh tố,50000,Sinh tố xoài chín.,true
-71,1,Kem vani,Tráng miệng,35000,Kem vị vani mát lạnh.,true
-72,1,Kem socola,Tráng miệng,35000,Kem vị socola đậm đà.,true
-73,1,Bánh flan,Tráng miệng,30000,Bánh flan mềm mịn.,true
-74,1,Tiramisu,Tráng miệng,55000,Bánh Tiramisu kiểu Ý.,true
-75,1,Cheesecake việt quất,Tráng miệng,60000,Bánh cheesecake phủ việt quất.,true
-76,1,Bánh mousse chanh dây,Tráng miệng,55000,Bánh mousse chanh dây thanh mát.,true
-77,1,Bánh su kem,Tráng miệng,35000,Bánh su nhân kem vani.,true
-78,1,Sữa chua trái cây,Tráng miệng,40000,Sữa chua ăn kèm trái cây tươi.,true
-79,1,Rau câu dừa,Tráng miệng,30000,Rau câu vị dừa mát lạnh.,true
+10,1,Bún cá,Món chính,70000,"Bún cá với nước dùng thanh ngọt, chả cá và rau sống.",true
+11,1,Bún mắm,Món chính,75000,"Bún mắm miền Tây với hải sản, thịt quay và rau sống.",true
+12,1,Miến gà,Món chính,65000,"Miến nước với thịt gà ta, nấm và hành lá.",true
+13,1,Hoành thánh nước,Món chính,70000,Hoành thánh nhân thịt trong nước dùng xương hầm.,true
+14,1,Bún mọc,Món chính,70000,"Bún mọc với mọc heo, nấm hương và nước dùng trong.",true
+15,1,Bún Thái hải sản,Món chính,80000,"Bún Thái chua cay với tôm, mực và nghêu.",true
+16,1,Bún cá rô đồng,Món chính,75000,Bún cá rô đồng chiên giòn với nước dùng ngọt thanh.,true
+17,1,Bánh canh giò heo,Món chính,80000,Bánh canh dai mềm ăn cùng giò heo hầm.,true
+18,1,Hủ tiếu bò kho,Món chính,85000,Hủ tiếu dùng với bò kho thơm mùi ngũ vị.,true
+19,1,Miến vịt,Món chính,80000,Miến vịt với thịt vịt mềm và nước dùng đậm đà.,true
+20,1,Cơm tấm sườn,Món chính,70000,"Cơm tấm với sườn nướng, bì và chả.",true
+21,1,Cơm gà xối mỡ,Món chính,75000,Gà chiên giòn ăn cùng cơm và nước sốt.,true
+22,1,Cơm chiên hải sản,Món chính,80000,"Cơm chiên với tôm, mực và rau củ.",true
+23,1,Cơm chiên Dương Châu,Món chính,75000,Cơm chiên truyền thống nhiều nguyên liệu.,true
+24,1,Cơm rang dưa bò,Món chính,75000,Cơm rang với thịt bò và dưa cải chua.,true
+25,1,Cơm bò lúc lắc,Món chính,90000,Cơm trắng ăn kèm bò lúc lắc và salad.,true
+26,1,Cơm cá kho tộ,Món chính,80000,Cơm nóng ăn cùng cá kho tộ đậm đà.,true
+27,1,Cơm sườn nướng mật ong,Món chính,85000,Cơm trắng ăn kèm sườn nướng mật ong và dưa chua.,true
+28,1,Cơm gà nướng,Món chính,85000,Gà nướng than hoa dùng cùng cơm trắng và salad.,true
+29,1,Cơm bò nướng tiêu đen,Món chính,95000,Bò nướng sốt tiêu đen ăn cùng cơm nóng.,true
+30,1,Cơm đùi gà Teriyaki,Món chính,90000,Đùi gà áp chảo sốt Teriyaki dùng với cơm trắng.,true
+31,1,Cơm gà Hải Nam,Món chính,85000,Cơm gà Hải Nam mềm thơm dùng với nước sốt gừng.,true
+32,1,Cơm thịt kho trứng,Món chính,80000,Thịt kho trứng kiểu truyền thống ăn cùng cơm nóng.,true
+33,1,Cơm sườn BBQ,Món chính,90000,Sườn nướng BBQ thơm lừng dùng với cơm trắng.,true
+34,1,Cơm gà sốt tiêu đen,Món chính,90000,Ức gà áp chảo sốt tiêu đen ăn cùng cơm.,true
+35,1,Cơm bò xào hành,Món chính,90000,Bò xào hành tây thơm ngọt dùng với cơm nóng.,true
+36,1,Cơm cá chiên nước mắm,Món chính,85000,Cá chiên giòn phủ nước mắm tỏi ăn cùng cơm.,true
+37,1,Mì xào bò,Món chính,70000,Mì xào với thịt bò và rau cải.,true
+38,1,Mì cay,Món chính,75000,Mì cay Hàn Quốc với hải sản và rau nấm.,true
+39,1,Lẩu Thái,Món chính,220000,Lẩu Thái chua cay với hải sản và rau tươi.,true
+40,1,Mì Ý sốt bò bằm,Món chính,85000,Spaghetti sốt bò bằm kiểu Ý.,true
+41,1,Mì Ý sốt kem,Món chính,90000,Mì Ý sốt kem béo ngậy cùng thịt xông khói.,true
+42,1,Pizza Margherita,Pizza,150000,Pizza phô mai và sốt cà chua truyền thống.,true
+43,1,Pizza Hải sản,Pizza,190000,"Pizza với tôm, mực và phô mai.",true
+44,1,Pizza Pepperoni,Pizza,180000,Pizza xúc xích Pepperoni đậm vị.,true
+45,1,Pizza Bò BBQ,Pizza,200000,Pizza bò sốt BBQ thơm ngon.,true
+46,1,Burger bò,Burger,85000,Burger bò nướng cùng rau và phô mai.,true
+47,1,Burger gà,Burger,80000,Burger gà giòn sốt mayonnaise.,true
+48,1,Gà rán truyền thống,Gà rán,90000,Gà rán giòn rụm theo công thức đặc biệt.,true
+49,1,Gà rán cay,Gà rán,95000,Gà rán phủ sốt cay Hàn Quốc.,true
+50,1,Cánh gà BBQ,Gà rán,110000,Cánh gà nướng sốt BBQ.,true
+51,1,Khoai tây chiên,Ăn kèm,45000,Khoai tây chiên giòn.,true
+52,1,Khoai tây lắc phô mai,Ăn kèm,50000,Khoai tây chiên lắc bột phô mai.,true
+53,1,Xúc xích nướng,Ăn kèm,45000,Xúc xích nướng ăn kèm tương cà.,true
+54,1,Kim chi,Ăn kèm,30000,Kim chi cải thảo lên men kiểu Hàn Quốc.,true
+55,1,Salad Caesar,Salad,70000,Salad rau xà lách với sốt Caesar.,true
+56,1,Salad cá ngừ,Salad,75000,Salad cá ngừ tươi cùng rau củ.,true
+57,1,Nem rán,Khai vị,60000,Nem rán giòn nhân thịt.,true
+58,1,Nem hải sản,Khai vị,70000,Nem rán nhân tôm và mực.,true
+59,1,Gỏi cuốn,Khai vị,55000,Gỏi cuốn tôm thịt ăn kèm nước chấm đậu phộng.,true
+60,1,Súp bí đỏ,Khai vị,50000,Súp bí đỏ kem mịn.,true
+61,1,Súp hải sản,Khai vị,65000,Súp hải sản nóng hổi.,true
+62,1,Bánh mì bơ tỏi,Khai vị,45000,Bánh mì nướng bơ tỏi thơm giòn.,true
+63,1,Trà đào cam sả,Đồ uống,45000,Trà đào kết hợp cam và sả.,true
+64,1,Trà chanh,Đồ uống,30000,Trà chanh tươi mát.,true
+65,1,Trà sữa truyền thống,Đồ uống,45000,Trà sữa với trân châu đen.,true
+66,1,Trà sữa Matcha,Đồ uống,50000,Trà sữa vị Matcha.,true
+67,1,Cà phê đen,Cà phê,30000,Cà phê đen pha phin.,true
+68,1,Cà phê sữa,Cà phê,35000,Cà phê sữa truyền thống.,true
+69,1,Bạc xỉu,Cà phê,40000,Bạc xỉu nhiều sữa ít cà phê.,true
+70,1,Americano,Cà phê,45000,Cà phê Americano.,true
+71,1,Latte,Cà phê,55000,Latte với lớp sữa mịn.,true
+72,1,Cappuccino,Cà phê,55000,Cappuccino phủ bọt sữa.,true
+73,1,Nước cam ép,Nước ép,40000,Nước cam ép tươi.,true
+74,1,Nước dưa hấu ép,Nước ép,40000,Nước ép dưa hấu nguyên chất.,true
+75,1,Sinh tố bơ,Sinh tố,50000,Sinh tố bơ béo mịn.,true
+76,1,Sinh tố xoài,Sinh tố,50000,Sinh tố xoài chín.,true
+77,1,Tiramisu,Tráng miệng,55000,Bánh Tiramisu kiểu Ý.,true
+78,1,Cheesecake việt quất,Tráng miệng,60000,Bánh cheesecake phủ việt quất.,true
+79,1,Bánh mousse chanh dây,Tráng miệng,55000,Bánh mousse chanh dây thanh mát.,true
 80,1,Trái cây theo mùa,Tráng miệng,50000,Đĩa trái cây tươi theo mùa.,true
