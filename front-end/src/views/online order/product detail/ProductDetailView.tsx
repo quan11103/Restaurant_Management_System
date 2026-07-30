@@ -10,10 +10,14 @@ import ReviewSection from './ReviewSection';
 import ProductSection from '../../../components/product/ProductSection';
 import './ProductDetailView.css';
 
-const MOCK_REVIEWS = [
-    { id: 'r1', user: 'Nguyễn Văn A', rating: 5, date: '28/06/2026', comment: 'Món ăn thực sự rất ngon, hợp khẩu vị. Sẽ ủng hộ dài dài!' },
-    { id: 'r2', user: 'Trần Thị B', rating: 4, date: '20/06/2026', comment: 'Giao hàng nhanh, đồ ăn đến nơi vẫn còn nóng hổi.' }
-];
+// Định nghĩa interface cho Review để type-checking chuẩn xác
+interface Review {
+    id: string;
+    user: string;
+    rating: number;
+    date: string;
+    comment: string;
+}
 
 interface DishDetail {
     id: number;
@@ -40,6 +44,9 @@ const ProductDetailView: React.FC = () => {
     const [product, setProduct] = useState<DishDetail | null>(null);
     const [recommendedDishes, setRecommendedDishes] = useState<MappedProduct[]>([]);
 
+    // Thêm state lưu reviews thật từ API
+    const [reviews, setReviews] = useState<Review[]>([]);
+
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
@@ -47,7 +54,6 @@ const ProductDetailView: React.FC = () => {
 
     useEffect(() => {
         const fetchProductDetail = async () => {
-            setIsLoading(true);
             try {
                 const response = await axiosClient.get(`/dishes/${id}`);
                 if (!response.data) {
@@ -57,21 +63,17 @@ const ProductDetailView: React.FC = () => {
             } catch (err) {
                 console.error(err);
                 setError('Có lỗi xảy ra khi tải dữ liệu món ăn.');
-            } finally {
-                setIsLoading(false);
             }
         };
 
         const fetchRecommendations = async (currentIdNum: number) => {
             try {
                 const token = localStorage.getItem("access_token");
-
                 const body: any = {
                     topK: 8,
                     excludeDishIds: [currentIdNum],
                 };
 
-                // Chỉ khách chưa đăng nhập mới gửi history
                 if (!token) {
                     body.history = [
                         {
@@ -81,11 +83,7 @@ const ProductDetailView: React.FC = () => {
                     ];
                 }
 
-                const response = await axiosClient.post(
-                    "/dishes/recommend",
-                    body
-                );
-
+                const response = await axiosClient.post("/dishes/recommend", body);
                 const recommended = response.data.map((dish: DishDetail) => ({
                     id: dish.id.toString(),
                     name: dish.name,
@@ -104,18 +102,47 @@ const ProductDetailView: React.FC = () => {
             }
         };
 
+        // Hàm gọi API lấy danh sách reviews
+        const fetchReviews = async (currentIdNum: number) => {
+            try {
+                const response = await axiosClient.get(`/reviews/dish/${currentIdNum}`);
+                const mappedReviews = response.data.map((review: any) => ({
+                    id: review.id.toString(),
+                    user: review.client?.fullName || 'Khách hàng',
+                    rating: review.rating,
+                    comment: review.comment || '',
+                    // Dùng updatedAt và format về dạng DD/MM/YYYY
+                    date: review.updatedAt
+                        ? new Date(review.updatedAt).toLocaleDateString('vi-VN')
+                        : 'Gần đây'
+                }));
+                setReviews(mappedReviews);
+            } catch (err) {
+                console.error("Lỗi khi tải danh sách đánh giá:", err);
+                setReviews([]);
+            }
+        };
+
         if (id) {
             const loadData = async () => {
+                setIsLoading(true);
                 setQuantity(1);
                 window.scrollTo(0, 0);
 
-                await fetchProductDetail();
-
                 const currentIdNum = parseInt(id, 10);
 
+                // Gọi API product detail trước (có thể gọi song song bằng Promise.all nếu backend hỗ trợ tốt)
+                await fetchProductDetail();
+
                 if (!isNaN(currentIdNum)) {
-                    await fetchRecommendations(currentIdNum);
+                    // Gọi song song API gợi ý và API reviews để tối ưu thời gian tải
+                    await Promise.all([
+                        fetchRecommendations(currentIdNum),
+                        fetchReviews(currentIdNum)
+                    ]);
                 }
+
+                setIsLoading(false);
             };
 
             loadData().catch(console.error);
@@ -138,7 +165,8 @@ const ProductDetailView: React.FC = () => {
         : ['https://via.placeholder.com/600x400?text=No+Image'];
 
     const displayRating = product.rating || 4.8;
-    const displayReviewCount = product.reviewCount || 128;
+    // Dùng trực tiếp độ dài mảng reviews thực tế
+    const displayReviewCount = reviews.length > 0 ? reviews.length : (product.reviewCount || 0);
 
     const handleAddToCart = async () => {
         setIsSubmitting(true);
@@ -163,13 +191,11 @@ const ProductDetailView: React.FC = () => {
     return (
         <div className="product-detail-view">
             <main className="detail-container main-content-layout">
-                {/* Khối trái: gallery */}
                 <ProductImageGallery
                     images={sortedImageUrls}
                     productName={product.name}
                 />
 
-                {/* Khối phải: thông tin chi tiết */}
                 <section className="detail-right-info">
                     <ProductInfo
                         name={product.name}
@@ -206,12 +232,13 @@ const ProductDetailView: React.FC = () => {
                 </section>
             </main>
 
+            {/* Truyền trực tiếp state reviews thật vào component */}
             <ReviewSection
-                reviews={MOCK_REVIEWS}
+                dishId={product.id}
+                reviews={reviews}
                 reviewCount={displayReviewCount}
             />
 
-            {/* Sản phẩm gợi ý */}
             {recommendedDishes.length > 0 && (
                 <section className="home-section detail-container">
                     <ProductSection

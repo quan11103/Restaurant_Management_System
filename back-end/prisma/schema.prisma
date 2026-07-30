@@ -126,9 +126,12 @@ model Review {
   clientId    Int
   rating      Int
   comment     String?
+  updatedAt   DateTime @updatedAt @default(now())
 
   dish        Dish     @relation(fields: [dishId], references: [id])
   client      User     @relation("ClientReviews", fields: [clientId], references: [id])
+
+  @@unique([clientId, dishId])
 }
 
 model Order {

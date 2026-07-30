@@ -7,8 +7,7 @@
     font-size: 1.3rem;
     font-weight: 700;
     color: #2f3640;
-    margin: 0 0 24px 0;
-    padding-bottom: 12px;
+    margin: 0;
     display: inline-block;
 }
 
@@ -72,4 +71,92 @@
     margin: 4px 0 0 0;
     color: #2f3640;
     font-size: 0.9rem;
+}
+
+.review-form-container {
+    background-color: #fff5f2;
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid #e1e8ed;
+}
+
+.review-form-title {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    color: #2f3640;
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2f3640;
+    font-size: 0.95rem;
+}
+
+.required-mark {
+    color: #e74c3c;
+    margin-left: 4px;
+}
+
+.interactive-stars {
+    display: flex;
+    gap: 8px;
+}
+
+.star-icon {
+    transition: all 0.2s ease-in-out;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-pointer:hover {
+    transform: scale(1.1);
+}
+
+.error-text {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin: 4px 0 0 0;
+}
+
+.review-textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #2f3640;
+    resize: vertical;
+    /* Cho phép kéo dãn chiều dọc */
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: white;
+}
+
+.review-textarea:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.1);
+}
+
+.review-textarea::placeholder {
+    color: #a4b0be;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
 }

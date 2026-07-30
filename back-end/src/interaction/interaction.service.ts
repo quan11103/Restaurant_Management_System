@@ -83,28 +83,28 @@ export class InteractionService {
     });
   }
 
-  // async updateReviewRating(
-  //   clientId: number,
-  //   dishId: number,
-  //   rating: number,
-  // ) {
-  //   return this.prisma.interaction.upsert({
-  //     where: {
-  //       clientId_dishId: {
-  //         clientId,
-  //         dishId,
-  //       },
-  //     },
-  //     create: {
-  //       clientId,
-  //       dishId,
-  //       reviewRating: rating,
-  //     },
-  //     update: {
-  //       reviewRating: rating,
-  //     },
-  //   });
-  // }
+  async updateReviewRating(
+    clientId: number,
+    dishId: number,
+    rating: number,
+  ) {
+    return this.prisma.interaction.upsert({
+      where: {
+        clientId_dishId: {
+          clientId,
+          dishId,
+        },
+      },
+      create: {
+        clientId,
+        dishId,
+        reviewScore: rating,
+      },
+      update: {
+        reviewScore: rating,
+      },
+    });
+  }
 
   async getRecommendationHistory(clientId: number) {
     const interactions = await this.prisma.interaction.findMany({
@@ -116,17 +116,24 @@ export class InteractionService {
         viewCount: true,
         cartQuantity: true,
         orderedQuantity: true,
+        reviewScore: true,
       },
     });
 
     return interactions
-      .map((item) => ({
-        dishId: item.dishId,
-        interaction:
-          item.viewCount * 50 +
-          item.cartQuantity * 60 +
-          item.orderedQuantity * 70,
-      }))
+      .map((item) => {
+        const reviewBonus =
+          item.reviewScore != null ? (item.reviewScore - 3) * 50 : 0;
+
+        return {
+          dishId: item.dishId,
+          interaction:
+            item.viewCount * 20 +
+            item.cartQuantity * 30 +
+            item.orderedQuantity * 40 +
+            reviewBonus,
+        };
+      })
       .filter((item) => item.interaction > 0);
   }
 

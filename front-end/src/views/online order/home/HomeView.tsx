@@ -37,7 +37,6 @@ const HomeView: React.FC = () => {
             setIsLoading(true);
 
             try {
-                // Lấy món bán chạy từ API
                 const response = await axiosClient.get("/dishes/popular?limit=8");
 
                 const bestSellersData = response.data.map((item: any) => {
@@ -57,7 +56,6 @@ const HomeView: React.FC = () => {
 
                 setBestSellers(bestSellersData);
 
-                // Lấy gợi ý từ recommender
                 const token = localStorage.getItem("access_token");
 
                 const recommendBody: any = {
