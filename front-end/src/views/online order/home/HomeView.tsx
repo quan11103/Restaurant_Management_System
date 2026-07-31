@@ -46,7 +46,7 @@ const HomeView: React.FC = () => {
                         id: item.id.toString(),
                         name: item.name,
                         price: item.price,
-                        rating: item.rating ?? 4.8,
+                        rating: item.rating,
                         imageUrl:
                             mainImage?.imageUrl ??
                             item.images?.[0]?.imageUrl ??
@@ -78,7 +78,7 @@ const HomeView: React.FC = () => {
                         id: item.id.toString(),
                         name: item.name,
                         price: item.price,
-                        rating: item.rating ?? 4.8,
+                        rating: item.rating,
                         imageUrl:
                             mainImage?.imageUrl ??
                             item.images?.[0]?.imageUrl ??

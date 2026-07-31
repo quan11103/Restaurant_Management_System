@@ -102,27 +102,6 @@ const ProductDetailView: React.FC = () => {
             }
         };
 
-        // Hàm gọi API lấy danh sách reviews
-        const fetchReviews = async (currentIdNum: number) => {
-            try {
-                const response = await axiosClient.get(`/reviews/dish/${currentIdNum}`);
-                const mappedReviews = response.data.map((review: any) => ({
-                    id: review.id.toString(),
-                    user: review.client?.fullName || 'Khách hàng',
-                    rating: review.rating,
-                    comment: review.comment || '',
-                    // Dùng updatedAt và format về dạng DD/MM/YYYY
-                    date: review.updatedAt
-                        ? new Date(review.updatedAt).toLocaleDateString('vi-VN')
-                        : 'Gần đây'
-                }));
-                setReviews(mappedReviews);
-            } catch (err) {
-                console.error("Lỗi khi tải danh sách đánh giá:", err);
-                setReviews([]);
-            }
-        };
-
         if (id) {
             const loadData = async () => {
                 setIsLoading(true);
@@ -131,14 +110,11 @@ const ProductDetailView: React.FC = () => {
 
                 const currentIdNum = parseInt(id, 10);
 
-                // Gọi API product detail trước (có thể gọi song song bằng Promise.all nếu backend hỗ trợ tốt)
                 await fetchProductDetail();
 
                 if (!isNaN(currentIdNum)) {
-                    // Gọi song song API gợi ý và API reviews để tối ưu thời gian tải
                     await Promise.all([
                         fetchRecommendations(currentIdNum),
-                        fetchReviews(currentIdNum)
                     ]);
                 }
 
@@ -235,8 +211,6 @@ const ProductDetailView: React.FC = () => {
             {/* Truyền trực tiếp state reviews thật vào component */}
             <ReviewSection
                 dishId={product.id}
-                reviews={reviews}
-                reviewCount={displayReviewCount}
             />
 
             {recommendedDishes.length > 0 && (

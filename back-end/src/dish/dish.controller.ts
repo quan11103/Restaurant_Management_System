@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
-import { DishService, DishQueryDto } from './dish.service';
+import { DishService } from './dish.service';
+import { DishQueryDto } from './dto/dish-query.dto';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -17,7 +18,7 @@ export class DishController {
   constructor(private readonly dishService: DishService) { }
 
   @Post()
-  @Auth(Role.MANAGER) // Chỉ Quản lý mới được thêm món vào Menu
+  @Auth(Role.MANAGER)
   @ApiOperation({ summary: 'Tạo món ăn mới (Chỉ Manager)' })
   create(@Body() createDishDto: CreateDishDto) {
     return this.dishService.create(createDishDto);
@@ -48,7 +49,7 @@ export class DishController {
   }
 
   @Patch(':id')
-  @Auth(Role.MANAGER) // Chỉ Quản lý mới được sửa giá hoặc tên món
+  @Auth(Role.MANAGER)
   @ApiOperation({ summary: 'Cập nhật món ăn (Chỉ Manager)' })
   update(
     @Param('id', ParseIntPipe) id: number,

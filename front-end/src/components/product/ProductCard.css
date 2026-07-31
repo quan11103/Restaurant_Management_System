@@ -102,44 +102,6 @@
     text-decoration: line-through;
 }
 
-.skeleton-card {
-    border: none;
-    box-shadow: none;
-}
-
-.skeleton-image {
-    width: 100%;
-    aspect-ratio: 4/3;
-}
-
-.skeleton-text {
-    height: 16px;
-    border-radius: 4px;
-    margin: 16px 16px 0;
-}
-
-.skeleton-text.title {
-    width: 80%;
-}
-
-.skeleton-text.short {
-    width: 50%;
-    margin-top: 12px;
-}
-
-.skeleton-text.price {
-    width: 40%;
-    margin-top: 24px;
-    height: 20px;
-}
-
-.skeleton-image,
-.skeleton-text {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: cardSkeletonLoading 1.5s infinite linear;
-}
-
 @keyframes cardSkeletonLoading {
     0% {
         background-position: 200% 0;

@@ -50,8 +50,8 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                 id: item.id,
                 user: item.client?.fullName || item.client?.email || 'Khách hàng',
                 rating: item.rating,
-                date: item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString('vi-VN')
+                date: item.updatedAt
+                    ? new Date(item.updatedAt).toLocaleDateString('vi-VN')
                     : 'Mới đây',
                 comment: item.comment || '',
             }));

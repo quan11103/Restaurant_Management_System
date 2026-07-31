@@ -1,0 +1,108 @@
+.filter-sidebar {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    height: fit-content;
+}
+
+@media (min-width: 768px) {
+    .filter-sidebar {
+        width: 256px;
+        flex-shrink: 0;
+    }
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.filter-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.btn-clear-filter {
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    color: #3b82f6;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-clear-filter:hover {
+    text-decoration: underline;
+}
+
+.filter-group {
+    margin-bottom: 24px;
+}
+
+.filter-group-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+    margin: 0 0 8px 0;
+}
+
+.filter-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Checkbox & Radio Labels */
+.checkbox-label,
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #334155;
+}
+
+.custom-checkbox,
+.custom-radio {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Lọc giá */
+.price-inputs-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-input {
+    width: 100%;
+}
+
+.price-separator {
+    color: #94a3b8;
+}
+
+/* Lọc sao */
+.rating-stars-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rating-suffix {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.btn-apply-filter {
+    width: 100%;
+}

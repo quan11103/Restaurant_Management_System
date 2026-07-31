@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
 
-                {product.rating && (
+                {product.rating !== undefined && (
                     <RatingStars
                         rating={product.rating}
                         size={14}

@@ -5,11 +5,12 @@ import ProductCard from './ProductCard';
 import './ProductSection.css';
 
 interface ProductSectionProps {
-    title: string;
+    title?: string;
     subtitle?: string;
     products: Product[];
     isLoading?: boolean;
     onViewAllClick?: () => void;
+    className?: string;
 }
 
 const ProductSection: React.FC<ProductSectionProps> = ({
@@ -17,12 +18,13 @@ const ProductSection: React.FC<ProductSectionProps> = ({
     subtitle,
     products,
     isLoading = false,
-    onViewAllClick
+    onViewAllClick,
+    className = ''
 }) => {
-    const skeletonArray = Array.from({ length: 4 });
+    const skeletonArray = Array.from({ length: 12 });
 
     return (
-        <section className="product-section">
+        <section className={`product-section ${className}`}>
             <div className="section-header">
                 <div className="section-title-group">
                     <h2 className="section-title">{title}</h2>

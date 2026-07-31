@@ -12,8 +12,8 @@ import AdminLayout from './views/admin/layouts/AdminLayout';
 import DashboardView from './views/admin/dashboard/DashboardView';
 import MenuManagementView from './views/admin/menu/MenuManagementView';
 import PromotionManagementView from './views/admin/promotions/PromotionManagementView';
-import CustomerHeader from './components/CustomerHeader';
-import CustomerFooter from './components/CustomerFooter';
+import CustomerHeader from './components/layout/CustomerHeader';
+import CustomerFooter from './components/layout/CustomerFooter';
 import HomeView from './views/online order/home/HomeView'
 import ProductDetailView from './views/online order/product detail/ProductDetailView';
 import CartView from './views/online order/cart/CartView';
@@ -22,6 +22,7 @@ import OrderSuccessView from './views/online order/client-checkout/ThankYouView'
 import OrderHistoryView from './views/online order/order history/OrderHistoryView';
 import OrderDetailView from './views/online order/order detail/OrderDetailView';
 import OrderManagementView from './views/admin/orders/OrderManagementView';
+import SearchView from './views/online order/search/SearchView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -98,6 +99,7 @@ function App() {
             <Route path="/order-success" element={<OrderSuccessView />} />
             <Route path="/order-history" element={<OrderHistoryView />} />
             <Route path="/order-detail/:id" element={<OrderDetailView />} />
+            <Route path="/search" element={<SearchView />} />
           </Route>
 
           {/* Route 404 */}

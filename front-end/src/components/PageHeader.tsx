@@ -12,16 +12,18 @@ interface PageHeaderProps {
     showBackButton?: boolean;
     onBack?: () => void;
     extraActions?: React.ReactNode; // Các nút bấm/hành động bên phải (tùy chọn)
+    className?: string;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
     title,
     showBackButton = false,
     onBack,
-    extraActions
+    extraActions,
+    className = ''
 }) => {
     return (
-        <div className="page-header-container">
+        <div className={`page-header-container ${className}`}>
             {/* Khối bên trái: Gồm Breadcrumbs và Tiêu đề */}
             <div className="ph-left-section">
 

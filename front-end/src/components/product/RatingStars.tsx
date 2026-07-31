@@ -66,12 +66,14 @@ const RatingStars: React.FC<RatingStarsProps> = ({
 
     return (
         <div className={`rating-stars-wrapper ${className}`}>
-            <div className={`stars-container ${isInteractive ? 'interactive' : ''}`}>
-                {renderStars()}
-            </div>
+            {rating > 0 && (
+                <div className={`stars-container ${isInteractive ? 'interactive' : ''}`}>
+                    {renderStars()}
+                </div>
+            )}
             {showText && (
                 <span className="rating-text" style={{ fontSize: `${size * 0.9}px` }}>
-                    {rating.toFixed(1)}
+                    {rating > 0 ? rating.toFixed(1) : "Chưa có đánh giá"}
                 </span>
             )}
         </div>

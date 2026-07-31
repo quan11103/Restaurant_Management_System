@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { User, MapPin, Menu, LogOut } from 'lucide-react';
+import { User, Menu, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../utils/auth';
-import Logo from './Logo';
-import SearchBar from './SearchBar';
-import CartBadge from './CartBadge';
+import { logout } from '../../utils/auth';
+import Logo from '../Logo';
+import SearchBar from '../SearchBar';
+import CartBadge from '../CartBadge';
 import './CustomerHeader.css';
 
 interface CustomerHeaderProps {
@@ -53,7 +53,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
 
     const handleTriggerSearch = () => {
         if (!searchText.trim()) return;
-        console.log("Đang gọi API tìm kiếm với từ khóa:", searchText);
+        navigate(`/search?q=${encodeURIComponent(searchText)}`);
     };
 
     return (
