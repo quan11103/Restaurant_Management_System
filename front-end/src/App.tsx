@@ -23,6 +23,9 @@ import OrderHistoryView from './views/online order/order history/OrderHistoryVie
 import OrderDetailView from './views/online order/order detail/OrderDetailView';
 import OrderManagementView from './views/admin/orders/OrderManagementView';
 import SearchView from './views/online order/search/SearchView';
+import RegisterView from './views/auth/register/RegisterView';
+import StaffManagementView from './views/admin/staffs/StaffManagementView';
+import ClientManagementView from './views/admin/clients/ClientManagementView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -59,28 +62,30 @@ function App() {
         <ScrollToTop />
 
         <Routes>
-          <Route
-            path="/login"
-            element={
-              <AuthLayout>
-                <LoginView />
-              </AuthLayout>
-            }
+          <Route path="/login" element={
+            <AuthLayout>
+              <LoginView />
+            </AuthLayout>
+          }
           />
-
-          <Route
-            path="/manager"
-            element={
-              <ProtectedRoute allowedRoles={['MANAGER']}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
+          <Route path="/register" element={
+            <AuthLayout>
+              <RegisterView />
+            </AuthLayout>
+          }
+          />
+          <Route path="/manager" element={
+            <ProtectedRoute allowedRoles={['MANAGER']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardView />} />
             <Route path="menu" element={<MenuManagementView />} />
             <Route path="promotions" element={<PromotionManagementView />} />
             <Route path="orders" element={<OrderManagementView />} />
+            <Route path="staffs" element={<StaffManagementView />} />
+            <Route path="clients" element={<ClientManagementView />} />
           </Route>
 
           <Route
@@ -100,17 +105,16 @@ function App() {
             <Route path="/order-history" element={<OrderHistoryView />} />
             <Route path="/order-detail/:id" element={<OrderDetailView />} />
             <Route path="/search" element={<SearchView />} />
+            {/* Route 404 */}
+            <Route
+              path="*"
+              element={
+                <div style={{ textAlign: 'center', margin: '47px 0' }}>
+                  <h2>404 - Không tìm thấy trang</h2>
+                </div>
+              }
+            />
           </Route>
-
-          {/* Route 404 */}
-          <Route
-            path="*"
-            element={
-              <div style={{ textAlign: 'center', marginTop: '50px' }}>
-                <h2>404 - Không tìm thấy trang</h2>
-              </div>
-            }
-          />
         </Routes>
       </BrowserRouter>
     </AlertProvider>

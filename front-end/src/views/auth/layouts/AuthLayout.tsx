@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from '../../../components/layout/Logo';
 import './AuthLayout.css';
 
 interface AuthLayoutProps {
@@ -8,24 +9,25 @@ interface AuthLayoutProps {
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
     return (
         <div className="auth-layout-container">
+            {/* Header đơn giản chỉ chứa Logo phía bên trái */}
+            <header className="auth-header">
+                <a href="/" className="auth-logo-link">
+                    <Logo className="auth-logo-image" />
+                    <div className="auth-logo-text-group">
+                        <span className="auth-logo-main">Hòa Hảo</span>
+                        <span className="auth-logo-sub">Restaurant</span>
+                    </div>
+                </a>
+            </header>
 
-            {/* Cột trái: Banner */}
-            <div className="auth-banner">
-                <div className="auth-banner-content">
-                    <h1 className="auth-brand-name">Nhà hàng Hòa Hảo</h1>
-                    <p className="auth-slogan">
-                        Nâng tầm trải nghiệm ẩm thực
-                    </p>
+            {/* Vùng Banner chính chứa form ở chính giữa */}
+            <main className="auth-banner-container">
+                <div className="auth-content">
+                    <div className="auth-content-wrapper">
+                        {children}
+                    </div>
                 </div>
-            </div>
-
-            {/* Cột phải: Form */}
-            <div className="auth-content">
-                <div className="auth-content-wrapper">
-                    {children}
-                </div>
-            </div>
-
+            </main>
         </div>
     );
 };

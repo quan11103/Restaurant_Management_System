@@ -1,4 +1,4 @@
-.menu-management-view {
+.staff-management-view {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -41,10 +41,6 @@
 
 .btn-add-new:hover {
     background-color: #0056b3;
-}
-
-.price-text {
-    color: #2e7d32;
 }
 
 .action-buttons {

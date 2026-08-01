@@ -1,13 +1,16 @@
-.login-form {
+.register-form {
     display: flex;
     flex-direction: column;
 }
 
-.login-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: -5px;
-    margin-bottom: 20px;
+.error-message {
+    color: #e84118;
+    margin-bottom: 15px;
+    font-size: 14px;
+    background-color: #fce4e4;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #fccacb;
 }
 
 .password-field-wrapper {
@@ -43,15 +46,15 @@
     outline: none;
 }
 
-/* Style cho nút Đăng ký bên dưới */
-.register-prompt {
+/* Style cho nút Đăng nhập bên dưới form đăng ký */
+.login-prompt {
     margin-top: 20px;
     text-align: center;
     font-size: 14px;
     color: #555555;
 }
 
-.register-link-btn {
+.login-link-btn {
     background: none;
     border: none;
     color: #e84118;
@@ -64,6 +67,6 @@
     transition: color 0.2s ease;
 }
 
-.register-link-btn:hover {
+.login-link-btn:hover {
     color: #c23616;
 }

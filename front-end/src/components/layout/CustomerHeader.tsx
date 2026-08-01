@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { User, Menu, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../utils/auth';
-import Logo from '../Logo';
+import Logo from './Logo';
 import SearchBar from '../SearchBar';
 import CartBadge from '../CartBadge';
 import './CustomerHeader.css';
@@ -60,7 +60,6 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
         <header className="customer-header">
             <div className="container header-container">
 
-                {/* Phần Left, Search, Address giữ nguyên giống file cũ của bạn */}
                 <div className="header-left">
                     <button className="mobile-menu-btn" title="Menu">
                         <Menu size={24} />
@@ -106,7 +105,6 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
                                     </div>
                                 )}
                                 <div className="user-popup-body">
-                                    {/* Sử dụng toán tử điều kiện để thay đổi giao diện nút */}
                                     {isLoggedIn ? (
                                         <button className="btn-logout-popup" onClick={handleLogout}>
                                             <LogOut size={16} />

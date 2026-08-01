@@ -17,7 +17,6 @@
     gap: 24px;
 }
 
-/* Khối Logo */
 .header-left {
     display: flex;
     align-items: center;
@@ -48,10 +47,6 @@
     width: auto;
 }
 
-.header-logo-image .logo-img {
-    max-height: 50px;
-}
-
 .logo-text-group {
     display: flex;
     flex-direction: column;
@@ -76,13 +71,11 @@
     margin-top: 4px;
 }
 
-/* Khối tìm kiếm */
 .header-search {
     flex: 1;
     max-width: 400px;
 }
 
-/* Khối actions */
 .header-actions {
     display: flex;
     align-items: center;

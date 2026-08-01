@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable, { type Column } from '../../../components/DataTable';
 import { TrendingUp, Users, ShoppingBag } from 'lucide-react';
+import axiosClient from '../../../api/axios';
 import './DashboardView.css';
 
 interface ProductStat {
@@ -15,33 +16,68 @@ interface RankedProductStat extends ProductStat {
     rank: number;
 }
 
-const MOCK_DATA: ProductStat[] = [
-    { id: 'p1', name: 'Gà rán giòn cay', imageUrl: 'https://via.placeholder.com/40', soldCount: 150, revenue: 6750000 },
-    { id: 'p2', name: 'Burger bò phô mai', imageUrl: 'https://via.placeholder.com/40', soldCount: 85, revenue: 4675000 },
-    { id: 'p3', name: 'Pizza hải sản', imageUrl: 'https://via.placeholder.com/40', soldCount: 200, revenue: 25800000 },
-    { id: 'p4', name: 'Trà sữa trân châu', imageUrl: 'https://via.placeholder.com/40', soldCount: 320, revenue: 11200000 },
-    { id: 'p5', name: 'Mì cay 7 cấp độ', imageUrl: 'https://via.placeholder.com/40', soldCount: 110, revenue: 5390000 },
-];
+interface QuickStats {
+    todayRevenue: number;
+    todayOrders: number;
+    totalCustomers: number;
+}
 
 const DashboardView: React.FC = () => {
+    // State cho bảng món ăn
     const [products, setProducts] = useState<RankedProductStat[]>([]);
 
-    useEffect(() => {
-        // Sắp xếp dữ liệu và gán thêm trường rank (thứ hạng) dựa vào index
-        const sortedData = [...MOCK_DATA]
-            .sort((a, b) => b.revenue - a.revenue)
-            .map((item, index) => ({
-                ...item,
-                rank: index + 1
-            }));
+    // State cho khu vực thống kê nhanh (3 ô vuông)
+    const [stats, setStats] = useState<QuickStats>({
+        todayRevenue: 0,
+        todayOrders: 0,
+        totalCustomers: 0
+    });
 
-        setProducts(sortedData);
+    // Trạng thái loading và xử lý lỗi
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Gọi API khi component mount
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Gọi API lấy overview dashboard (đường dẫn khớp với backend đã tạo)
+                const response = await axiosClient.get('/statistics/dashboard-overview');
+
+                // Giả định response.data trả về format: { stats: {}, topDishes: [] } 
+                // theo chuẩn của axios (hoặc tùy thuộc vào interceptor của bạn)
+                const data = response.data?.data || response.data;
+
+                // 1. Cập nhật Thống kê nhanh
+                setStats({
+                    todayRevenue: data.stats?.todayRevenue || 0,
+                    todayOrders: data.stats?.todayOrders || 0,
+                    totalCustomers: data.stats?.totalCustomers || 0,
+                });
+
+                // 2. Cập nhật Top Món ăn (backend đã xử lý sẵn rank và sort)
+                setProducts(data.topDishes || []);
+
+            } catch (err: any) {
+                console.error("Lỗi tải dữ liệu Dashboard:", err);
+                setError(err.response?.data?.message || 'Không thể tải dữ liệu thống kê. Vui lòng thử lại sau.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchDashboardData();
     }, []);
 
+    // Hàm format tiền tệ (VNĐ)
     const formatCurrency = (amount: number) => {
         return amount.toLocaleString('vi-VN') + ' đ';
     };
 
+    // Cấu hình cột cho DataTable
     const columns: Column<RankedProductStat>[] = [
         {
             key: 'rank',
@@ -57,6 +93,14 @@ const DashboardView: React.FC = () => {
             title: 'Món ăn',
             render: (record) => (
                 <div className="product-cell">
+                    {/* Thêm hình ảnh món ăn nếu CSS của bạn có hỗ trợ */}
+                    {record.imageUrl && (
+                        <img
+                            src={record.imageUrl}
+                            alt={record.name}
+                            style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', marginRight: '10px' }}
+                        />
+                    )}
                     <span className="product-name">{record.name}</span>
                 </div>
             )
@@ -73,6 +117,16 @@ const DashboardView: React.FC = () => {
         }
     ];
 
+    // Giao diện khi đang loading
+    if (isLoading) {
+        return <div className="dashboard-container" style={{ padding: '20px', textAlign: 'center' }}>Đang tải dữ liệu...</div>;
+    }
+
+    // Giao diện khi lỗi
+    if (error) {
+        return <div className="dashboard-container" style={{ padding: '20px', color: 'red' }}>Lỗi: {error}</div>;
+    }
+
     return (
         <div className="dashboard-container">
 
@@ -84,7 +138,7 @@ const DashboardView: React.FC = () => {
                     </div>
                     <div className="stat-info">
                         <span className="stat-label">Doanh thu hôm nay</span>
-                        <h3 className="stat-value">24.500.000 đ</h3>
+                        <h3 className="stat-value">{formatCurrency(stats.todayRevenue)}</h3>
                     </div>
                 </div>
 
@@ -94,7 +148,7 @@ const DashboardView: React.FC = () => {
                     </div>
                     <div className="stat-info">
                         <span className="stat-label">Đơn hàng mới</span>
-                        <h3 className="stat-value">128</h3>
+                        <h3 className="stat-value">{stats.todayOrders}</h3>
                     </div>
                 </div>
 
@@ -103,8 +157,8 @@ const DashboardView: React.FC = () => {
                         <Users size={24} />
                     </div>
                     <div className="stat-info">
-                        <span className="stat-label">Khách hàng</span>
-                        <h3 className="stat-value">85</h3>
+                        <span className="stat-label">Tổng Khách hàng</span>
+                        <h3 className="stat-value">{stats.totalCustomers}</h3>
                     </div>
                 </div>
             </div>

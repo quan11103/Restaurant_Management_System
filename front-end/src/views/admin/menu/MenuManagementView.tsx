@@ -80,10 +80,7 @@ const MenuManagementView: React.FC = () => {
             });
 
             if (response.data) {
-                // Xử lý linh hoạt cấu trúc trả về từ backend
-                const rawData = Array.isArray(response.data)
-                    ? response.data
-                    : response.data.data || response.data.dishes || response.data.items || [];
+                const rawData = response.data.data;
 
                 const formattedData: MenuItem[] = rawData.map((item: any) => ({
                     id: item.id,
@@ -244,7 +241,7 @@ const MenuManagementView: React.FC = () => {
         <div className="menu-management-view">
             <div className="view-header">
                 <div>
-                    <h1 className="view-title">Quản Lý Thực Đơn</h1>
+                    <h1 className="view-title">Quản lí thực đơn</h1>
                     <p className="view-subtitle">Danh mục các món ăn và thức uống phục vụ tại cửa hàng</p>
                 </div>
                 <button className="btn-add-new" onClick={handleOpenAddModal}>
@@ -288,7 +285,7 @@ const MenuManagementView: React.FC = () => {
                     setIsModalOpen(false);
                     setEditingItem(null);
                 }}
-                title={editingItem ? 'Cập Nhật Món Ăn' : 'Thêm Món Ăn Mới'}
+                title={editingItem ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}
                 footer={
                     <>
                         <button className="btn-form-cancel" onClick={() => { setIsModalOpen(false); setEditingItem(null); }}>

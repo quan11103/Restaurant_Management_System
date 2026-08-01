@@ -344,6 +344,7 @@ export class DishService {
 
   // Lấy món ăn phổ biến
   async getPopular(limit = 8) {
+    // 1. Lấy top các món đã được đặt theo tổng số lượng giảm dần
     const ordered = await this.prisma.orderedDish.groupBy({
       by: ['dishId'],
       _sum: {
@@ -357,12 +358,43 @@ export class DishService {
       take: limit,
     });
 
-    let dishes;
+    const orderedIds = ordered.map((x) => x.dishId);
+    let popularDishes: any[] = [];
 
-    if (ordered.length === 0) {
-      dishes = await this.prisma.dish.findMany({
+    // 2. Nếu có món đã được đặt, lấy chi tiết các món đó (chỉ lấy món khả dụng)
+    if (orderedIds.length > 0) {
+      const dishes = await this.prisma.dish.findMany({
+        where: {
+          id: { in: orderedIds },
+          isAvailable: true,
+        },
+        include: {
+          images: true,
+          reviews: { select: { rating: true } },
+        },
+      });
+
+      // Sắp xếp lại đúng thứ tự bán chạy
+      const orderMap = new Map<number, number>();
+      orderedIds.forEach((id, index) => orderMap.set(id, index));
+      dishes.sort((a, b) => orderMap.get(a.id)! - orderMap.get(b.id)!);
+
+      popularDishes = dishes;
+    }
+
+    // 3. Tính số món còn thiếu để đủ `limit`
+    const remainingCount = limit - popularDishes.length;
+    let fallbackDishes: any[] = [];
+
+    // 4. Nếu còn thiếu, trám thêm các món khả dụng khác theo ID tăng dần
+    if (remainingCount > 0) {
+      const existingIds = popularDishes.map((dish) => dish.id);
+
+      fallbackDishes = await this.prisma.dish.findMany({
         where: {
           isAvailable: true,
+          // Loại trừ các món đã có trong danh sách bán chạy để tránh trùng lặp
+          ...(existingIds.length > 0 && { id: { notIn: existingIds } }),
         },
         include: {
           images: true,
@@ -371,30 +403,13 @@ export class DishService {
         orderBy: {
           id: 'asc',
         },
-        take: limit,
+        take: remainingCount,
       });
-      return dishes.map((dish) => this.mapDishWithRating(dish));
     }
 
-    const ids = ordered.map((x) => x.dishId);
-
-    dishes = await this.prisma.dish.findMany({
-      where: {
-        id: { in: ids },
-        isAvailable: true,
-      },
-      include: {
-        images: true,
-        reviews: { select: { rating: true } },
-      },
-    });
-
-    const order = new Map<number, number>();
-    ids.forEach((id, index) => order.set(id, index));
-
-    dishes.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
-
-    return dishes.map((dish) => this.mapDishWithRating(dish));
+    // 5. Gộp danh sách món bán chạy + món trám và map kết quả
+    const finalDishes = [...popularDishes, ...fallbackDishes];
+    return finalDishes.map((dish) => this.mapDishWithRating(dish));
   }
 
   // Gợi ý món ăn

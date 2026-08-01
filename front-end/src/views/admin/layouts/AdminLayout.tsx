@@ -1,16 +1,15 @@
 import React from 'react';
 import { NavLink, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Layers, Utensils, Archive, Users, Smile, Tag } from 'lucide-react';
-import Logo from '../../../components/Logo';
+import { LayoutDashboard, Layers, Utensils, Users, Smile, Tag } from 'lucide-react';
+import Logo from '../../../components/layout/Logo';
 import './AdminLayout.css';
 
 const MENU_ITEMS = [
     { path: '/manager/dashboard', name: 'Dashboard', icon: LayoutDashboard },
     { path: '/manager/orders', name: 'Đơn hàng', icon: Layers },
     { path: '/manager/menu', name: 'Thực đơn', icon: Utensils },
-    { path: '/manager/inventory', name: 'Kho & Vật tư', icon: Archive },
-    { path: '/manager/staff', name: 'Nhân sự', icon: Users },
-    { path: '/manager/customers', name: 'Khách hàng', icon: Smile },
+    { path: '/manager/staffs', name: 'Nhân sự', icon: Users },
+    { path: '/manager/clients', name: 'Khách hàng', icon: Smile },
     { path: '/manager/promotions', name: 'Khuyến mãi', icon: Tag },
 ];
 

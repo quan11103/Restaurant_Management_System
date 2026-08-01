@@ -18,9 +18,11 @@ import { VnpayService } from './vnpay/vnpay.service';
 import { BillModule } from './bill/bill.module';
 import { InteractionModule } from './interaction/interaction.module';
 import { ReviewModule } from './review/review.module';
+import { UserModule } from './user/user.module';
+import { StatisticModule } from './statistic/statistic.module';
 
 @Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule, BillModule, InteractionModule, ReviewModule],
+    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule, BillModule, InteractionModule, ReviewModule, UserModule, StatisticModule],
     controllers: [],
     providers: [PrismaService, VnpayService],
 })

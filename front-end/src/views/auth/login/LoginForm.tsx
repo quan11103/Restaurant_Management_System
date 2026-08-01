@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import axiosClient from '../../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAlert } from '../../../components/Alert';
 import InputField from '../../../components/InputField';
 import Button from '../../../components/Button';
 import CustomLink from '../../../components/CustomLink';
 import './LoginForm.css';
 
 const LoginForm: React.FC = () => {
+    const { showAlert } = useAlert();
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -18,7 +20,12 @@ const LoginForm: React.FC = () => {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
+
+        if (!username.trim() || !password) {
+            showAlert('warning', 'Vui lòng nhập tên đăng nhập và mật khẩu!', 'Cảnh báo');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -30,21 +37,24 @@ const LoginForm: React.FC = () => {
             if (response.data.refresh_token) {
                 localStorage.setItem('refresh_token', response.data.refresh_token);
             }
-            navigate(response.data.role === 'MANAGER' ? '/manager/dashboard' : '/');
+            navigate(response.data.role === 'MANAGER' ? '/manager' : '/');
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
-                setError('Sai tên đăng nhập hoặc mật khẩu');
+                showAlert('error', 'Sai tên đăng nhập hoặc mật khẩu!', 'Đăng nhập thất bại');
             } else {
-                setError('Có lỗi xảy ra, vui lòng thử lại sau.');
+                showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
             }
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const handleGoToRegister = () => {
+        navigate('/register');
     };
 
     return (
         <form className="login-form" onSubmit={handleLogin}>
-
-            {error && <div style={{ color: 'red', marginBottom: '15px', fontSize: '14px' }}>{error}</div>}
-
             <InputField
                 label="Tên đăng nhập"
                 type="text"
@@ -62,7 +72,7 @@ const LoginForm: React.FC = () => {
                 />
 
                 <button
-                    type="button" // Bắt buộc phải là type="button" để không kích hoạt submit form nhầm
+                    type="button"
                     className="password-toggle-btn"
                     onClick={() => setShowPassword(!showPassword)}
                     title={showPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'}
@@ -80,6 +90,17 @@ const LoginForm: React.FC = () => {
             <Button type="submit" fullWidth variant="primary" disabled={isLoading}>
                 {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
             </Button>
+
+            <div className="register-prompt">
+                <span>Chưa có tài khoản? </span>
+                <button
+                    type="button"
+                    className="register-link-btn"
+                    onClick={handleGoToRegister}
+                >
+                    Đăng ký ngay
+                </button>
+            </div>
         </form>
     );
 };

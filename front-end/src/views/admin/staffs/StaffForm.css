@@ -1,0 +1,56 @@
+.staff-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Chia form thành 2 cột đều nhau */
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.text-required {
+    color: #dc3545;
+    /* Màu đỏ cho dấu sao bắt buộc */
+    margin-left: 3px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #333;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-input:disabled {
+    background-color: #f1f3f5;
+    color: #868e96;
+    cursor: not-allowed;
+    border-color: #e9ecef;
+}
+
+/* Responsive: Thu về 1 cột nếu màn hình nhỏ (Mobile) */
+@media (max-width: 500px) {
+    .staff-form-grid {
+        grid-template-columns: 1fr;
+    }
+}

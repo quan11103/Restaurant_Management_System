@@ -59,7 +59,6 @@ const OrderManagementView: React.FC = () => {
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
 
-    // Fetch danh sách đơn hàng từ API với params phân trang & tìm kiếm
     const fetchOrders = async () => {
         setIsLoading(true);
         try {
@@ -91,7 +90,6 @@ const OrderManagementView: React.FC = () => {
         fetchOrders();
     }, [selectedStatus, currentPage, searchTerm]);
 
-    // Trở về trang 1 khi lọc hoặc tìm kiếm
     const handleSearchChange = (term: string) => {
         setSearchTerm(term);
         setCurrentPage(1);
@@ -102,7 +100,6 @@ const OrderManagementView: React.FC = () => {
         setCurrentPage(1);
     };
 
-    // Chi tiết đơn hàng theo ID và mở Modal Xem nhanh
     const handleOpenQuickView = async (order: OrderItem) => {
         try {
             const response = await axiosClient.get(`/orders/${order.id}`);
@@ -121,7 +118,6 @@ const OrderManagementView: React.FC = () => {
         setIsCancelModalOpen(true);
     };
 
-    // Cập nhật trạng thái đơn hàng qua API
     const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
         try {
             const response = await axiosClient.patch(`/orders/${orderId}/status`, {
@@ -146,7 +142,6 @@ const OrderManagementView: React.FC = () => {
         }
     };
 
-    // Hủy đơn hàng phía Quản lý / Admin
     const handleCancelOrder = async () => {
         if (!selectedOrder) return;
 
@@ -242,15 +237,14 @@ const OrderManagementView: React.FC = () => {
 
     return (
         <div className="order-management-view">
-            {/* Header */}
+
             <div className="view-header">
                 <div>
-                    <h1 className="view-title">Quản Lý Đơn Hàng</h1>
-                    <p className="view-subtitle">Theo dõi và xử lý các đơn đặt hàng của hệ thống</p>
+                    <h1 className="view-title">Quản lí đơn hàng</h1>
+                    <p className="view-subtitle">Theo dõi và xử lí các đơn đặt hàng của hệ thống</p>
                 </div>
             </div>
 
-            {/* Filter Bar */}
             <OrderFilterBar
                 searchTerm={searchTerm}
                 onSearchChange={handleSearchChange}
@@ -259,7 +253,6 @@ const OrderManagementView: React.FC = () => {
                 statusOptions={statusOptions}
             />
 
-            {/* Data Table */}
             <div className="view-content">
                 <DataTable
                     columns={columns}
@@ -268,7 +261,6 @@ const OrderManagementView: React.FC = () => {
                 />
             </div>
 
-            {/* Pagination Component */}
             <div className="pagination-wrapper">
                 <Pagination
                     currentPage={currentPage}
@@ -277,7 +269,6 @@ const OrderManagementView: React.FC = () => {
                 />
             </div>
 
-            {/* Quick View Modal */}
             <Modal
                 isOpen={isViewModalOpen}
                 onClose={() => setIsViewModalOpen(false)}
@@ -286,12 +277,11 @@ const OrderManagementView: React.FC = () => {
             >
                 {selectedOrder && (
                     <div className="quick-view-container">
-                        {/* Order Timeline */}
+
                         <div className="timeline-section">
                             <OrderTimeline currentStatus={selectedOrder.status} />
                         </div>
 
-                        {/* Thanh cập nhật trạng thái trong Modal */}
                         <div className="status-update-bar">
                             <div className="status-update-title">
                                 <RefreshCw size={18} />
@@ -310,7 +300,6 @@ const OrderManagementView: React.FC = () => {
                             </select>
                         </div>
 
-                        {/* Grid thông tin chi tiết */}
                         <div className="quick-view-grid">
                             <div className="info-column">
                                 <InfoCard title="Thông tin giao hàng">
@@ -348,7 +337,6 @@ const OrderManagementView: React.FC = () => {
                 )}
             </Modal>
 
-            {/* Confirm Modal */}
             <ConfirmModal
                 isOpen={isCancelModalOpen}
                 title="Xác nhận hủy đơn hàng"

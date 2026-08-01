@@ -1,6 +1,6 @@
 import React from 'react';
 import { Phone, Mail, MapPin, ShieldCheck } from 'lucide-react';
-import Logo from '../Logo';
+import Logo from './Logo';
 import './CustomerFooter.css';
 
 const CustomerFooter: React.FC = () => {

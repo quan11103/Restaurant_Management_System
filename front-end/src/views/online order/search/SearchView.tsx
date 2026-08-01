@@ -159,7 +159,7 @@ const SearchView: React.FC = () => {
 
         // Cuộn mượt lên đầu trang
         window.scrollTo({
-            top: 0,
+            top: 72,
             behavior: 'smooth',
         });
     };
