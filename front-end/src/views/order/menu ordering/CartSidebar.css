@@ -6,6 +6,9 @@
     flex-direction: column;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.03);
     height: 100%;
+    position: sticky;
+    top: 75px;
+    align-self: flex-start;
 }
 
 .cart-sidebar-header {
@@ -88,7 +91,7 @@
     font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s;
 }
 
 .btn-submit-order:hover:not(:disabled) {
@@ -98,4 +101,27 @@
 .btn-submit-order:disabled {
     background: #bdc3c7;
     cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Style cho hiệu ứng loading nút bấm */
+.btn-loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }

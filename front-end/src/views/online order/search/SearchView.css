@@ -70,7 +70,6 @@
 
 /* Phân trang */
 .pagination-wrapper {
-    margin-top: 32px;
     display: flex;
     justify-content: center;
 }

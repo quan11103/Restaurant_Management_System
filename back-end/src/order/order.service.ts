@@ -13,8 +13,9 @@ export class OrderService {
   ) { }
 
   // Đặt món tại quán
-  async createOrder(createOrderDto: CreateOrderDto) {
-    const { waiterId, tableId, items } = createOrderDto;
+  async createOrder(createOrderDto: CreateOrderDto, staffId: number) {
+    // Bỏ waiterId ra khỏi DTO, lấy trực tiếp staffId từ JWT
+    const { tableId, items } = createOrderDto;
 
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -27,58 +28,106 @@ export class OrderService {
           throw new BadRequestException('Có món ăn không tồn tại hoặc đã ngừng bán!');
         }
 
-        let totalQuantity = 0;
-        let totalAmount = 0;
+        let currentOrderQuantity = 0;
+        let currentOrderTotal = 0;
+
         const orderedDishesData = items.map(item => {
           const dish = dbDishes.find(d => d.id === item.dishId);
           const subTotal = dish.price * item.quantity;
-          totalQuantity += item.quantity;
-          totalAmount += subTotal;
+          currentOrderQuantity += item.quantity;
+          currentOrderTotal += subTotal;
 
           return {
             dishId: item.dishId,
             price: dish.price,
             quantity: item.quantity,
-            subTotal: subTotal,
           };
         });
 
-        const newOrder = await tx.order.create({
-          data: {
-            waiterId: waiterId,
-            orderType: 'DINE_IN',
-            status: 'PENDING',
-            totalQuantity: totalQuantity,
-            total: totalAmount,
-          },
-        });
+        // Kiểm tra xem bàn này đã có khách (đang mở Order) chưa?
+        const table = await tx.table.findUnique({ where: { id: tableId } });
+        if (!table) throw new NotFoundException('Không tìm thấy bàn!');
 
-        await tx.orderTable.create({
-          data: {
-            orderId: newOrder.id,
-            tableId: tableId,
-            isPaid: false,
-          },
-        });
+        let targetOrderId: number;
 
-        await tx.table.update({
-          where: { id: tableId },
-          data: { isOccupied: true }
-        });
+        if (table.isOccupied) {
+          // Bàn đang có khách -> Tìm Order
+          const activeOrderTable = await tx.orderTable.findFirst({
+            where: { tableId: tableId, isPaid: false },
+            include: { order: true }
+          });
 
+          if (!activeOrderTable) {
+            throw new InternalServerErrorException('Bàn có trạng thái có khách nhưng không tìm thấy đơn hàng tương ứng!');
+          }
+
+          targetOrderId = activeOrderTable.orderId;
+
+          // Cập nhật lại tổng tiền và tổng số lượng của Order cũ
+          await tx.order.update({
+            where: { id: targetOrderId },
+            data: {
+              totalQuantity: activeOrderTable.order.totalQuantity + currentOrderQuantity,
+              total: activeOrderTable.order.total + currentOrderTotal,
+            }
+          });
+
+        } else {
+          // Bàn trống -> Tạo Order mới với ID nhân viên lấy từ Token (staffId)
+          const newOrder = await tx.order.create({
+            data: {
+              waiterId: staffId, // <--- Ghi nhận ID nhân viên tạo đơn tại đây
+              orderType: 'DINE_IN',
+              status: 'PROCESSING',
+              totalQuantity: currentOrderQuantity,
+              total: currentOrderTotal,
+            },
+          });
+
+          targetOrderId = newOrder.id;
+
+          // Liên kết Order với Table
+          await tx.orderTable.create({
+            data: {
+              orderId: targetOrderId,
+              tableId: tableId,
+              isPaid: false,
+            },
+          });
+
+          // Cập nhật trạng thái bàn thành "Có khách"
+          await tx.table.update({
+            where: { id: tableId },
+            data: { isOccupied: true }
+          });
+
+          // Tạo Bill tạm thời
+          await tx.bill.create({
+            data: {
+              orderId: targetOrderId,
+              paymentMethod: 'CASH', // Mặc định tiền mặt
+              paymentStatus: 'UNPAID',
+              discount: 0,
+            }
+          });
+        }
+
+        // Thêm các món ăn vào Order (Dùng chung cho cả tạo mới và gọi thêm)
         await tx.orderedDish.createMany({
-          data: orderedDishesData.map(d => ({ ...d, orderId: newOrder.id })),
+          data: orderedDishesData.map(d => ({ ...d, orderId: targetOrderId })),
         });
 
         return {
           status: 'success',
-          message: 'Tạo đơn hàng tại bàn thành công',
-          orderId: newOrder.id,
+          message: table.isOccupied ? 'Gọi thêm món thành công' : 'Tạo đơn hàng tại bàn thành công',
+          orderId: targetOrderId,
         };
       });
     } catch (error) {
-      if (error instanceof BadRequestException) throw error;
-      throw new InternalServerErrorException('Có lỗi xảy ra khi tạo đơn hàng!');
+      if (error instanceof BadRequestException || error instanceof NotFoundException || error instanceof InternalServerErrorException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Có lỗi xảy ra khi xử lý đơn hàng tại bàn!');
     }
   }
 

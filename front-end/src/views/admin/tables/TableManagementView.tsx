@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosClient from '../../../api/axios';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useAlert } from '../../../components/Alert';
@@ -8,54 +8,41 @@ import Modal from '../../../components/Modal';
 import Badge from '../../../components/Badge';
 import ConfirmModal from '../../../components/ConfirmModal';
 import Pagination from '../../../components/Pagination';
-import MenuFilterBar from './MenuFilterBar';
-import MenuForm, { type DishImageInput, type MenuFormData } from './MenuForm';
-import './MenuManagementView.css';
+import TableFilterBar from './TableFilterBar';
+import TableForm, { type TableFormData } from './TableForm';
+import './TableManagementView.css';
 
-interface MenuItem {
+export interface TableItem {
     id: string;
     name: string;
-    category: string;
-    price: number;
-    isAvailable: 'Có thể gọi' | 'Tạm ngừng';
+    capacity: number;
     description: string;
-    images: DishImageInput[];
+    isOccupied: boolean;
 }
 
-const categoryOptions: SelectOption[] = [
-    { label: 'Tất cả danh mục', value: 'Tất cả' },
-    { label: 'Món chính', value: 'Món chính' },
-    { label: 'Pizza', value: 'Pizza' },
-    { label: 'Burger', value: 'Burger' },
-    { label: 'Gà rán', value: 'Gà rán' },
-    { label: 'Ăn kèm', value: 'Ăn kèm' },
-    { label: 'Salad', value: 'Salad' },
-    { label: 'Khai vị', value: 'Khai vị' },
-    { label: 'Đồ uống', value: 'Đồ uống' },
-    { label: 'Cà phê', value: 'Cà phê' },
-    { label: 'Nước ép', value: 'Nước ép' },
-    { label: 'Sinh tố', value: 'Sinh tố' },
-    { label: 'Tráng miệng', value: 'Tráng miệng' },
+const statusOptions: SelectOption[] = [
+    { label: 'Tất cả trạng thái', value: 'Tất cả' },
+    { label: 'Trống', value: 'Trống' },
+    { label: 'Có khách', value: 'Có khách' },
 ];
 
-const MenuManagementView: React.FC = () => {
+const TableManagementView: React.FC = () => {
     const { showAlert } = useAlert();
 
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [tableItems, setTableItems] = useState<TableItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('Tất cả');
+    const [selectedStatus, setSelectedStatus] = useState('Tất cả');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+    const [editingItem, setEditingItem] = useState<TableItem | null>(null);
     const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
-    const [formData, setFormData] = useState<MenuFormData>({
+
+    const [formData, setFormData] = useState<TableFormData>({
         name: '',
-        category: 'Món chính',
-        price: '',
-        isAvailable: 'Có thể gọi',
+        capacity: '',
         description: '',
-        images: [],
+        isOccupied: false,
     });
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -63,17 +50,22 @@ const MenuManagementView: React.FC = () => {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        fetchDishes();
+        fetchTables();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedCategory, currentPage, searchTerm]);
+    }, [selectedStatus, currentPage, searchTerm]);
 
-    const fetchDishes = async () => {
+    const fetchTables = async () => {
         setIsLoading(true);
         try {
-            const response = await axiosClient.get('/dishes', {
+            // Xác định param isOccupied để gửi lên API
+            let isOccupiedParam: boolean | undefined = undefined;
+            if (selectedStatus === 'Có khách') isOccupiedParam = true;
+            if (selectedStatus === 'Trống') isOccupiedParam = false;
+
+            const response = await axiosClient.get('/tables', {
                 params: {
                     search: searchTerm,
-                    type: selectedCategory !== 'Tất cả' ? selectedCategory : undefined,
+                    isOccupied: isOccupiedParam,
                     page: currentPage,
                     limit: itemsPerPage,
                 },
@@ -82,17 +74,15 @@ const MenuManagementView: React.FC = () => {
             if (response.data) {
                 const rawData = response.data.data;
 
-                const formattedData: MenuItem[] = rawData.map((item: any) => ({
+                const formattedData: TableItem[] = rawData.map((item: any) => ({
                     id: item.id,
                     name: item.name,
-                    category: item.type,
-                    price: item.price,
-                    isAvailable: item.isAvailable !== false ? 'Có thể gọi' : 'Tạm ngừng',
+                    capacity: item.capacity,
                     description: item.description || '',
-                    images: item.images || [],
+                    isOccupied: item.isOccupied || false,
                 }));
 
-                setMenuItems(formattedData);
+                setTableItems(formattedData);
 
                 if (response.data.pagination) {
                     setCurrentPage(response.data.pagination.currentPage || currentPage);
@@ -101,7 +91,7 @@ const MenuManagementView: React.FC = () => {
                     setTotalPages(response.data.totalPages || 1);
                 }
             } else {
-                showAlert('error', 'Không thể tải dữ liệu thực đơn', 'Lỗi');
+                showAlert('error', 'Không thể tải dữ liệu bàn', 'Lỗi');
             }
         } catch (error) {
             console.error('Lỗi khi fetch data:', error);
@@ -113,19 +103,22 @@ const MenuManagementView: React.FC = () => {
 
     const handleOpenAddModal = () => {
         setEditingItem(null);
-        setFormData({ name: '', category: 'Món chính', price: '', isAvailable: 'Có thể gọi', description: '', images: [] });
+        setFormData({
+            name: '',
+            capacity: '',
+            description: '',
+            isOccupied: false
+        });
         setIsModalOpen(true);
     };
 
-    const handleOpenEditModal = (item: MenuItem) => {
+    const handleOpenEditModal = (item: TableItem) => {
         setEditingItem(item);
         setFormData({
             name: item.name,
-            category: item.category,
-            price: item.price,
-            isAvailable: item.isAvailable,
+            capacity: item.capacity.toString(),
             description: item.description || '',
-            images: item.images || []
+            isOccupied: item.isOccupied,
         });
         setIsModalOpen(true);
     };
@@ -136,22 +129,20 @@ const MenuManagementView: React.FC = () => {
     };
 
     const handleSaveItem = async () => {
-        if (!formData.name.trim() || !formData.price) {
-            alert('Vui lòng nhập tên và giá món ăn!');
+        if (!formData.name.trim() || !formData.capacity) {
+            showAlert('warning', 'Vui lòng nhập tên bàn và sức chứa!', 'Thiếu thông tin');
             return;
         }
 
         const payload = {
             name: formData.name,
-            type: formData.category,
-            price: Number(formData.price),
+            capacity: Number(formData.capacity),
             description: formData.description,
-            images: formData.images,
-            isAvailable: formData.isAvailable === 'Có thể gọi',
+            isOccupied: formData.isOccupied,
         };
 
         const isEditMode = !!editingItem;
-        const url = isEditMode ? `/dishes/${editingItem.id}` : '/dishes';
+        const url = isEditMode ? `/tables/${editingItem.id}` : '/tables';
         const method = isEditMode ? 'patch' : 'post';
 
         try {
@@ -163,16 +154,16 @@ const MenuManagementView: React.FC = () => {
             if (response.data) {
                 showAlert(
                     'success',
-                    isEditMode ? 'Cập nhật thông tin món ăn thành công!' : 'Đã thêm món ăn mới vào thực đơn',
+                    isEditMode ? 'Cập nhật thông tin bàn thành công!' : 'Đã thêm bàn mới vào danh sách',
                     'Thành công'
                 );
                 setIsModalOpen(false);
                 setEditingItem(null);
-                fetchDishes();
+                fetchTables();
             } else {
                 showAlert(
                     'error',
-                    response.data.message || (isEditMode ? 'Không thể cập nhật món ăn' : 'Không thể tạo món ăn'),
+                    response.data.message || (isEditMode ? 'Không thể cập nhật thông tin bàn' : 'Không thể tạo bàn mới'),
                     'Lỗi hệ thống'
                 );
             }
@@ -184,18 +175,18 @@ const MenuManagementView: React.FC = () => {
 
     const handleDeleteItem = async (id: string) => {
         if (!id) {
-            showAlert('error', 'Không tìm thấy ID món ăn để tiến hành xóa!', 'Lỗi dữ liệu');
+            showAlert('error', 'Không tìm thấy ID bàn để tiến hành xóa!', 'Lỗi dữ liệu');
             return;
         }
 
         try {
-            const response = await axiosClient.delete(`/dishes/${id}`);
+            const response = await axiosClient.delete(`/tables/${id}`);
 
             if (response.data) {
-                showAlert('success', 'Đã xóa món ăn khỏi thực đơn!', 'Thành công');
-                fetchDishes();
+                showAlert('success', 'Đã xóa bàn khỏi danh sách!', 'Thành công');
+                fetchTables();
             } else {
-                showAlert('error', response.data.message || 'Không thể xóa món ăn này', 'Lỗi hệ thống');
+                showAlert('error', response.data.message || 'Không thể xóa bàn này', 'Lỗi hệ thống');
             }
         } catch (error) {
             console.error('Lỗi khi gọi API xóa:', error);
@@ -203,21 +194,21 @@ const MenuManagementView: React.FC = () => {
         }
     };
 
-    const columns: Column<MenuItem>[] = [
-        { key: 'id', title: 'Mã món' },
-        { key: 'name', title: 'Tên món ăn / đồ uống' },
-        { key: 'category', title: 'Danh mục' },
+    const columns: Column<TableItem>[] = [
+        { key: 'id', title: 'Mã bàn' },
+        { key: 'name', title: 'Tên bàn' },
         {
-            key: 'price',
-            title: 'Giá bán',
-            render: (item) => <strong className="price-text">{item.price.toLocaleString('vi-VN')} đ</strong>
+            key: 'capacity',
+            title: 'Số chỗ',
+            render: (item) => <span>{item.capacity}</span>
         },
+        { key: 'description', title: 'Mô tả' },
         {
-            key: 'isAvailable',
+            key: 'isOccupied',
             title: 'Trạng thái',
             render: (item) => (
-                <Badge variant={item.isAvailable === 'Có thể gọi' ? 'success' : 'danger'}>
-                    {item.isAvailable}
+                <Badge variant={!item.isOccupied ? 'success' : 'warning'}>
+                    {!item.isOccupied ? 'Trống' : 'Có khách'}
                 </Badge>
             )
         },
@@ -237,52 +228,44 @@ const MenuManagementView: React.FC = () => {
         }
     ];
 
-    const topRef = useRef<HTMLDivElement>(null);
-
     return (
-        <div className="menu-management-view">
+        <div className="table-management-view">
             <div className="view-header">
                 <div>
-                    <h1 className="view-title">Quản lí thực đơn</h1>
-                    <p className="view-subtitle">Danh mục các món ăn và thức uống phục vụ tại cửa hàng</p>
+                    <h1 className="view-title">Quản lí bàn</h1>
+                    <p className="view-subtitle">Danh sách sơ đồ bàn và quản lý chỗ ngồi tại nhà hàng</p>
                 </div>
                 <button className="btn-add-new" onClick={handleOpenAddModal}>
-                    <Plus size={18} /> Thêm món mới
+                    <Plus size={18} /> Thêm bàn mới
                 </button>
             </div>
 
-            <MenuFilterBar
+            <TableFilterBar
                 searchTerm={searchTerm}
                 onSearchChange={(val) => {
                     setSearchTerm(val);
                     setCurrentPage(1);
                 }}
-                selectedCategory={selectedCategory}
-                onCategoryChange={(val) => {
-                    setSelectedCategory(val);
+                selectedStatus={selectedStatus}
+                onStatusChange={(val) => {
+                    setSelectedStatus(val);
                     setCurrentPage(1);
                 }}
-                categoryOptions={categoryOptions}
+                statusOptions={statusOptions}
             />
 
-            <div className="view-content" ref={topRef}>
+            <div className="view-content">
                 <DataTable
                     columns={columns}
-                    data={menuItems}
-                    emptyMessage={isLoading ? 'Đang tải dữ liệu...' : 'Không tìm thấy món ăn nào khớp với bộ lọc'}
+                    data={tableItems}
+                    emptyMessage={isLoading ? 'Đang tải dữ liệu...' : 'Không tìm thấy bàn nào khớp với bộ lọc'}
                 />
 
                 <div className="pagination-wrapper">
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPageChange={(page) => {
-                            setCurrentPage(page);
-                            topRef.current?.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start',
-                            });
-                        }}
+                        onPageChange={setCurrentPage}
                     />
                 </div>
             </div>
@@ -293,7 +276,7 @@ const MenuManagementView: React.FC = () => {
                     setIsModalOpen(false);
                     setEditingItem(null);
                 }}
-                title={editingItem ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}
+                title={editingItem ? 'Cập nhật bàn' : 'Thêm bàn mới'}
                 footer={
                     <>
                         <button className="btn-form-cancel" onClick={() => { setIsModalOpen(false); setEditingItem(null); }}>
@@ -306,17 +289,16 @@ const MenuManagementView: React.FC = () => {
                 }
                 maxWidth="550px"
             >
-                <MenuForm
+                <TableForm
                     formData={formData}
                     onChange={setFormData}
-                    categoryOptions={categoryOptions}
                 />
             </Modal>
 
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
-                title="Xác nhận xóa món ăn"
-                message={`Bạn có chắc chắn muốn xóa món này?`}
+                title="Xác nhận xóa bàn"
+                message={`Bạn có chắc chắn muốn xóa bàn này khỏi hệ thống?`}
                 confirmLabel="Xác nhận xóa"
                 cancelLabel="Hủy bỏ"
                 onConfirm={async () => {
@@ -334,4 +316,4 @@ const MenuManagementView: React.FC = () => {
     );
 };
 
-export default MenuManagementView;
+export default TableManagementView;

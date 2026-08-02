@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Layers, Utensils, Users, Smile, Tag } from 'lucide-react';
+import { LayoutDashboard, Layers, Utensils, Users, Smile, Tag, Table } from 'lucide-react';
 import Logo from '../../../components/layout/Logo';
 import './AdminLayout.css';
 
@@ -8,6 +8,7 @@ const MENU_ITEMS = [
     { path: '/manager/dashboard', name: 'Dashboard', icon: LayoutDashboard },
     { path: '/manager/orders', name: 'Đơn hàng', icon: Layers },
     { path: '/manager/menu', name: 'Thực đơn', icon: Utensils },
+    { path: '/manager/tables', name: 'Bàn', icon: Table },
     { path: '/manager/staffs', name: 'Nhân sự', icon: Users },
     { path: '/manager/clients', name: 'Khách hàng', icon: Smile },
     { path: '/manager/promotions', name: 'Khuyến mãi', icon: Tag },

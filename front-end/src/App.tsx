@@ -26,6 +26,9 @@ import SearchView from './views/online order/search/SearchView';
 import RegisterView from './views/auth/register/RegisterView';
 import StaffManagementView from './views/admin/staffs/StaffManagementView';
 import ClientManagementView from './views/admin/clients/ClientManagementView';
+import TableManagementView from './views/admin/tables/TableManagementView';
+import MenuOrderingView from './views/order/menu ordering/MenuOrderingView';
+import TableMapView from './views/checkout/table map/TableMapView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -86,6 +89,7 @@ function App() {
             <Route path="orders" element={<OrderManagementView />} />
             <Route path="staffs" element={<StaffManagementView />} />
             <Route path="clients" element={<ClientManagementView />} />
+            <Route path="tables" element={<TableManagementView />} />
           </Route>
 
           <Route
@@ -105,6 +109,8 @@ function App() {
             <Route path="/order-history" element={<OrderHistoryView />} />
             <Route path="/order-detail/:id" element={<OrderDetailView />} />
             <Route path="/search" element={<SearchView />} />
+            <Route path="/table-map" element={<TableMapView />} />
+            <Route path="/staff-order" element={<MenuOrderingView />} />
             {/* Route 404 */}
             <Route
               path="*"

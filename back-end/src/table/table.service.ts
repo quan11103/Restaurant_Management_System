@@ -1,68 +1,222 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { TableQueryDto } from './dto/table-query.dto';
 
 @Injectable()
 export class TableService {
   constructor(private prisma: PrismaService) { }
 
+  // 1. Tạo bàn mới
   async create(createTableDto: CreateTableDto) {
     const RESTAURANT_ID = 1;
+    const { name } = createTableDto;
 
-    // Kiểm tra trùng tên bàn trong nhà hàng này
-    const isExist = await this.prisma.table.findFirst({
-      where: { name: createTableDto.name, restaurantId: RESTAURANT_ID },
+    const exist = await this.prisma.table.findFirst({
+      where: { name, restaurantId: RESTAURANT_ID },
     });
-    if (isExist) {
-      throw new ConflictException(`Tên bàn '${createTableDto.name}' đã tồn tại!`);
+
+    if (exist) {
+      throw new ConflictException(`Tên bàn '${name}' đã tồn tại trong hệ thống!`);
     }
 
-    return this.prisma.table.create({
-      data: {
-        ...createTableDto,
-        restaurantId: RESTAURANT_ID,
-      },
-    });
+    try {
+      return await this.prisma.table.create({
+        data: {
+          ...createTableDto,
+          restaurantId: RESTAURANT_ID,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Có lỗi xảy ra khi tạo bàn ăn!');
+    }
   }
 
-  async findAll() {
+  // 2. Lấy danh sách bàn (Hỗ trợ Tìm kiếm, Lọc, Sắp xếp, Phân trang)
+  async findAll(query: TableQueryDto) {
+    const RESTAURANT_ID = 1;
+
+    // Không cần set default thủ công nữa vì DTO đã lo
+    const { q, isOccupied, minCapacity, maxCapacity, sortBy, page = 1, limit = 12 } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = { restaurantId: RESTAURANT_ID };
+
+    // So sánh trực tiếp boolean vì DTO đã parse 'true' -> true
+    if (isOccupied === true || isOccupied === false) {
+      where.isOccupied = isOccupied;
+    }
+
+    if (minCapacity !== undefined || maxCapacity !== undefined) {
+      where.capacity = {};
+      if (minCapacity !== undefined) where.capacity.gte = minCapacity;
+      if (maxCapacity !== undefined) where.capacity.lte = maxCapacity;
+    }
+
+    if (q) {
+      const searchConditions: any[] = [{ name: { contains: q, mode: 'insensitive' } }];
+      if (!isNaN(Number(q))) searchConditions.push({ id: Number(q) });
+      where.OR = searchConditions;
+    }
+
+    let orderBy: any = { id: 'asc' };
+    if (sortBy === 'name_asc') orderBy = { name: 'asc' };
+    if (sortBy === 'capacity_asc') orderBy = { capacity: 'asc' };
+    if (sortBy === 'capacity_desc') orderBy = { capacity: 'desc' };
+
+    const [tables, totalRecords] = await this.prisma.$transaction([
+      this.prisma.table.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit, // Dùng thẳng limit, không cần ép kiểu
+        include: {
+          orderTables: {
+            where: { isPaid: false },
+            take: 1,
+            include: {
+              order: {
+                select: { id: true, total: true, status: true, orderTime: true },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.table.count({ where }),
+    ]);
+
+    return {
+      data: tables,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalRecords / limit) || 1,
+        totalRecords,
+      },
+    };
+  }
+
+  // 3. Tìm bàn theo ID
+  async findOne(id: number | string) {
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      throw new BadRequestException('ID bàn không hợp lệ!');
+    }
+
+    const table = await this.prisma.table.findUnique({
+      where: { id: numericId },
+    });
+
+    if (!table) {
+      throw new NotFoundException(`Không tìm thấy bàn ăn có ID = ${id}`);
+    }
+
+    return table;
+  }
+
+  // 4. Cập nhật thông tin bàn
+  async update(id: number | string, updateTableDto: UpdateTableDto) {
+    const numericId = Number(id);
+    await this.findOne(numericId);
+
+    const RESTAURANT_ID = 1;
+    const { name } = updateTableDto;
+
+    if (name) {
+      const exist = await this.prisma.table.findFirst({
+        where: {
+          name,
+          restaurantId: RESTAURANT_ID,
+          NOT: { id: numericId },
+        },
+      });
+
+      if (exist) {
+        throw new ConflictException(`Tên bàn '${name}' đã trùng với một bàn khác!`);
+      }
+    }
+
+    try {
+      return await this.prisma.table.update({
+        where: { id: numericId },
+        data: updateTableDto,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Có lỗi xảy ra khi cập nhật bàn ăn!');
+    }
+  }
+
+  // 5. Xóa bàn ăn
+  async remove(id: number | string) {
+    const numericId = Number(id);
+    await this.findOne(numericId);
+
+    try {
+      await this.prisma.table.delete({
+        where: { id: numericId },
+      });
+
+      return {
+        status: 'success',
+        message: 'Xóa bàn ăn thành công!',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Không thể xóa bàn vì đang có hóa đơn/đơn hàng liên kết!',
+      );
+    }
+  }
+
+  // 6. Lấy danh sách bàn theo trạng thái (Phục vụ đặt bàn/gọi món)
+  async getTableByStatus(isOccupied: boolean | string) {
+    const isOccupiedBool = String(isOccupied) === 'true';
     return this.prisma.table.findMany({
-      where: { restaurantId: 1 },
+      where: {
+        isOccupied: isOccupiedBool,
+        restaurantId: 1,
+      },
       orderBy: { name: 'asc' },
     });
   }
 
-  async findOne(id: number) {
-    const table = await this.prisma.table.findUnique({ where: { id } });
-    if (!table) throw new NotFoundException(`Không tìm thấy bàn ăn có ID = ${id}`);
-    return table;
+  // 7. Cập nhật trạng thái bàn nhanh
+  async updateStatus(id: number | string, isOccupied: boolean | string) {
+    const numericId = Number(id);
+    await this.findOne(numericId);
+
+    const isOccupiedBool = String(isOccupied) === 'true';
+
+    try {
+      return await this.prisma.table.update({
+        where: { id: numericId },
+        data: { isOccupied: isOccupiedBool },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Có lỗi khi cập nhật trạng thái bàn!');
+    }
   }
 
-  async update(id: number, updateTableDto: UpdateTableDto) {
-    await this.findOne(id);
-    return this.prisma.table.update({
-      where: { id },
-      data: updateTableDto,
-    });
-  }
+  // 8. Thống kê số lượng bàn theo trạng thái (Dùng cho Tabs giao diện)
+  async getSummary() {
+    const RESTAURANT_ID = 1; // Khuyến nghị: Kéo từ req.user
 
-  async remove(id: number) {
-    await this.findOne(id);
-    await this.prisma.table.delete({ where: { id } });
-    return { message: `Đã xóa bàn ăn thành công!` };
-  }
+    // Sử dụng Promise.all để chạy 3 câu query song song, tối ưu hiệu suất
+    const [total, available, occupied] = await Promise.all([
+      this.prisma.table.count({
+        where: { restaurantId: RESTAURANT_ID }
+      }),
+      this.prisma.table.count({
+        where: { restaurantId: RESTAURANT_ID, isOccupied: false }
+      }),
+      this.prisma.table.count({
+        where: { restaurantId: RESTAURANT_ID, isOccupied: true }
+      }),
+    ]);
 
-  async getTableByStatus(isOccupied: boolean) {
-    return this.prisma.table.findMany({
-      where: { isOccupied: isOccupied },
-    });
-  }
-
-  async updateStatus(id: number, isOccupied: boolean) {
-    return this.prisma.table.update({
-      where: { id: id },
-      data: { isOccupied: isOccupied },
-    });
+    return {
+      total,
+      available,
+      occupied
+    };
   }
 }

@@ -24,8 +24,11 @@ export class OrderController {
   // Luồng dành cho nhân viên: đặt món tại bàn (DINE_IN)
   @Auth(Role.MANAGER, Role.WAITER)
   @Post('dine-in')
-  createOrder(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.createOrder(createOrderDto);
+  createOrder(
+    @CurrentUser() user: JwtPayload,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.orderService.createOrder(createOrderDto, user.sub);
   }
 
   // Luồng dành cho khách hàng: thanh toán online / COD (DELIVERY)

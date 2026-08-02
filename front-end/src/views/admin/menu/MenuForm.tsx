@@ -40,7 +40,7 @@ const MenuForm: React.FC<MenuFormProps> = ({ formData, onChange, categoryOptions
         };
 
         handleChange('images', [...formData.images, newImage]);
-        setTempImageUrl(''); // Reset ô nhập link ảnh
+        setTempImageUrl('');
     };
 
     const handleSetMainImage = (indexToSet: number) => {
@@ -110,7 +110,6 @@ const MenuForm: React.FC<MenuFormProps> = ({ formData, onChange, categoryOptions
             <div className="form-group col-span-full image-section">
                 <label className="form-label">Hình ảnh món ăn (Cho phép thêm nhiều ảnh)</label>
 
-                {/* Ô nhập link ảnh và nút thêm */}
                 <div className="image-input-wrapper">
                     <input
                         type="text"

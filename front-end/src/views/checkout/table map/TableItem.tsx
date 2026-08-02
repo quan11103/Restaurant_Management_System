@@ -1,6 +1,8 @@
 import React from 'react';
-import { Users, ReceiptText, Clock, Utensils } from 'lucide-react';
+import { Users } from 'lucide-react';
 import './TableItem.css';
+
+export type OrderStatusType = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED';
 
 export interface TableModel {
     id: number;
@@ -16,8 +18,8 @@ export interface TableModel {
         isPaid: boolean;
         order: {
             total: number;
-            status: 'PENDING' | 'PROCESSING' | 'DELIVERING' | 'COMPLETED' | 'CANCELLED';
-        }
+            status: OrderStatusType;
+        };
     }[];
 }
 
@@ -27,57 +29,41 @@ interface TableItemProps {
 }
 
 const TableItem: React.FC<TableItemProps> = ({ table, onClick }) => {
-
-    // Tìm Order ở bàn
+    // Lấy order chưa thanh toán của bàn (nếu có)
     const activeOrderInfo = table.orderTables?.find(ot => ot.isPaid === false);
 
-    // Định nghĩa các trạng thái
-    const isAvailable = !table.isOccupied;
-    const isOccupied = table.isOccupied && !!activeOrderInfo;
+    const isOccupied = table.isOccupied;
 
-    // Bàn đang ăn nhưng món đã ra đủ (COMPLETED) => Sẵn sàng chờ thanh toán
-    const isWaitingPayment = isOccupied && activeOrderInfo?.order.status === 'COMPLETED';
-
-    const getStatusClass = () => {
-        if (isAvailable) return 'status-available';
-        if (isWaitingPayment) return 'status-waiting';
-        return 'status-occupied';
-    };
-
-    const renderIcon = () => {
-        if (isAvailable) return <Users size={24} opacity={0.3} />;
-        if (isWaitingPayment) return <ReceiptText size={24} />;
-
-        // Nếu đang ở trạng thái bếp đang làm hoặc chuẩn bị món
-        if (activeOrderInfo?.order.status === 'PROCESSING') return <Utensils size={24} />;
-        return <Clock size={24} />;
-    };
-
+    // Render thông tin phụ bên dưới tên bàn
     const renderSubInfo = () => {
-        if (isAvailable) return `${table.capacity} chỗ`;
+        if (!isOccupied) return `${table.capacity} chỗ`;
 
         if (activeOrderInfo) {
-            if (isWaitingPayment) {
-                return `${activeOrderInfo.order.total.toLocaleString('vi-VN')} đ`;
+            switch (activeOrderInfo.order.status) {
+                case 'PENDING':
+                    return 'Mới gọi món';
+                case 'PROCESSING':
+                    return 'Đang chế biến';
+                case 'SHIPPED':
+                case 'DELIVERED':
+                case 'COMPLETED':
+                    return 'Đang phục vụ';
+                default:
+                    return 'Đang phục vụ';
             }
-            // Hiển thị trạng thái đơn hàng hiện tại
-            const statusText = activeOrderInfo.order.status === 'PENDING' ? 'Mới gọi món' :
-                activeOrderInfo.order.status === 'PROCESSING' ? 'Đang phục vụ' :
-                    activeOrderInfo.order.status === 'DELIVERING' ? 'Đang giao...' : 'Đang phục vụ';
-            return statusText;
         }
 
-        return 'Đang dọn...';
+        return 'Đang phục vụ';
     };
 
     return (
         <div
-            className={`table-item ${getStatusClass()}`}
+            className={`table-item ${isOccupied ? 'status-occupied' : 'status-available'}`}
             onClick={() => onClick(table)}
         >
             <div className="table-header">
                 <span className="table-name">{table.name}</span>
-                <span className="table-icon">{renderIcon()}</span>
+                <span className="table-icon">{isOccupied && <Users size={20} />}</span>
             </div>
             <div className="table-body">
                 <span className="table-sub-info">{renderSubInfo()}</span>

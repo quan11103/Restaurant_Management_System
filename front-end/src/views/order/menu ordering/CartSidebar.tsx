@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Loader2 } from 'lucide-react';
 import CartItemComponent from './CartItem';
 import { type CartItem as CartItemType } from './MenuOrderingView';
 import './CartSidebar.css';
@@ -11,6 +11,7 @@ interface CartSidebarProps {
     onDecrease: (cartItemId: string) => void;
     onRemove: (cartItemId: string) => void;
     onSubmitOrder: () => void;
+    isSubmitting?: boolean; // Prop nhận trạng thái gửi API
 }
 
 const CartSidebar: React.FC<CartSidebarProps> = ({
@@ -20,6 +21,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
     onDecrease,
     onRemove,
     onSubmitOrder,
+    isSubmitting = false,
 }) => {
     const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -57,10 +59,16 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                 </div>
                 <button
                     className="btn-submit-order"
-                    disabled={cartItems.length === 0}
+                    disabled={cartItems.length === 0 || isSubmitting}
                     onClick={onSubmitOrder}
                 >
-                    Gửi nhà bếp
+                    {isSubmitting ? (
+                        <span className="btn-loading-content">
+                            <Loader2 size={18} className="spinner" /> Đang gửi nhà bếp...
+                        </span>
+                    ) : (
+                        'Gửi nhà bếp'
+                    )}
                 </button>
             </div>
         </div>

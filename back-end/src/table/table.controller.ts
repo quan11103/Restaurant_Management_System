@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query 
 import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { TableQueryDto } from './dto/table-query.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { Role } from '@prisma/client';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
@@ -19,8 +20,8 @@ export class TableController {
 
   @Get()
   @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER)
-  findAll() {
-    return this.tableService.findAll();
+  findAll(@Query() query: TableQueryDto) {
+    return this.tableService.findAll(query);
   }
 
   // Lấy danh sách bàn theo trạng thái
@@ -45,6 +46,12 @@ export class TableController {
     @Body('isOccupied') isOccupied: boolean
   ) {
     return this.tableService.updateStatus(Number(id), isOccupied);
+  }
+
+  @Get('summary')
+  @Auth(Role.MANAGER, Role.CASHIER, Role.WAITER)
+  getSummary() {
+    return this.tableService.getSummary();
   }
 
   @Patch(':id')

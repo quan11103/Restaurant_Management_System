@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import axiosClient from '../../../api/axios';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useAlert } from '../../../components/Alert';
 import DataTable, { type Column } from '../../../components/DataTable';
 import Modal from '../../../components/Modal';
@@ -322,7 +322,6 @@ const PromotionManagementView: React.FC = () => {
 
             <div className="promotions-filter-bar">
                 <div className="search-wrapper">
-                    <Search size={18} className="search-icon" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm theo mã khuyến mãi..."

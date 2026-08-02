@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { User, Menu, LogOut } from 'lucide-react';
+import { User, Menu, LogOut, Utensils, LayoutGrid, Grid, ClipboardList } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../utils/auth';
 import Logo from './Logo';
@@ -16,19 +16,21 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
     const [searchText, setSearchText] = useState('');
     const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
     const [userName, setUserName] = useState('');
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     const userPopupRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-    // Mỗi khi popup được mở, kiểm tra lại token trong localStorage để cập nhật trạng thái mới nhất
+    // Đồng bộ thông tin user (token, name, role) từ localStorage
     useEffect(() => {
-        if (isUserPopupOpen) {
-            const token = localStorage.getItem('access_token');
-            const storedName = localStorage.getItem('user_name');
-            setIsLoggedIn(!!token); // Nếu có token sẽ là true, ngược lại là false
-            setUserName(storedName || 'Thành viên')
-        }
-    }, [isUserPopupOpen]);
+        const token = localStorage.getItem('access_token');
+        const storedName = localStorage.getItem('user_name');
+        const storedRole = localStorage.getItem('user_role');
+
+        setIsLoggedIn(!!token);
+        setUserName(storedName || 'Thành viên');
+        setUserRole(storedRole);
+    }, [isLoggedIn, isUserPopupOpen, setIsLoggedIn]);
 
     // Xử lý đóng popup khi click ra ngoài vùng chứa
     useEffect(() => {
@@ -46,15 +48,18 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
 
     const handleLogout = () => {
         logout();
-
         setIsLoggedIn(false);
         setIsUserPopupOpen(false);
+        setUserRole(null);
     };
 
     const handleTriggerSearch = () => {
         if (!searchText.trim()) return;
         navigate(`/search?q=${encodeURIComponent(searchText)}`);
     };
+
+    // Xác định đường dẫn dựa trên role của user
+    const cartPath = userRole === 'WAITER' ? '/table-map' : '/cart';
 
     return (
         <header className="customer-header">
@@ -93,7 +98,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
                         >
                             <User size={22} />
                             <span className="action-text hidden-mobile">
-                                {isLoggedIn ? 'Tài khoản' : 'Tài khoản'}
+                                Tài khoản
                             </span>
                         </button>
 
@@ -125,9 +130,19 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
                         )}
                     </div>
 
-                    <Link to={`/cart`} className="action-btn cart-wrapper">
-                        <CartBadge size={22} />
-                        <span className="action-text hidden-mobile">Giỏ hàng</span>
+                    {/* Điều hướng linh hoạt theo role */}
+                    <Link to={cartPath} className="action-btn cart-wrapper">
+                        {userRole === 'WAITER' ? (
+                            <>
+                                <ClipboardList size={22} />
+                                <span className="action-text hidden-mobile">Đặt món</span>
+                            </>
+                        ) : (
+                            <>
+                                <CartBadge size={22} />
+                                <span className="action-text hidden-mobile">Giỏ hàng</span>
+                            </>
+                        )}
                     </Link>
                 </div>
 

@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsArray, ValidateNested, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsArray, ValidateNested, Min, ArrayNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 // DTO phụ để validate từng món ăn trong mảng items
@@ -14,16 +14,17 @@ export class OrderItemDto {
 
 // DTO chính dùng trong Controller
 export class CreateOrderDto {
-    @IsInt({ message: 'ID nhân viên phục vụ (waiterId) phải là một số nguyên' })
-    @IsNotEmpty({ message: 'ID nhân viên phục vụ không được để trống' })
-    waiterId: number;
-
     @IsInt({ message: 'ID bàn (tableId) phải là một số nguyên' })
     @IsNotEmpty({ message: 'ID bàn không được để trống' })
     tableId: number;
 
     @IsArray({ message: 'Danh sách món ăn (items) phải là một mảng' })
-    @ValidateNested({ each: true, message: 'Dữ liệu từng món ăn trong mảng không hợp lệ' })
-    @Type(() => OrderItemDto) // Yêu cầu class-transformer chuyển đổi object thuần thành instance của OrderItemDto
+    @ArrayNotEmpty({ message: 'Đơn hàng phải có ít nhất 1 món ăn' })
+    @ValidateNested({ each: true })
+    @Type(() => OrderItemDto)
     items: OrderItemDto[];
+
+    @IsOptional()
+    @IsString({ message: 'Ghi chú phải là chuỗi ký tự' })
+    note?: string;
 }

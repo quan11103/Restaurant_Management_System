@@ -159,7 +159,7 @@ export class DishService {
     }
 
     // Cấu hình Sắp xếp
-    let orderBy: any = { id: 'desc' }; // Mặc định: 'newest'
+    let orderBy: any = { id: 'asc' };
     if (sortBy === 'price_asc') orderBy = { price: 'asc' };
     if (sortBy === 'price_desc') orderBy = { price: 'desc' };
 

@@ -1,10 +1,7 @@
 /* Layout chính: Chia đôi màn hình */
 .ordering-view-layout {
     display: flex;
-    height: 100vh;
-    /* Hoặc 100% chiều cao của khu vực content */
     background-color: #f5f6fa;
-    overflow: hidden;
 }
 
 .menu-section {

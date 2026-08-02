@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Eye, XCircle, RefreshCw } from 'lucide-react';
 import axiosClient from '../../../api/axios';
 import { useAlert } from '../../../components/Alert';
@@ -235,6 +235,8 @@ const OrderManagementView: React.FC = () => {
         }
     ];
 
+    const topRef = useRef<HTMLDivElement>(null);
+
     return (
         <div className="order-management-view">
 
@@ -253,7 +255,7 @@ const OrderManagementView: React.FC = () => {
                 statusOptions={statusOptions}
             />
 
-            <div className="view-content">
+            <div className="view-content" ref={topRef}>
                 <DataTable
                     columns={columns}
                     data={orders}
@@ -265,7 +267,13 @@ const OrderManagementView: React.FC = () => {
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    onPageChange={setCurrentPage}
+                    onPageChange={(page) => {
+                        setCurrentPage(page);
+                        topRef.current?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                    }}
                 />
             </div>
 
