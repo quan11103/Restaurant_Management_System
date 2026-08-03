@@ -19,6 +19,55 @@
     color: #2d3748;
 }
 
+.btn-back-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+}
+
+.btn-back-header:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+    border-color: #d1d5db;
+    transform: translateX(-3px);
+}
+
+.btn-back-header:active {
+    transform: translateX(0);
+    background-color: #d1d5db;
+}
+
+/* Nút Quay lại trong màn hình báo lỗi (Checkout Error) */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 20px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-back:hover {
+    background-color: #1d4ed8;
+}
+
 /* ==================== NỘI DUNG CHÍNH (2 CỘT) ==================== */
 .checkout-content {
     display: flex;
@@ -114,15 +163,15 @@
     color: #4a5568;
 }
 
-.discount-row {
-    color: #e53e3e;
+.summary-row.total-row {
+    border-top: 0;
 }
 
 .total-row {
     border-top: 2px solid #e2e8f0;
     padding-top: 16px;
     font-weight: 700;
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     color: #2d3748;
     margin-bottom: 0;
 }
@@ -147,7 +196,7 @@
     background: white;
     border: 1px solid #cbd5e0;
     color: #4a5568;
-    padding: 16px;
+    padding: 15px;
     border-radius: 8px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -174,4 +223,8 @@
 
 .btn-pay:hover {
     background: #2f855a;
+}
+
+.promo-code-box {
+    padding: 0;
 }

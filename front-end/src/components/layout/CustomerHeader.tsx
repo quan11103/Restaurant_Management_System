@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { User, Menu, LogOut, Utensils, LayoutGrid, Grid, ClipboardList } from 'lucide-react';
+import { User, Menu, LogOut, ClipboardList } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../utils/auth';
 import Logo from './Logo';
@@ -58,8 +58,54 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
         navigate(`/search?q=${encodeURIComponent(searchText)}`);
     };
 
-    // Xác định đường dẫn dựa trên role của user
-    const cartPath = userRole === 'WAITER' ? '/table-map' : '/cart';
+    // Hàm chuyển đổi vai trò (userRole) sang Chức vụ tiếng Việt
+    const getRoleDisplayName = () => {
+        if (!isLoggedIn) return 'Tài khoản';
+
+        switch (userRole) {
+            case 'MANAGER':
+                return 'Quản lí';
+            case 'WAITER':
+                return 'Phục vụ';
+            case 'CASHIER':
+                return 'Thu ngân';
+            case 'CLIENT':
+                return 'Khách hàng';
+            default:
+                return 'Tài khoản';
+        }
+    };
+
+    // Xác định đường dẫn dựa trên role của user (Cả WAITER và CASHIER đều vào /table-map)
+    const cartPath = (userRole === 'WAITER' || userRole === 'CASHIER') ? '/table-map' : '/cart';
+
+    // Hàm render icon + text tương ứng với role
+    const renderCartOrAction = () => {
+        if (userRole === 'WAITER') {
+            return (
+                <>
+                    <ClipboardList size={22} />
+                    <span className="action-text hidden-mobile">Đặt món</span>
+                </>
+            );
+        }
+
+        if (userRole === 'CASHIER') {
+            return (
+                <>
+                    <ClipboardList size={22} />
+                    <span className="action-text hidden-mobile">Thanh toán</span>
+                </>
+            );
+        }
+
+        return (
+            <>
+                <CartBadge size={22} />
+                <span className="action-text hidden-mobile">Giỏ hàng</span>
+            </>
+        );
+    };
 
     return (
         <header className="customer-header">
@@ -98,7 +144,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
                         >
                             <User size={22} />
                             <span className="action-text hidden-mobile">
-                                Tài khoản
+                                {getRoleDisplayName()}
                             </span>
                         </button>
 
@@ -132,17 +178,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
 
                     {/* Điều hướng linh hoạt theo role */}
                     <Link to={cartPath} className="action-btn cart-wrapper">
-                        {userRole === 'WAITER' ? (
-                            <>
-                                <ClipboardList size={22} />
-                                <span className="action-text hidden-mobile">Đặt món</span>
-                            </>
-                        ) : (
-                            <>
-                                <CartBadge size={22} />
-                                <span className="action-text hidden-mobile">Giỏ hàng</span>
-                            </>
-                        )}
+                        {renderCartOrAction()}
                     </Link>
                 </div>
 

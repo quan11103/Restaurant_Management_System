@@ -1,82 +1,245 @@
-import React, { useState } from 'react';
-import { Printer } from 'lucide-react';
-import DiscountApplier, { type AppliedDiscount } from './DiscountApplier';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Printer } from 'lucide-react';
+import axiosClient from '../../../api/axios';
+import PromoCodeInput from '../../online order/cart/PromoCodeInput';
 import PaymentMethodSelector, { type PaymentMethod } from './PaymentMethodSelector';
 import BillSummary, { type BillModel } from './BillSummary';
-import './CheckOutView.css';
+import './CheckoutView.css';
 
-const MOCK_ORDER_DATA = {
-    id: 5002,
-    orderTime: new Date().toISOString(),
-    totalQuantity: 4,
-    total: 325000,
-    orderTables: [{ table: { name: 'Bàn 03' } }],
-    orderedDishes: [
-        { id: 1, dish: { name: 'Bò bít tết sốt tiêu đen' }, price: 180000, quantity: 1, subTotal: 180000 },
-        { id: 2, dish: { name: 'Salad cá ngừ' }, price: 85000, quantity: 1, subTotal: 85000 },
-        { id: 3, dish: { name: 'Trà đào cam sả' }, price: 30000, quantity: 2, subTotal: 60000 },
-    ]
-};
+interface OrderedDishDetail {
+    id: number;
+    price: number;
+    quantity: number;
+    dish: {
+        id: number;
+        name: string;
+    };
+}
+
+interface OrderDetail {
+    id: number;
+    orderTime: string;
+    totalQuantity: number;
+    total: number;
+    orderedDishes: OrderedDishDetail[];
+    bill?: {
+        id: number;
+        paymentTime: string;
+        paymentMethod: string;
+        discount: number;
+    };
+}
+
+interface LocationState {
+    tableId?: number;
+    tableName?: string;
+    orderId?: number;
+    promoCode?: string;
+    discountAmount?: number;
+    userRole?: string;
+}
 
 const CheckOutView: React.FC = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const state = (location.state || {}) as LocationState;
+
+    const { tableId, tableName, orderId, promoCode, discountAmount: initialDiscount } = state;
+
+    const userRole = localStorage.getItem('user_role');
+    const isWaiter = userRole === 'WAITER';
+
+    const [orderData, setOrderData] = useState<OrderDetail | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
-    const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
-    // State quản lý hiển thị và dữ liệu Hóa đơn
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
     const [showBillSummary, setShowBillSummary] = useState(false);
     const [completedBillData, setCompletedBillData] = useState<BillModel | null>(null);
-    // Tiền giảm giá lấy từ state
-    const subTotal = MOCK_ORDER_DATA.total;
-    const discountAmount = appliedDiscount?.discountAmount || 0;
-    const finalTotal = subTotal - discountAmount;
 
-    const handleCheckout = () => {
-        // Trong thực tế, đoạn này bạn sẽ gọi API (POST /api/bills) để lưu xuống PostgreSQL
-        // Sau khi API trả về thành công, lấy dữ liệu đó để nhét vào state.
+    const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(promoCode || null);
+    const [discountAmount, setDiscountAmount] = useState<number>(initialDiscount || 0);
+    const [promoError, setPromoError] = useState<string | null>(null);
+    const [promoSuccess, setPromoSuccess] = useState<string | null>(
+        promoCode ? `Đã áp dụng mã ${promoCode}` : null
+    );
+    const [isCheckingPromo, setIsCheckingPromo] = useState<boolean>(false);
 
-        // Giả lập dữ liệu trả về từ Backend (Khớp chuẩn với BillModel)
-        const newBill: BillModel = {
-            id: Math.floor(Math.random() * 10000) + 9000, // Tạo mã HĐ ngẫu nhiên
-            orderId: MOCK_ORDER_DATA.id,
-            paymentTime: new Date().toISOString(),
-            paymentMethod: paymentMethod,
-            discount: discountAmount,
-            total: finalTotal,
-            cashier: { fullName: 'Admin Thu Ngân' }, // Lấy từ Session User
-            promotion: appliedDiscount ? {
-                code: appliedDiscount.code,
-                value: discountAmount,
-                type: 'UNKNOWN'
-            } : null,
-            order: {
-                totalQuantity: MOCK_ORDER_DATA.totalQuantity,
-                orderedDishes: MOCK_ORDER_DATA.orderedDishes
+    useEffect(() => {
+        if (!orderId) {
+            setErrorMsg('Không tìm thấy thông tin đơn hàng của bàn này!');
+            setIsLoading(false);
+            return;
+        }
+
+        const fetchOrderDetail = async () => {
+            setIsLoading(true);
+            try {
+                const response = await axiosClient.get(`/orders/${orderId}`);
+                setOrderData(response.data);
+            } catch (err: any) {
+                console.error('Lỗi khi tải chi tiết đơn hàng:', err);
+                setErrorMsg('Không thể tải thông tin đơn hàng. Vui lòng thử lại!');
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        // Lưu dữ liệu hóa đơn và bật Popup
-        setCompletedBillData(newBill);
+        fetchOrderDetail();
+    }, [orderId]);
+
+    const subTotal = orderData?.total || 0;
+    const finalTotal = Math.max(0, subTotal - discountAmount);
+
+    const handleApplyPromo = async (code: string) => {
+        if (!code.trim()) {
+            setPromoError('Vui lòng nhập mã khuyến mãi.');
+            return;
+        }
+
+        setIsCheckingPromo(true);
+        setPromoError(null);
+        setPromoSuccess(null);
+
+        try {
+            const response = await axiosClient.get(`/promotions/code/${code}?total=${subTotal}`);
+            const data = response.data;
+
+            setDiscountAmount(data.discountAmount);
+            setAppliedPromoCode(data.code);
+            setPromoSuccess(`Áp dụng thành công! Giảm ${data.discountAmount.toLocaleString('vi-VN')} đ`);
+
+        } catch (err: any) {
+            console.error('Lỗi khi áp dụng mã:', err);
+            const errorMessage = err.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.';
+            setPromoError(errorMessage);
+            setDiscountAmount(0);
+            setAppliedPromoCode(null);
+        } finally {
+            setIsCheckingPromo(false);
+        }
+    };
+
+    const handlePrintBill = () => {
+        if (!orderData || !orderData.bill) return;
+
+        const billFromResponse = orderData.bill;
+        const cashierName = localStorage.getItem('user_name') || 'Nhân viên thu ngân';
+
+        const formattedBill: BillModel = {
+            id: billFromResponse.id,
+            orderId: orderData.id,
+            paymentTime: billFromResponse.paymentTime,
+            paymentMethod: billFromResponse.paymentMethod,
+            discount: billFromResponse.discount,
+            total: finalTotal,
+            cashier: {
+                fullName: cashierName
+            },
+            promotion: appliedPromoCode ? {
+                code: appliedPromoCode,
+                value: discountAmount,
+                type: 'DISCOUNT',
+            } : null,
+            order: {
+                totalQuantity: orderData.totalQuantity,
+                orderedDishes: orderData.orderedDishes.map((item: any) => ({
+                    id: item.id,
+                    dish: item.dish,
+                    price: item.price,
+                    quantity: item.quantity,
+                    subTotal: item.price * item.quantity,
+                }))
+            }
+        };
+
+        setCompletedBillData(formattedBill);
         setShowBillSummary(true);
+    };
+
+    const handleCheckout = async () => {
+        if (!orderId || !orderData) return;
+
+        setIsSubmitting(true);
+        try {
+            const response = await axiosClient.post('/orders/staff-checkout', {
+                orderId: orderId,
+                paymentMethod: paymentMethod,
+                discount: discountAmount,
+                promotionCode: appliedPromoCode,
+            });
+
+            const result = response.data;
+            console.log('Checkout response:', result);
+
+            const paymentUrl = result.paymentUrl;
+
+            if (paymentMethod === 'TRANSFER') {
+                if (paymentUrl) {
+                    window.location.href = paymentUrl;
+                    return;
+                } else {
+                    console.error('Không tìm thấy paymentUrl trong response:', result);
+                    alert('Hệ thống không nhận được liên kết thanh toán VNPAY. Vui lòng kiểm tra lại API Backend!');
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
+        } catch (err: any) {
+            console.error('Lỗi khi thanh toán:', err);
+            alert(err.response?.data?.message || 'Có lỗi xảy ra khi hoàn tất thanh toán!');
+            setIsSubmitting(false);
+        }
     };
 
     const handleCloseBill = () => {
         setShowBillSummary(false);
-        // Sau khi đóng bill thành công, thường sẽ redirect user về lại màn hình Sơ đồ bàn
-        console.log('Quay về trang TableMapView...');
+        setIsSubmitting(false);
     };
+
+    const isTransferMethod = paymentMethod === 'TRANSFER';
+
+    if (isLoading) {
+        return <div className="checkout-loading">Đang tải thông tin đơn hàng...</div>;
+    }
+
+    if (errorMsg || !orderData) {
+        return (
+            <div className="checkout-error">
+                <p>{errorMsg || 'Không tìm thấy dữ liệu đơn hàng.'}</p>
+                <button className="btn-back" onClick={() => navigate(-1)}>
+                    <ArrowLeft size={18} /> Quay lại sơ đồ bàn
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="checkout-layout">
             <div className="checkout-header">
-                <h2>Thanh toán - {MOCK_ORDER_DATA.orderTables[0]?.table.name}</h2>
-                <div style={{ width: 100 }}></div> {/* Spacer để căn giữa tiêu đề */}
+                <button className="btn-back-header" onClick={() => navigate(-1)}>
+                    <ArrowLeft size={20} /> Danh sách bàn
+                </button>
+                <h2>
+                    {isWaiter
+                        ? `Chi tiết đơn hàng - ${tableName || 'Bàn chưa xác định'}`
+                        : `Thanh toán - ${tableName || 'Bàn chưa xác định'}`}
+                </h2>
+                <div style={{ width: 80 }}></div>
             </div>
 
             <div className="checkout-content">
-                {/* Cột trái: chi tiết lần gọi */}
+                {/* Cột trái: Chi tiết món ăn trong Order */}
                 <div className="order-details-section">
                     <div className="order-meta">
-                        <span><strong>Mã đơn:</strong> #{MOCK_ORDER_DATA.id}</span>
-                        <span><strong>Thời gian:</strong> {new Date(MOCK_ORDER_DATA.orderTime).toLocaleTimeString('vi-VN')}</span>
+                        <span><strong>Mã đơn:</strong> #{orderData.id}</span>
+                        <span>
+                            <strong>Thời gian:</strong>{' '}
+                            {new Date(orderData.orderTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                     </div>
 
                     <div className="ordered-items-list">
@@ -87,73 +250,86 @@ const CheckOutView: React.FC = () => {
                             <span className="col-subtotal">Thành tiền</span>
                         </div>
 
-                        {MOCK_ORDER_DATA.orderedDishes.map((item) => (
-                            <div key={item.id} className="item-row">
-                                <span className="col-name">{item.dish.name}</span>
-                                <span className="col-qty">{item.quantity}</span>
-                                <span className="col-price">{item.price.toLocaleString('vi-VN')}</span>
-                                <span className="col-subtotal">{item.subTotal.toLocaleString('vi-VN')}</span>
-                            </div>
-                        ))}
+                        {orderData.orderedDishes.map((item) => {
+                            const itemSubTotal = item.price * item.quantity;
+                            return (
+                                <div key={item.id} className="item-row">
+                                    <span className="col-name">{item.dish.name}</span>
+                                    <span className="col-qty">{item.quantity}</span>
+                                    <span className="col-price">{item.price.toLocaleString('vi-VN')}</span>
+                                    <span className="col-subtotal">{itemSubTotal.toLocaleString('vi-VN')}</span>
+                                </div>
+                            );
+                        })}
                     </div>
+
+                    {/* Chỉ hiển thị tổng tiền 1 dòng ở cột trái khi người dùng là WAITER */}
+                    {isWaiter && (
+                        <div className="summary-row total-row" style={{ marginTop: '16px' }}>
+                            <span>Tổng tiền ({orderData.totalQuantity} suất):</span>
+                            <span className="final-price">{subTotal.toLocaleString('vi-VN')} đ</span>
+                        </div>
+                    )}
                 </div>
 
-                {/* Cột phải: bảng tính tiền & thanh toán */}
-                <div className="payment-section">
-                    {/* Phần tính tiền */}
-                    <div className="summary-block">
-                        <div className="summary-row">
-                            <span>Tổng tiền hàng ({MOCK_ORDER_DATA.totalQuantity} món):</span>
-                            <span>{subTotal.toLocaleString('vi-VN')} đ</span>
-                        </div>
-
-                        {/* Nhập khuyến mãi */}
-                        <DiscountApplier
-                            orderTotal={subTotal}
-                            appliedDiscount={appliedDiscount}
-                            onApply={(discount) => setAppliedDiscount(discount)}
-                            onRemove={() => setAppliedDiscount(null)}
-                        />
-
-                        {discountAmount > 0 && (
-                            <div className="summary-row discount-row">
-                                <span>Khuyến mãi:</span>
-                                <span>- {discountAmount.toLocaleString('vi-VN')} đ</span>
+                {/* Cột phải: Tính tiền & Phương thức thanh toán (Ẩn hoàn toàn đối với WAITER) */}
+                {!isWaiter && (
+                    <div className="payment-section">
+                        <div className="summary-block">
+                            <div className="summary-row">
+                                <span>Tổng tiền ({orderData.totalQuantity} suất):</span>
+                                <span>{subTotal.toLocaleString('vi-VN')} đ</span>
                             </div>
-                        )}
 
-                        <div className="summary-row total-row">
-                            <span>Khách cần trả:</span>
-                            <span className="final-price">{finalTotal.toLocaleString('vi-VN')} đ</span>
+                            <PromoCodeInput
+                                onApply={handleApplyPromo}
+                                isLoading={isCheckingPromo}
+                                errorMsg={promoError}
+                                successMsg={promoSuccess}
+                            />
+
+                            <div className="summary-row total-row">
+                                <span>Khách cần trả:</span>
+                                <span className="final-price">{finalTotal.toLocaleString('vi-VN')} đ</span>
+                            </div>
+                        </div>
+
+                        <div className="payment-methods">
+                            <PaymentMethodSelector
+                                selectedMethod={paymentMethod}
+                                onSelect={setPaymentMethod}
+                            />
+                        </div>
+
+                        <div className="action-buttons">
+                            {!isTransferMethod && (
+                                <button className="btn-print-temp" onClick={handlePrintBill}>
+                                    <Printer size={20} />
+                                    In hóa đơn
+                                </button>
+                            )}
+                            <button
+                                className="btn-pay"
+                                onClick={handleCheckout}
+                                disabled={isSubmitting}
+                                style={{ opacity: isSubmitting ? 0.7 : 1 }}
+                            >
+                                {isSubmitting
+                                    ? (isTransferMethod ? 'Đang chuyển hướng VNPAY...' : 'Đang xử lý...')
+                                    : isTransferMethod
+                                        ? `Thanh toán`
+                                        : `Hoàn tất thanh toán`}
+                            </button>
                         </div>
                     </div>
-
-                    {/* Phương thức thanh toán */}
-                    <div className="payment-methods">
-                        <PaymentMethodSelector
-                            selectedMethod={paymentMethod}
-                            onSelect={setPaymentMethod}
-                        />
-                    </div>
-
-                    {/* Các nút hành động */}
-                    <div className="action-buttons">
-                        <button className="btn-print-temp">
-                            <Printer size={20} />
-                            In tạm tính
-                        </button>
-                        <button className="btn-pay" onClick={handleCheckout}>
-                            Hoàn tất thanh toán
-                        </button>
-                    </div>
-                </div>
+                )}
             </div>
+
             {showBillSummary && completedBillData && (
                 <BillSummary
                     bill={completedBillData}
                     onClose={handleCloseBill}
                     onPrint={() => {
-                        console.log('Kích hoạt máy in cho hóa đơn:', completedBillData.id);
                         window.print();
                     }}
                 />

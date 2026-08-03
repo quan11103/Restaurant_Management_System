@@ -22,6 +22,7 @@
 .promo-input {
     flex: 1;
     padding: 12px 16px;
+    background-color: #fff5f2;
     border: 1px solid #edeff4;
     border-radius: 10px;
     outline: none;

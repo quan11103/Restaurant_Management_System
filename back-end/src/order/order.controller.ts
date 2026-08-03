@@ -4,13 +4,13 @@ import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { Req } from '@nestjs/common';
 import { Request } from 'express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
-import { Role } from '@prisma/client';
+import { Role, OrderStatus } from '@prisma/client';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ClientCheckoutDto } from './dto/client-checkout.dto';
+import { StaffCheckoutDto } from './dto/staff-checkout.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { VnpayService } from 'src/vnpay/vnpay.service';
-import { OrderStatus } from '@prisma/client';
 import { InteractionService } from 'src/interaction/interaction.service';
 
 @Controller('orders')
@@ -29,6 +29,56 @@ export class OrderController {
     @Body() createOrderDto: CreateOrderDto,
   ) {
     return this.orderService.createOrder(createOrderDto, user.sub);
+  }
+
+  // Luồng dành cho thu ngân / quản lý: thanh toán tại quầy
+  @Auth(Role.MANAGER, Role.CASHIER)
+  @Post('staff-checkout')
+  async staffCheckout(
+    @CurrentUser() user: JwtPayload,
+    @Req() req: Request, // 1. Bổ sung @Req() để lấy thông tin Request
+    @Body() staffCheckoutDto: StaffCheckoutDto,
+  ) {
+    const cashierId = user.sub;
+
+    const result = await this.orderService.staffCheckout(cashierId, staffCheckoutDto);
+
+    // 2. Nếu thu ngân chọn thanh toán chuyển khoản (VNPAY)
+    if (staffCheckoutDto.paymentMethod === 'TRANSFER') {
+      let ipAddress =
+        (req.headers['x-forwarded-for'] as string) ||
+        req.socket.remoteAddress ||
+        '127.0.0.1';
+
+      if (ipAddress === '::1') {
+        ipAddress = '127.0.0.1';
+      }
+
+      // Giả định `result` trả về có chứa id đơn hàng và tổng tiền
+      const orderId = result.orderId;
+      const totalAmount = result.totalPay;
+
+      const paymentUrl = this.vnpayService.createPaymentUrl(
+        ipAddress.toString(),
+        orderId.toString(),
+        totalAmount,
+        `Thanh toan don hang #${orderId}`,
+      );
+
+      return {
+        success: true,
+        message: 'Tạo liên kết thanh toán VNPAY thành công!',
+        paymentUrl: paymentUrl, // Trả paymentUrl về cho React Frontend
+        data: result,
+      };
+    }
+
+    // 3. Trường hợp thanh toán Tiền mặt (CASH)
+    return {
+      success: true,
+      message: 'Thanh toán đơn hàng thành công!',
+      data: result,
+    };
   }
 
   // Luồng dành cho khách hàng: thanh toán online / COD (DELIVERY)
@@ -233,7 +283,6 @@ export class OrderController {
       throw new NotFoundException('Order not found');
     }
 
-    const currentUserId = user.sub;
     if (
       user.role === Role.CLIENT &&
       order.clientId !== user.sub
@@ -244,7 +293,7 @@ export class OrderController {
     return order;
   }
 
-  //Cập nhật trạng thái đơn hàng (Dành cho Admin/Quản lý/Nhân viên)
+  // Cập nhật trạng thái đơn hàng (Dành cho Admin/Quản lý/Nhân viên)
   @Auth(Role.MANAGER, Role.WAITER, Role.CASHIER)
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
@@ -258,7 +307,7 @@ export class OrderController {
     return this.orderService.updateOrderStatus(id, status);
   }
 
-  //Khách hàng tự hủy đơn hàng của mình (Chỉ hủy được khi status = PENDING)
+  // Khách hàng tự hủy đơn hàng của mình (Chỉ hủy được khi status = PENDING)
   @Patch(':id/cancel')
   @UseGuards(JwtAuthGuard)
   async cancelOrderByClient(
@@ -270,7 +319,7 @@ export class OrderController {
     return this.orderService.cancelOrderByClient(clientId, id);
   }
 
-  //Quản lý/Admin hủy đơn hàng
+  // Quản lý/Admin hủy đơn hàng
   @Auth(Role.MANAGER)
   @Patch(':id/cancel-manager')
   async cancelOrderByManager(@Param('id') id: string) {

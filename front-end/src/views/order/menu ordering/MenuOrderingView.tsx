@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import axiosClient from '../../../api/axios';
+import { useAlert } from '../../../components/Alert';
 import Pagination from '../../../components/Pagination';
 import MenuFilterBar from './MenuFilterBar';
 import DishGrid from './DishGrid';
@@ -8,7 +9,7 @@ import CartSidebar from './CartSidebar';
 import './MenuOrderingView.css';
 
 export interface Dish {
-    id: string; // Đồng bộ ID từ API về dạng chuỗi để dễ xử lý trên UI
+    id: string;
     name: string;
     price: number;
     category: string;
@@ -47,8 +48,8 @@ const CATEGORY_OPTIONS = [
 ];
 
 const MenuOrderingView: React.FC = () => {
+    const { showAlert } = useAlert();
     const location = useLocation();
-    const navigate = useNavigate();
     const state = location.state as OrderLocationState | null;
 
     const currentTableName = state?.tableName || 'Chưa chọn bàn';
@@ -68,7 +69,6 @@ const MenuOrderingView: React.FC = () => {
 
     const topRef = useRef<HTMLDivElement>(null);
 
-    // Tải danh sách món ăn từ API
     useEffect(() => {
         const fetchDishes = async () => {
             setIsLoading(true);
@@ -103,10 +103,13 @@ const MenuOrderingView: React.FC = () => {
 
                     setDishes(mappedDishes);
                     setTotalPages(response.data.pagination?.totalPages || 1);
+                } else {
+                    showAlert('error', 'Không thể tải danh sách thực đơn', 'Lỗi');
                 }
             } catch (error) {
                 console.error('Lỗi khi tải danh sách món ăn:', error);
                 setDishes([]);
+                showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
             } finally {
                 setIsLoading(false);
             }
@@ -144,23 +147,21 @@ const MenuOrderingView: React.FC = () => {
         setCart(prev => prev.filter(item => item.cartItemId !== cartItemId));
     };
 
-    // --- TÍCH HỢP API POST /orders/dine-in KHỚP VỚI CREATEORDERDTO MỚI ---
     const handleSubmitOrder = async () => {
         if (!currentTableId) {
-            alert('Chưa xác định được bàn! Vui lòng quay lại sơ đồ bàn để chọn bàn trước.');
+            showAlert('warning', 'Chưa xác định được bàn! Vui lòng quay lại sơ đồ bàn để chọn bàn trước.', 'Cảnh báo');
             return;
         }
 
         if (cart.length === 0) {
-            alert('Giỏ hàng đang trống! Vui lòng chọn món trước khi gửi nhà bếp.');
+            showAlert('warning', 'Giỏ hàng đang trống! Vui lòng chọn món trước khi gửi nhà bếp.', 'Cảnh báo');
             return;
         }
 
-        // Tạo Payload chuẩn CreateOrderDto (Không gửi waiterId, Backend tự lấy từ JWT)
         const createOrderDto = {
             tableId: Number(currentTableId),
             items: cart.map(item => ({
-                dishId: Number(item.id), // Chuyển id dạng string thành number
+                dishId: Number(item.id),
                 quantity: item.quantity,
             })),
         };
@@ -172,9 +173,10 @@ const MenuOrderingView: React.FC = () => {
 
             if (response.data) {
                 const message = response.data.message || 'Đã gửi món xuống nhà bếp thành công!';
-                alert(`✅ ${message}`);
-
-                setCart([]); // Reset giỏ hàng sau khi gửi thành công
+                showAlert('success', message, 'Thành công');
+                setCart([]);
+            } else {
+                showAlert('error', 'Không thể gửi đơn hàng xuống nhà bếp', 'Lỗi hệ thống');
             }
         } catch (error: any) {
             console.error('Lỗi khi gửi order:', error);
@@ -182,11 +184,11 @@ const MenuOrderingView: React.FC = () => {
             const apiMessage = error.response?.data?.message;
 
             if (Array.isArray(apiMessage)) {
-                alert(`❌ Vui lòng kiểm tra lại:\n- ${apiMessage.join('\n- ')}`);
+                showAlert('error', `Vui lòng kiểm tra lại:\n- ${apiMessage.join('\n- ')}`, 'Lỗi nhập liệu');
             } else if (typeof apiMessage === 'string') {
-                alert(`❌ Lỗi: ${apiMessage}`);
+                showAlert('error', apiMessage, 'Lỗi');
             } else {
-                alert('❌ Lỗi kết nối đến máy chủ. Vui lòng thử lại!');
+                showAlert('error', 'Đã xảy ra lỗi kết nối với máy chủ!', 'Lỗi hệ thống');
             }
         } finally {
             setIsSubmitting(false);
@@ -228,7 +230,6 @@ const MenuOrderingView: React.FC = () => {
                 )}
             </div>
 
-            {/* Component Giỏ hàng Sidebar */}
             <CartSidebar
                 cartItems={cart}
                 tableName={currentTableName}

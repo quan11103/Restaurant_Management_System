@@ -88,7 +88,7 @@ const CustomerFooter: React.FC = () => {
                     </div>
 
                     <h3 className="footer-title mt-4">Phương thức thanh toán</h3>
-                    <div className="payment-methods">
+                    <div className="footer-payment-methods">
                         {/* Các icon/logo thanh toán có thể thay bằng thẻ <img> thật */}
                         <div className="payment-badge">COD</div>
                         <div className="payment-badge vnpay">VNPAY</div>

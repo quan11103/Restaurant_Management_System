@@ -35,28 +35,6 @@ interface BillSummaryProps {
     onPrint?: () => void;
 }
 
-// =======================================================
-// MOCK DATA (Dùng để test nếu bạn chưa nối Backend)
-// =======================================================
-export const MOCK_BILL_DATA: BillModel = {
-    id: 9001,
-    orderId: 5002,
-    paymentTime: new Date().toISOString(),
-    paymentMethod: 'TRANSFER',
-    discount: 50000,
-    total: 275000, // 325.000 - 50.000
-    cashier: { fullName: 'Vũ Hồng Quân' },
-    promotion: { code: 'GIAM50K', value: 50000, type: 'FIXED' },
-    order: {
-        totalQuantity: 4,
-        orderedDishes: [
-            { id: 1, quantity: 1, price: 180000, subTotal: 180000, dish: { name: 'Bò bít tết sốt tiêu đen' } },
-            { id: 2, quantity: 1, price: 85000, subTotal: 85000, dish: { name: 'Salad cá ngừ' } },
-            { id: 3, quantity: 2, price: 30000, subTotal: 60000, dish: { name: 'Trà đào cam sả' } },
-        ]
-    }
-};
-
 const BillSummary: React.FC<BillSummaryProps> = ({ bill, onClose, onPrint }) => {
     // Hàm dịch phương thức thanh toán sang tiếng Việt
     const getPaymentMethodText = (method: string) => {
@@ -95,7 +73,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({ bill, onClose, onPrint }) => 
                             <div className="receipt-meta">
                                 <div className="meta-row"><span>Số HĐ:</span> <span>#{bill.id}</span></div>
                                 <div className="meta-row"><span>Mã ĐH:</span> <span>#{bill.orderId}</span></div>
-                                <div className="meta-row"><span>Ngày:</span> <span>{new Date(bill.paymentTime).toLocaleString('vi-VN')}</span></div>
+                                <div className="meta-row"><span>Thời gian:</span> <span>{new Date(bill.paymentTime).toLocaleString('vi-VN')}</span></div>
                                 <div className="meta-row"><span>Thu ngân:</span> <span>{bill.cashier?.fullName || 'N/A'}</span></div>
                                 <div className="meta-row"><span>PT Thanh toán:</span> <span>{getPaymentMethodText(bill.paymentMethod)}</span></div>
                             </div>

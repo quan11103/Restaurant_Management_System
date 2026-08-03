@@ -29,6 +29,7 @@ import ClientManagementView from './views/admin/clients/ClientManagementView';
 import TableManagementView from './views/admin/tables/TableManagementView';
 import MenuOrderingView from './views/order/menu ordering/MenuOrderingView';
 import TableMapView from './views/checkout/table map/TableMapView';
+import CheckOutView from './views/checkout/checkout/CheckoutView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -111,6 +112,7 @@ function App() {
             <Route path="/search" element={<SearchView />} />
             <Route path="/table-map" element={<TableMapView />} />
             <Route path="/staff-order" element={<MenuOrderingView />} />
+            <Route path="/staff-checkout" element={<CheckOutView />} />
             {/* Route 404 */}
             <Route
               path="*"

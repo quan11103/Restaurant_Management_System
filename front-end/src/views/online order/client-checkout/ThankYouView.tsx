@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import axiosClient from '../../../api/axios';
+import BillSummary, { type BillModel } from '../../checkout/checkout/BillSummary';
 import './ThankYouView.css';
 
 interface OrderState {
@@ -18,11 +19,11 @@ interface OrderState {
     shippingAddress?: string;
 }
 
-// Thêm interface cho dữ liệu fetch từ API
 interface FetchedOrderInfo {
     fullName?: string;
     phone?: string;
     address?: string;
+    orderType?: string;
 }
 
 const handleRetryCheckout = async (orderId: number) => {
@@ -43,7 +44,13 @@ const ThankYouView: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+
     const [fetchedOrderInfo, setFetchedOrderInfo] = useState<FetchedOrderInfo | null>(null);
+    const [fullOrderData, setFullOrderData] = useState<any | null>(null);
+
+    // State phục vụ việc xem/in hóa đơn (BillSummary Modal)
+    const [showBillSummary, setShowBillSummary] = useState<boolean>(false);
+    const [completedBillData, setCompletedBillData] = useState<BillModel | null>(null);
 
     const vnpResponseCode = searchParams.get('vnp_ResponseCode');
     const vnpTxnRef = searchParams.get('vnp_TxnRef');
@@ -51,7 +58,6 @@ const ThankYouView: React.FC = () => {
 
     // Nếu trên URL có mã VNPAY thì đây là luồng VNPAY
     const isVnpayFlow = vnpResponseCode !== null;
-
     const isSuccess = isVnpayFlow ? vnpResponseCode === '00' : true;
 
     // Lấy dữ liệu nội bộ (Dành cho COD)
@@ -61,16 +67,18 @@ const ThankYouView: React.FC = () => {
     const finalOrderId = isVnpayFlow ? vnpTxnRef : orderData?.orderId;
 
     useEffect(() => {
-        if (isVnpayFlow && isSuccess && finalOrderId) {
+        if (isSuccess && finalOrderId) {
             const fetchOrderDetails = async () => {
                 try {
                     const response = await axiosClient.get(`/orders/${finalOrderId}`);
                     const data = response.data;
                     if (data) {
+                        setFullOrderData(data);
                         setFetchedOrderInfo({
-                            fullName: data.receiverName,
-                            phone: data.receiverPhone,
-                            address: data.shippingAddress,
+                            fullName: data.receiverName || data.fullName,
+                            phone: data.receiverPhone || data.phone,
+                            address: data.shippingAddress || data.address,
+                            orderType: data.orderType || data.order_type,
                         });
                     }
                 } catch (error) {
@@ -80,7 +88,7 @@ const ThankYouView: React.FC = () => {
 
             fetchOrderDetails();
         }
-    }, [isVnpayFlow, isSuccess, finalOrderId]);
+    }, [isSuccess, finalOrderId]);
 
     // Xử lý khi truy cập sai luồng (Không có VNPAY params và không có state)
     if (!isVnpayFlow && !orderData) {
@@ -107,13 +115,60 @@ const ThankYouView: React.FC = () => {
     // VNPAY nhân số tiền lên 100 lần, nên cần chia lại cho 100
     const finalTotalPay = isVnpayFlow
         ? (vnpAmount ? Number(vnpAmount) / 100 : 0)
-        : (orderData?.order?.totalAmount || orderData?.totalPay || 0);
+        : (orderData?.order?.totalAmount || orderData?.totalPay || fullOrderData?.total || 0);
 
-    // Cập nhật lại các biến này để ưu tiên dữ liệu từ API (nếu có)
-    const finalReceiverName = orderData?.order?.fullName || orderData?.receiverName || fetchedOrderInfo?.fullName || 'Đang cập nhật...';
-    const finalPhone = orderData?.order?.phone || orderData?.receiverPhone || fetchedOrderInfo?.phone || 'Đang cập nhật...';
-    const finalAddress = orderData?.order?.address || orderData?.shippingAddress || fetchedOrderInfo?.address || 'Đang cập nhật...';
+    // Kiểm tra xem đơn hàng có phải DINE_IN không
+    const isDineIn = fetchedOrderInfo?.orderType === 'DINE_IN';
+
+    const finalReceiverName = fetchedOrderInfo?.fullName || 'Đang cập nhật...';
+    const finalPhone = fetchedOrderInfo?.phone || 'Đang cập nhật...';
+    const finalAddress = fetchedOrderInfo?.address || 'Đang cập nhật...';
     const methodDisplay = isVnpayFlow ? 'Thanh toán trực tuyến (VNPAY)' : 'Thanh toán khi nhận hàng (COD)';
+
+    // Hàm xử lý khi nhấn In Hóa Đơn (Tương tự CheckoutView)
+    const handlePrintBill = () => {
+        if (!fullOrderData) {
+            alert('Đang tải dữ liệu hóa đơn, vui lòng thử lại sau giây lát!');
+            return;
+        }
+
+        const billFromResponse = fullOrderData.bill;
+        const cashierName = localStorage.getItem('user_name') || 'Nhân viên';
+
+        const formattedBill: BillModel = {
+            id: billFromResponse?.id || fullOrderData.id,
+            orderId: fullOrderData.id,
+            paymentTime: billFromResponse?.paymentTime || new Date().toISOString(),
+            paymentMethod: billFromResponse?.paymentMethod || (isVnpayFlow ? 'TRANSFER' : 'CASH'),
+            discount: billFromResponse?.discount || 0,
+            total: finalTotalPay,
+            cashier: {
+                fullName: cashierName
+            },
+            promotion: fullOrderData.promotionCode ? {
+                code: fullOrderData.promotionCode,
+                value: billFromResponse?.discount || 0,
+                type: 'DISCOUNT',
+            } : null,
+            order: {
+                totalQuantity: fullOrderData.totalQuantity || fullOrderData.orderedDishes?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0,
+                orderedDishes: (fullOrderData.orderedDishes || []).map((item: any) => ({
+                    id: item.id,
+                    dish: item.dish,
+                    price: item.price,
+                    quantity: item.quantity,
+                    subTotal: item.price * item.quantity,
+                }))
+            }
+        };
+
+        setCompletedBillData(formattedBill);
+        setShowBillSummary(true);
+    };
+
+    const handleCloseBill = () => {
+        setShowBillSummary(false);
+    };
 
     return (
         <div className={`ty-container ${!isSuccess ? 'is-error' : ''}`}>
@@ -138,11 +193,17 @@ const ThankYouView: React.FC = () => {
                     </h1>
                     <p className="ty-desc">
                         {isSuccess ? (
-                            <>
-                                Yêu cầu của bạn đã được tiếp nhận.
-                                <br />
-                                Chúng tôi sẽ liên hệ để xác nhận trong thời gian sớm nhất.
-                            </>
+                            isDineIn ? (
+                                <>
+                                    Cảm ơn bạn đã đặt món tại nhà hàng!
+                                </>
+                            ) : (
+                                <>
+                                    Yêu cầu của bạn đã được tiếp nhận.
+                                    <br />
+                                    Chúng tôi sẽ liên hệ để xác nhận trong thời gian sớm nhất.
+                                </>
+                            )
                         ) : (
                             <>
                                 Giao dịch qua cổng VNPAY đã bị hủy hoặc gặp sự cố.
@@ -174,11 +235,15 @@ const ThankYouView: React.FC = () => {
                 {/* Thông tin giao nhận (Chỉ hiện nếu thành công) */}
                 {isSuccess && (
                     <>
-                        <h3 className="ty-delivery-title">Địa chỉ nhận hàng</h3>
+                        <h3 className="ty-delivery-title">
+                            {isDineIn ? 'Thông tin khách hàng' : 'Địa chỉ nhận hàng'}
+                        </h3>
                         <div className="ty-delivery-details">
                             <div className="ty-delivery-item">Người nhận: <strong>{finalReceiverName}</strong></div>
                             <div className="ty-delivery-item">Số điện thoại: <strong>{finalPhone}</strong></div>
-                            <div className="ty-delivery-item">Địa chỉ: <strong>{finalAddress}</strong></div>
+                            {!isDineIn && (
+                                <div className="ty-delivery-item">Địa chỉ: <strong>{finalAddress}</strong></div>
+                            )}
                             <div className="ty-delivery-item">Hình thức: <strong>{methodDisplay}</strong></div>
                         </div>
                     </>
@@ -195,6 +260,15 @@ const ThankYouView: React.FC = () => {
                                 Quay về trang chủ
                             </button>
                         </>
+                    ) : isDineIn ? (
+                        <>
+                            <button onClick={handlePrintBill} className="ty-btn ty-btn-outline">
+                                In hóa đơn
+                            </button>
+                            <button onClick={() => navigate('/table-map')} className="ty-btn ty-btn-fill">
+                                Hoàn tất
+                            </button>
+                        </>
                     ) : (
                         <>
                             <button onClick={() => navigate('/')} className="ty-btn ty-btn-outline">
@@ -207,6 +281,17 @@ const ThankYouView: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {/* Modal hiển thị và in hóa đơn chi tiết */}
+            {showBillSummary && completedBillData && (
+                <BillSummary
+                    bill={completedBillData}
+                    onClose={handleCloseBill}
+                    onPrint={() => {
+                        window.print();
+                    }}
+                />
+            )}
         </div>
     );
 };

@@ -37,22 +37,6 @@ const TableItem: React.FC<TableItemProps> = ({ table, onClick }) => {
     // Render thông tin phụ bên dưới tên bàn
     const renderSubInfo = () => {
         if (!isOccupied) return `${table.capacity} chỗ`;
-
-        if (activeOrderInfo) {
-            switch (activeOrderInfo.order.status) {
-                case 'PENDING':
-                    return 'Mới gọi món';
-                case 'PROCESSING':
-                    return 'Đang chế biến';
-                case 'SHIPPED':
-                case 'DELIVERED':
-                case 'COMPLETED':
-                    return 'Đang phục vụ';
-                default:
-                    return 'Đang phục vụ';
-            }
-        }
-
         return 'Đang phục vụ';
     };
 

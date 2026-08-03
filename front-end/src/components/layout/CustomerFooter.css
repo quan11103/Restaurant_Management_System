@@ -139,7 +139,7 @@
     color: #ffffff;
 }
 
-.payment-methods {
+.footer-payment-methods {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;

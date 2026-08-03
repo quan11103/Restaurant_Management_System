@@ -152,12 +152,13 @@ const StaffManagementView: React.FC = () => {
         }
 
         const payload: any = {
-            username: formData.username,
-            fullName: formData.fullName,
-            email: formData.email,
-            phone: formData.phone,
+            username: formData.username.trim(),
+            fullName: formData.fullName.trim(),
+            email: formData.email.trim() || undefined,
+            phone: formData.phone.trim() || undefined,
             role: formData.role,
         };
+
 
         // Chỉ gửi password nếu có nhập (dùng cho cả tạo mới và cập nhật password)
         if (formData.password) {

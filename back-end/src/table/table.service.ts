@@ -8,7 +8,7 @@ import { TableQueryDto } from './dto/table-query.dto';
 export class TableService {
   constructor(private prisma: PrismaService) { }
 
-  // 1. Tạo bàn mới
+  // Tạo bàn mới
   async create(createTableDto: CreateTableDto) {
     const RESTAURANT_ID = 1;
     const { name } = createTableDto;
@@ -33,17 +33,15 @@ export class TableService {
     }
   }
 
-  // 2. Lấy danh sách bàn (Hỗ trợ Tìm kiếm, Lọc, Sắp xếp, Phân trang)
+  // Lấy danh sách bàn (Hỗ trợ Tìm kiếm, Lọc, Sắp xếp, Phân trang)
   async findAll(query: TableQueryDto) {
     const RESTAURANT_ID = 1;
 
-    // Không cần set default thủ công nữa vì DTO đã lo
     const { q, isOccupied, minCapacity, maxCapacity, sortBy, page = 1, limit = 12 } = query;
     const skip = (page - 1) * limit;
 
     const where: any = { restaurantId: RESTAURANT_ID };
 
-    // So sánh trực tiếp boolean vì DTO đã parse 'true' -> true
     if (isOccupied === true || isOccupied === false) {
       where.isOccupied = isOccupied;
     }
@@ -70,7 +68,7 @@ export class TableService {
         where,
         orderBy,
         skip,
-        take: limit, // Dùng thẳng limit, không cần ép kiểu
+        take: limit,
         include: {
           orderTables: {
             where: { isPaid: false },
@@ -96,7 +94,7 @@ export class TableService {
     };
   }
 
-  // 3. Tìm bàn theo ID
+  // Tìm bàn theo ID
   async findOne(id: number | string) {
     const numericId = Number(id);
     if (isNaN(numericId)) {
@@ -114,7 +112,7 @@ export class TableService {
     return table;
   }
 
-  // 4. Cập nhật thông tin bàn
+  // Cập nhật thông tin bàn
   async update(id: number | string, updateTableDto: UpdateTableDto) {
     const numericId = Number(id);
     await this.findOne(numericId);
@@ -146,7 +144,7 @@ export class TableService {
     }
   }
 
-  // 5. Xóa bàn ăn
+  // Xóa bàn ăn
   async remove(id: number | string) {
     const numericId = Number(id);
     await this.findOne(numericId);
@@ -167,7 +165,7 @@ export class TableService {
     }
   }
 
-  // 6. Lấy danh sách bàn theo trạng thái (Phục vụ đặt bàn/gọi món)
+  // Lấy danh sách bàn theo trạng thái (Phục vụ đặt bàn/gọi món)
   async getTableByStatus(isOccupied: boolean | string) {
     const isOccupiedBool = String(isOccupied) === 'true';
     return this.prisma.table.findMany({
@@ -179,7 +177,7 @@ export class TableService {
     });
   }
 
-  // 7. Cập nhật trạng thái bàn nhanh
+  // Cập nhật trạng thái bàn nhanh
   async updateStatus(id: number | string, isOccupied: boolean | string) {
     const numericId = Number(id);
     await this.findOne(numericId);
@@ -196,11 +194,10 @@ export class TableService {
     }
   }
 
-  // 8. Thống kê số lượng bàn theo trạng thái (Dùng cho Tabs giao diện)
+  // Thống kê số lượng bàn theo trạng thái
   async getSummary() {
-    const RESTAURANT_ID = 1; // Khuyến nghị: Kéo từ req.user
+    const RESTAURANT_ID = 1;
 
-    // Sử dụng Promise.all để chạy 3 câu query song song, tối ưu hiệu suất
     const [total, available, occupied] = await Promise.all([
       this.prisma.table.count({
         where: { restaurantId: RESTAURANT_ID }

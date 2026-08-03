@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, BadRequestException, NotFound
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ClientCheckoutDto } from './dto/client-checkout.dto';
+import { StaffCheckoutDto } from './dto/staff-checkout.dto';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
 import { InteractionService } from '../interaction/interaction.service';
 
@@ -274,6 +275,209 @@ export class OrderService {
     });
   }
 
+  // Nhân viên thu ngân thanh toán
+  async staffCheckout(cashierId: number, dto: StaffCheckoutDto) {
+    const { orderId, items, clientId, paymentMethod, promoCode } = dto;
+
+    if (!orderId && (!items || items.length === 0)) {
+      throw new BadRequestException('Vui lòng cung cấp ID đơn hàng (orderId) hoặc danh sách món ăn (items)!');
+    }
+
+    // Kiểm tra phương thức thanh toán có phải tiền mặt không
+    const isCash = paymentMethod === 'CASH';
+
+    let isExistingOrder = false;
+    let subTotal = 0;
+    let totalQuantity = 0;
+    let orderItemsData = [];
+
+    if (orderId) {
+      // LUỒNG 1: Thanh toán đơn đã có (Dine-in / Ăn tại bàn)
+      isExistingOrder = true;
+
+      const existingOrder = await this.prisma.order.findUnique({
+        where: { id: orderId },
+        include: { bill: true, orderedDishes: true },
+      });
+
+      if (!existingOrder) {
+        throw new NotFoundException('Không tìm thấy đơn hàng trên hệ thống!');
+      }
+
+      if (existingOrder.bill?.paymentStatus === 'PAID') {
+        throw new BadRequestException('Đơn hàng này đã được thanh toán trước đó!');
+      }
+
+      existingOrder.orderedDishes.forEach((item) => {
+        subTotal += item.price * item.quantity;
+      });
+
+    } else if (items && items.length > 0) {
+      // LUỒNG 2: Thu ngân lên đơn trực tiếp tại quầy POS
+      const dishIds = items.map((item) => item.dishId);
+      const dishes = await this.prisma.dish.findMany({
+        where: { id: { in: dishIds } },
+      });
+
+      if (dishes.length !== dishIds.length) {
+        throw new BadRequestException('Một hoặc nhiều món ăn không tồn tại trong hệ thống!');
+      }
+
+      const dishMap = new Map(dishes.map((d) => [d.id, d]));
+
+      items.forEach((item) => {
+        const dish = dishMap.get(item.dishId);
+        subTotal += dish.price * item.quantity;
+        totalQuantity += item.quantity;
+
+        orderItemsData.push({
+          dishId: item.dishId,
+          price: dish.price,
+          quantity: item.quantity,
+        });
+      });
+    }
+
+    // Xử lý mã giảm giá
+    let discount = 0.0;
+    let promotionId: number | null = null;
+
+    if (promoCode) {
+      const promotion = await this.prisma.promotion.findUnique({
+        where: { code: promoCode },
+      });
+
+      if (!promotion) {
+        throw new NotFoundException('Mã giảm giá không tồn tại trên hệ thống!');
+      }
+
+      const now = new Date();
+      if (now < promotion.startDate || now > promotion.endDate) {
+        throw new BadRequestException('Mã giảm giá đã hết hạn hoặc chưa đến thời gian sử dụng!');
+      }
+
+      if (promotion.minOrderValue && subTotal < promotion.minOrderValue) {
+        throw new BadRequestException(
+          `Đơn hàng chưa đạt giá trị tối thiểu ${promotion.minOrderValue.toLocaleString('vi-VN')}đ để áp dụng mã!`
+        );
+      }
+
+      if (promotion.usageLimit && promotion.usedCount >= promotion.usageLimit) {
+        throw new BadRequestException('Mã giảm giá này đã hết lượt sử dụng!');
+      }
+
+      if (promotion.type === 'PERCENTAGE') {
+        discount = (subTotal * promotion.value) / 100;
+        if (promotion.maxDiscount && discount > promotion.maxDiscount) {
+          discount = promotion.maxDiscount;
+        }
+      } else if (promotion.type === 'FIXED_AMOUNT') {
+        discount = promotion.value;
+      }
+
+      if (discount > subTotal) {
+        discount = subTotal;
+      }
+
+      promotionId = promotion.id;
+    }
+
+    const finalTotal = subTotal - discount;
+
+    // Transaction cập nhật hoặc tạo mới đơn hàng & hóa đơn
+    return await this.prisma.$transaction(async (tx) => {
+      let resultOrderId: number;
+
+      // Trạng thái thanh toán & đơn hàng phụ thuộc vào việc có phải CASH hay không
+      const paymentStatus = isCash ? 'PAID' : 'UNPAID';
+      const orderStatus = isCash ? 'COMPLETED' : 'PENDING';
+
+      if (isExistingOrder) {
+        await tx.order.update({
+          where: { id: orderId },
+          data: {
+            total: finalTotal,
+            status: orderStatus,
+          },
+        });
+
+        await tx.bill.upsert({
+          where: { orderId: orderId },
+          create: {
+            cashierId: cashierId,
+            orderId: orderId,
+            paymentMethod: paymentMethod,
+            discount: discount,
+            promotionId: promotionId,
+            paymentStatus: paymentStatus,
+          },
+          update: {
+            paymentMethod: paymentMethod,
+            discount: discount,
+            promotionId: promotionId,
+            paymentStatus: paymentStatus,
+          },
+        });
+
+        // =========================================================================
+        // CHỈ CẬP NHẬT ORDER_TABLE VÀ GIẢI PHÓNG BÀN NẾU ĐÃ THANH TOÁN TIỀN MẶT
+        // (Nếu Chuyển khoản: Bàn và OrderTable giữ nguyên cho tới khi Webhook/Callback xác nhận)
+        // =========================================================================
+        if (isCash) {
+          await this.releaseTableAndCompleteOrder(tx, orderId);
+        }
+
+        resultOrderId = orderId;
+
+      } else {
+        const newOrder = await tx.order.create({
+          data: {
+            clientId: clientId || null,
+            totalQuantity: totalQuantity,
+            total: finalTotal,
+            orderType: 'DINE_IN',
+            status: orderStatus,
+            orderedDishes: {
+              create: orderItemsData,
+            },
+          },
+        });
+
+        await tx.bill.create({
+          data: {
+            orderId: newOrder.id,
+            paymentMethod: paymentMethod,
+            discount: discount,
+            promotionId: promotionId,
+            paymentStatus: paymentStatus,
+          },
+        });
+
+        resultOrderId = newOrder.id;
+      }
+
+      // Tăng số lượt dùng mã giảm giá nếu có áp dụng thành công (Chỉ tăng khi là cash hoặc ghi nhận mã)
+      if (promotionId && isCash) {
+        await tx.promotion.update({
+          where: { id: promotionId },
+          data: {
+            usedCount: { increment: 1 },
+          },
+        });
+      }
+
+      return {
+        orderId: resultOrderId,
+        totalPay: finalTotal,
+        paymentMethod: paymentMethod,
+        isPaid: isCash,
+        message: isCash
+          ? 'Thanh toán thành công!'
+          : 'Đã tạo thông tin thanh toán. Vui lòng chờ khách chuyển khoản!',
+      };
+    });
+  }
+
   // Lấy danh sách toàn bộ đơn hàng trên hệ thống (Có phân trang, lọc, tìm kiếm)
   async getAllOrders(query: {
     status?: string;
@@ -379,34 +583,80 @@ export class OrderService {
   async updateBillForOrder(
     orderId: string | number,
     data: {
-      paymentMethod?: string,
-      paymentStatus: PaymentStatus,
-      paymentTransactionNo?: string | null,
-      paymentBankCode?: string | null
-    }
+      paymentMethod?: string;
+      paymentStatus: PaymentStatus;
+      paymentTransactionNo?: string | null;
+      paymentBankCode?: string | null;
+    },
   ) {
     const numericOrderId = Number(orderId);
 
-    // Sử dụng upsert để xử lí mọi tình huống
-    return await this.prisma.bill.upsert({
-      where: {
-        orderId: numericOrderId
-      },
-      // Nếu tồn tại Bill: Chỉ cập nhật các trường liên quan đến thanh toán
-      update: {
-        paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus,
-        paymentTransactionNo: data.paymentTransactionNo ?? null,
-        paymentBankCode: data.paymentBankCode ?? null,
-      },
-      // Nếu chưa có Bill: Tạo mới luôn hóa đơn này
-      create: {
-        orderId: numericOrderId,
-        paymentStatus: data.paymentStatus,
-        paymentTransactionNo: data.paymentTransactionNo ?? null,
-        paymentBankCode: data.paymentBankCode ?? null,
-        paymentMethod: 'TRANSFER',
-      },
+    return await this.prisma.$transaction(async (tx) => {
+      const bill = await tx.bill.upsert({
+        where: {
+          orderId: numericOrderId,
+        },
+        update: {
+          paymentMethod: data.paymentMethod,
+          paymentStatus: data.paymentStatus,
+          paymentTransactionNo: data.paymentTransactionNo ?? null,
+          paymentBankCode: data.paymentBankCode ?? null,
+        },
+        create: {
+          orderId: numericOrderId,
+          paymentMethod: data.paymentMethod ?? 'TRANSFER',
+          paymentStatus: data.paymentStatus,
+          paymentTransactionNo: data.paymentTransactionNo ?? null,
+          paymentBankCode: data.paymentBankCode ?? null,
+        },
+      });
+
+      // Tìm thông tin Order để kiểm tra orderType
+      const order = await tx.order.findUnique({
+        where: { id: numericOrderId },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Không tìm thấy đơn hàng #${numericOrderId}`);
+      }
+
+      // Phân luồng xử lý theo trạng thái thanh toán
+      if (data.paymentStatus === 'PAID') {
+        if (order.orderType === 'DINE_IN') {
+          // LUỒNG 1: Đơn ăn tại bàn (DINE_IN)
+          // -> Đổi trạng thái Order thành COMPLETED & Giải phóng bàn
+          await tx.order.update({
+            where: { id: numericOrderId },
+            data: { status: 'COMPLETED' },
+          });
+
+          // Gọi hàm giải phóng bàn
+          await this.releaseTableAndCompleteOrder(tx, numericOrderId);
+        } else {
+          // LUỒNG 2: Đơn giao hàng/mang về (DELIVERY / TAKE_AWAY)
+          // -> Đổi trạng thái Order thành PROCESSING (Đang chuẩn bị món)
+          await tx.order.update({
+            where: { id: numericOrderId },
+            data: { status: 'PROCESSING' },
+          });
+        }
+
+        // Tăng số lượt sử dụng mã giảm giá nếu đơn này có áp dụng voucher
+        if (bill.promotionId) {
+          await tx.promotion.update({
+            where: { id: bill.promotionId },
+            data: { usedCount: { increment: 1 } },
+          });
+        }
+      } else if (data.paymentStatus === 'FAILED') {
+        // Trường hợp VNPAY báo thanh toán thất bại
+        await tx.order.update({
+          where: { id: numericOrderId },
+          data: { status: 'CANCELLED' },
+        });
+      }
+
+      return bill;
     });
   }
 
@@ -550,5 +800,38 @@ export class OrderService {
       message: 'Hủy đơn hàng thành công!',
       orderId: order.id,
     };
+  }
+
+  // Hàm phụ trợ: Cập nhật OrderTable và Giải phóng Bàn
+  private async releaseTableAndCompleteOrder(tx: any, orderId: number) {
+    const orderTables = await tx.orderTable.findMany({
+      where: { orderId: orderId },
+    });
+
+    if (orderTables.length > 0) {
+      // 1. Đánh dấu tất cả OrderTable liên quan đến Order này là đã thanh toán
+      await tx.orderTable.updateMany({
+        where: { orderId: orderId },
+        data: { isPaid: true },
+      });
+
+      // 2. Với mỗi bàn liên kết, kiểm tra còn đơn nào chưa thanh toán không
+      for (const ot of orderTables) {
+        const remainingUnpaidOrder = await tx.orderTable.findFirst({
+          where: {
+            tableId: ot.tableId,
+            isPaid: false,
+          },
+        });
+
+        // Nếu bàn không còn đơn active nào khác -> chuyển trạng thái bàn về trống
+        if (!remainingUnpaidOrder) {
+          await tx.table.update({
+            where: { id: ot.tableId },
+            data: { isOccupied: false },
+          });
+        }
+      }
+    }
   }
 }

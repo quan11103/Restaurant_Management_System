@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../../api/axios';
 import { type TableModel } from './TableItem';
 import TableGrid from './TableGrid';
@@ -8,22 +8,18 @@ import './TableMapView.css';
 type StatusFilter = 'ALL' | 'AVAILABLE' | 'OCCUPIED';
 
 const TableMapView: React.FC = () => {
-    // 1. Khai báo các State
     const [tables, setTables] = useState<TableModel[]>([]);
     const [summary, setSummary] = useState({ total: 0, available: 0, occupied: 0 });
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
 
-    // 2. Khai báo navigate
     const navigate = useNavigate();
 
-    // 3. Tích hợp API Fetch Data
     useEffect(() => {
         const fetchTableData = async () => {
             setIsLoading(true);
             try {
-                // Sắp xếp bàn tăng dần (sortBy=name_asc)
                 const response = await axiosClient.get('/tables?limit=100&sortBy=name_asc');
 
                 const tableData = response.data.data;
@@ -45,10 +41,17 @@ const TableMapView: React.FC = () => {
         fetchTableData();
     }, []);
 
-    // 4. Xử lý click bàn & truyền state sang trang /staff-order
     const handleTableClick = (table: TableModel) => {
+        // Lấy vai trò người dùng từ localStorage
+        const userRole = localStorage.getItem('user_role');
+
         if (!table.isOccupied) {
-            // Bàn trống -> Chuyển sang order mới cho bàn này
+            // Nếu vai trò là CASHIER thì không cho phép mở bàn trống để order
+            if (userRole === 'CASHIER') {
+                return;
+            }
+
+            // Bàn trống -> Chuyển sang màn hình Đặt món (/staff-order)
             console.log(`Mở menu gọi món cho ${table.name}`);
             navigate('/staff-order', {
                 state: {
@@ -57,11 +60,11 @@ const TableMapView: React.FC = () => {
                 }
             });
         } else {
-            // Bàn đang phục vụ -> Chuyển sang order hiện tại
+            // Bàn đang phục vụ (đã có Order) -> Chuyển sang màn hình Thanh toán (/staff-checkout)
             const activeOrder = table.orderTables?.find(ot => ot.isPaid === false);
-            console.log(`Mở chi tiết Order #${activeOrder?.orderId} của ${table.name}`);
+            console.log(`Mở trang thanh toán Order #${activeOrder?.orderId} của ${table.name}`);
 
-            navigate('/staff-order', {
+            navigate('/staff-checkout', {
                 state: {
                     tableId: table.id,
                     tableName: table.name,
