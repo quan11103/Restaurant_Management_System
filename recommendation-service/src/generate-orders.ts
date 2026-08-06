@@ -18,15 +18,15 @@ let orderId = 1;
 for (let clientId = 1; clientId <= CLIENT_COUNT; clientId++) {
     let orderCount: number;
 
-    if (clientId <= 600) {
-        // 60%
+    if (clientId <= 700) {
+        // 70%
         orderCount = 20;
     } else if (clientId <= 900) {
-        // 30%
-        orderCount = 40;
+        // 20%
+        orderCount = 80;
     } else {
         // 10%
-        orderCount = 60;
+        orderCount = 200;
     }
 
     for (let i = 0; i < orderCount; i++) {

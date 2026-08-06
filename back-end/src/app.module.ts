@@ -20,9 +20,10 @@ import { InteractionModule } from './interaction/interaction.module';
 import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
 import { StatisticModule } from './statistic/statistic.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule, BillModule, InteractionModule, ReviewModule, UserModule, StatisticModule],
+    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, TableModule, DishModule, IngredientModule, SupplierModule, PromotionModule, OrderModule, CheckoutModule, IngredientSupplierModule, GoodsBillModule, DishImageModule, CartItemModule, BillModule, InteractionModule, ReviewModule, UserModule, StatisticModule, NotificationModule],
     controllers: [],
     providers: [PrismaService, VnpayService],
 })

@@ -16,12 +16,14 @@ interface ReviewSectionProps {
     dishId: number;
     clientId?: number;
     className?: string;
+    onReviewsChange?: (reviews: ReviewData[]) => void;
 }
 
 const ReviewSection: React.FC<ReviewSectionProps> = ({
     dishId,
     clientId,
     className = '',
+    onReviewsChange,
 }) => {
     const [reviews, setReviews] = useState<ReviewData[]>([]);
     const [totalReviews, setTotalReviews] = useState<number>(0);
@@ -58,6 +60,9 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
 
             setReviews(formattedReviews);
             setTotalReviews(formattedReviews.length);
+            if (onReviewsChange) {
+                onReviewsChange(formattedReviews);
+            }
         } catch (err) {
             console.error('Lỗi khi tải danh sách đánh giá:', err);
         } finally {

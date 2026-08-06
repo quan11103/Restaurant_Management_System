@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Printer } from 'lucide-react';
 import axiosClient from '../../../api/axios';
+import { useAlert } from '../../../components/Alert';
 import PromoCodeInput from '../../online order/cart/PromoCodeInput';
 import PaymentMethodSelector, { type PaymentMethod } from './PaymentMethodSelector';
 import BillSummary, { type BillModel } from './BillSummary';
@@ -41,11 +42,12 @@ interface LocationState {
 }
 
 const CheckOutView: React.FC = () => {
+    const { showAlert } = useAlert();
     const location = useLocation();
     const navigate = useNavigate();
     const state = (location.state || {}) as LocationState;
 
-    const { tableId, tableName, orderId, promoCode, discountAmount: initialDiscount } = state;
+    const { tableName, orderId, promoCode, discountAmount: initialDiscount } = state;
 
     const userRole = localStorage.getItem('user_role');
     const isWaiter = userRole === 'WAITER';
@@ -82,7 +84,9 @@ const CheckOutView: React.FC = () => {
                 setOrderData(response.data);
             } catch (err: any) {
                 console.error('Lỗi khi tải chi tiết đơn hàng:', err);
-                setErrorMsg('Không thể tải thông tin đơn hàng. Vui lòng thử lại!');
+                const msg = 'Không thể tải thông tin đơn hàng. Vui lòng thử lại!';
+                setErrorMsg(msg);
+                showAlert('error', msg, 'Lỗi hệ thống');
             } finally {
                 setIsLoading(false);
             }
@@ -97,6 +101,7 @@ const CheckOutView: React.FC = () => {
     const handleApplyPromo = async (code: string) => {
         if (!code.trim()) {
             setPromoError('Vui lòng nhập mã khuyến mãi.');
+            showAlert('warning', 'Vui lòng nhập mã khuyến mãi!', 'Thông báo');
             return;
         }
 
@@ -110,7 +115,9 @@ const CheckOutView: React.FC = () => {
 
             setDiscountAmount(data.discountAmount);
             setAppliedPromoCode(data.code);
-            setPromoSuccess(`Áp dụng thành công! Giảm ${data.discountAmount.toLocaleString('vi-VN')} đ`);
+            const successMsg = `Áp dụng thành công! Giảm ${data.discountAmount.toLocaleString('vi-VN')} đ`;
+            setPromoSuccess(successMsg);
+            showAlert('success', successMsg, 'Thành công');
 
         } catch (err: any) {
             console.error('Lỗi khi áp dụng mã:', err);
@@ -118,6 +125,7 @@ const CheckOutView: React.FC = () => {
             setPromoError(errorMessage);
             setDiscountAmount(0);
             setAppliedPromoCode(null);
+            showAlert('error', errorMessage, 'Không thể áp dụng mã');
         } finally {
             setIsCheckingPromo(false);
         }
@@ -161,7 +169,10 @@ const CheckOutView: React.FC = () => {
     };
 
     const handleCheckout = async () => {
-        if (!orderId || !orderData) return;
+        if (!orderId || !orderData) {
+            showAlert('error', 'Không tìm thấy thông tin đơn hàng!', 'Lỗi dữ liệu');
+            return;
+        }
 
         setIsSubmitting(true);
         try {
@@ -183,14 +194,18 @@ const CheckOutView: React.FC = () => {
                     return;
                 } else {
                     console.error('Không tìm thấy paymentUrl trong response:', result);
-                    alert('Hệ thống không nhận được liên kết thanh toán VNPAY. Vui lòng kiểm tra lại API Backend!');
+                    showAlert('error', 'Hệ thống không nhận được liên kết thanh toán VNPAY. Vui lòng kiểm tra lại API Backend!', 'Lỗi thanh toán');
                     setIsSubmitting(false);
                     return;
                 }
             }
+
+            // Thanh toán tiền mặt thành công
+            showAlert('success', 'Thanh toán đơn hàng thành công!', 'Thành công');
+            navigate(-1);
         } catch (err: any) {
             console.error('Lỗi khi thanh toán:', err);
-            alert(err.response?.data?.message || 'Có lỗi xảy ra khi hoàn tất thanh toán!');
+            showAlert('error', err.response?.data?.message || 'Có lỗi xảy ra khi thanh toán!', 'Lỗi hệ thống');
             setIsSubmitting(false);
         }
     };

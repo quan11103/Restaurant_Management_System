@@ -6,18 +6,9 @@ import { ShoppingCart, Loader2 } from 'lucide-react';
 import QuantitySelector from '../../../components/QuantitySelector';
 import ProductImageGallery from './ProductImageGallery';
 import ProductInfo from './ProductInfo';
-import ReviewSection from './ReviewSection';
+import ReviewSection, { type ReviewData } from './ReviewSection';
 import ProductSection from '../../../components/product/ProductSection';
 import './ProductDetailView.css';
-
-// Định nghĩa interface cho Review để type-checking chuẩn xác
-interface Review {
-    id: string;
-    user: string;
-    rating: number;
-    date: string;
-    comment: string;
-}
 
 interface DishDetail {
     id: number;
@@ -44,8 +35,8 @@ const ProductDetailView: React.FC = () => {
     const [product, setProduct] = useState<DishDetail | null>(null);
     const [recommendedDishes, setRecommendedDishes] = useState<MappedProduct[]>([]);
 
-    // Thêm state lưu reviews thật từ API
-    const [reviews, setReviews] = useState<Review[]>([]);
+    // Thêm state lưu reviews từ ReviewSection
+    const [reviews, setReviews] = useState<ReviewData[]>([]);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -140,9 +131,10 @@ const ProductDetailView: React.FC = () => {
             .map(img => img.imageUrl)
         : ['https://via.placeholder.com/600x400?text=No+Image'];
 
-    const displayRating = product.rating || 4.8;
-    // Dùng trực tiếp độ dài mảng reviews thực tế
     const displayReviewCount = reviews.length > 0 ? reviews.length : (product.reviewCount || 0);
+    const displayRating = reviews.length > 0
+        ? Number((reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1))
+        : (product.rating || 4.8);
 
     const handleAddToCart = async () => {
         setIsSubmitting(true);
@@ -208,9 +200,10 @@ const ProductDetailView: React.FC = () => {
                 </section>
             </main>
 
-            {/* Truyền trực tiếp state reviews thật vào component */}
+            {/* Truyền callback nhận danh sách reviews từ ReviewSection */}
             <ReviewSection
                 dishId={product.id}
+                onReviewsChange={setReviews}
             />
 
             {recommendedDishes.length > 0 && (

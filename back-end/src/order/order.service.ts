@@ -5,12 +5,14 @@ import { ClientCheckoutDto } from './dto/client-checkout.dto';
 import { StaffCheckoutDto } from './dto/staff-checkout.dto';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
 import { InteractionService } from '../interaction/interaction.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly interactionService: InteractionService,
+    private readonly notificationService: NotificationService,
   ) { }
 
   // Đặt món tại quán
@@ -117,6 +119,8 @@ export class OrderService {
         await tx.orderedDish.createMany({
           data: orderedDishesData.map(d => ({ ...d, orderId: targetOrderId })),
         });
+
+        await this.notificationService.notifyDbChange({});
 
         return {
           status: 'success',
@@ -465,6 +469,8 @@ export class OrderService {
           },
         });
       }
+
+      await this.notificationService.notifyDbChange({});
 
       return {
         orderId: resultOrderId,

@@ -1,9 +1,9 @@
 {
     "model": "Implicit ALS",
     "implicit_version": "0.7.3",
-    "factors": 64,
+    "factors": 128,
     "iterations": 30,
     "regularization": 0.05,
-    "alpha": 40,
+    "alpha": 80,
     "top_k": 10
 }

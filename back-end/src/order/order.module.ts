@@ -4,9 +4,10 @@ import { OrderController } from './order.controller';
 import { VnpayService } from 'src/vnpay/vnpay.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { InteractionModule } from 'src/interaction/interaction.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
-  imports: [PrismaModule, InteractionModule],
+  imports: [PrismaModule, InteractionModule, NotificationModule],
   controllers: [OrderController],
   providers: [OrderService, VnpayService],
 })

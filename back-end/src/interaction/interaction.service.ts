@@ -123,14 +123,14 @@ export class InteractionService {
     return interactions
       .map((item) => {
         const reviewBonus =
-          item.reviewScore != null ? (item.reviewScore - 3) * 50 : 0;
+          item.reviewScore != null ? (item.reviewScore - 3) * 5 : 0;
 
         return {
           dishId: item.dishId,
           interaction:
-            item.viewCount * 20 +
-            item.cartQuantity * 30 +
-            item.orderedQuantity * 40 +
+            item.viewCount +
+            item.cartQuantity * 2 +
+            item.orderedQuantity * 3 +
             reviewBonus,
         };
       })

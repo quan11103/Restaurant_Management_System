@@ -38,6 +38,7 @@ const SearchView: React.FC = () => {
     const [typeFilter, setTypeFilter] = useState<string>('');
     const [priceFilter, setPriceFilter] = useState<{ minPrice?: string; maxPrice?: string }>({});
     const [minRatingFilter, setMinRatingFilter] = useState<string>('');
+    const [filterKey, setFilterKey] = useState<number>(0);
 
     // Reset về trang 1 khi thay đổi bất kỳ bộ lọc nào
     useEffect(() => {
@@ -145,6 +146,7 @@ const SearchView: React.FC = () => {
         setTypeFilter('');
         setPriceFilter({});
         setMinRatingFilter('');
+        setFilterKey((prev) => prev + 1);
     };
 
     // Thay đổi kiểu sắp xếp
@@ -178,6 +180,7 @@ const SearchView: React.FC = () => {
             <div className="search-view-layout">
                 {/* Bộ lọc bên trái */}
                 <FilterSidebar
+                    key={filterKey}
                     onApplyFilter={handleApplyFilter}
                     onClearFilter={handleClearFilter}
                 />

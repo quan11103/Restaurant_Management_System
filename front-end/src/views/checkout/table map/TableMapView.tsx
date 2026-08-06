@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../../api/axios';
 import { type TableModel } from './TableItem';
@@ -16,43 +16,62 @@ const TableMapView: React.FC = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchTableData = async () => {
-            setIsLoading(true);
-            try {
-                const response = await axiosClient.get('/tables?limit=100&sortBy=name_asc');
+    // 1. Tách hàm fetchTableData ra ngoài để tái sử dụng
+    // Dùng useCallback để hàm không bị tạo lại sau mỗi lần re-render
+    const fetchTableData = useCallback(async (isSilent = false) => {
+        // Nếu không phải refetch ngầm (isSilent = false) thì mới hiện loading spinner
+        if (!isSilent) setIsLoading(true);
 
-                const tableData = response.data.data;
-                setTables(tableData);
+        try {
+            const response = await axiosClient.get('/tables?limit=100&sortBy=name_asc');
 
-                setSummary({
-                    total: tableData.length,
-                    available: tableData.filter((t: TableModel) => !t.isOccupied).length,
-                    occupied: tableData.filter((t: TableModel) => t.isOccupied).length,
-                });
+            const tableData = response.data.data;
+            setTables(tableData);
 
-            } catch (error) {
-                console.error("Lỗi khi fetch data bàn:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+            setSummary({
+                total: tableData.length,
+                available: tableData.filter((t: TableModel) => !t.isOccupied).length,
+                occupied: tableData.filter((t: TableModel) => t.isOccupied).length,
+            });
 
-        fetchTableData();
+        } catch (error) {
+            console.error("Lỗi khi fetch data bàn:", error);
+        } finally {
+            if (!isSilent) setIsLoading(false);
+        }
     }, []);
 
+    // 2. Fetch dữ liệu lần đầu khi component mount
+    useEffect(() => {
+        fetchTableData();
+    }, [fetchTableData]);
+
+    // 3. Lắng nghe SSE và tự động refetch ngầm (isSilent = true) khi có event mới
+    useEffect(() => {
+        const eventSource = new EventSource('http://localhost:3000/api/stream');
+
+        eventSource.onmessage = () => {
+            // const payload = JSON.parse(event.data);
+
+            // Bạn có thể lọc event (ví dụ chỉ refetch khi đúng loại event liên quan đến Table/Order)
+            // if (payload.type === 'TABLE_UPDATED' || payload.type === 'ORDER_CREATED') {
+            fetchTableData(true); // true = refetch ngầm, không làm nháy màn hình
+            // }
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }, [fetchTableData]);
+
     const handleTableClick = (table: TableModel) => {
-        // Lấy vai trò người dùng từ localStorage
         const userRole = localStorage.getItem('user_role');
 
         if (!table.isOccupied) {
-            // Nếu vai trò là CASHIER thì không cho phép mở bàn trống để order
             if (userRole === 'CASHIER') {
                 return;
             }
 
-            // Bàn trống -> Chuyển sang màn hình Đặt món (/staff-order)
-            console.log(`Mở menu gọi món cho ${table.name}`);
             navigate('/staff-order', {
                 state: {
                     tableId: table.id,
@@ -60,9 +79,7 @@ const TableMapView: React.FC = () => {
                 }
             });
         } else {
-            // Bàn đang phục vụ (đã có Order) -> Chuyển sang màn hình Thanh toán (/staff-checkout)
             const activeOrder = table.orderTables?.find(ot => ot.isPaid === false);
-            console.log(`Mở trang thanh toán Order #${activeOrder?.orderId} của ${table.name}`);
 
             navigate('/staff-checkout', {
                 state: {
