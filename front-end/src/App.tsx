@@ -30,6 +30,7 @@ import TableManagementView from './views/admin/tables/TableManagementView';
 import MenuOrderingView from './views/order/menu ordering/MenuOrderingView';
 import TableMapView from './views/checkout/table map/TableMapView';
 import CheckOutView from './views/checkout/checkout/CheckoutView';
+import CategoryView from './views/online order/category/CategoryView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -110,6 +111,7 @@ function App() {
             <Route path="/order-history" element={<OrderHistoryView />} />
             <Route path="/order-detail/:id" element={<OrderDetailView />} />
             <Route path="/search" element={<SearchView />} />
+            <Route path="/category" element={<CategoryView />} />
             <Route path="/table-map" element={<TableMapView />} />
             <Route path="/staff-order" element={<MenuOrderingView />} />
             <Route path="/staff-checkout" element={<CheckOutView />} />

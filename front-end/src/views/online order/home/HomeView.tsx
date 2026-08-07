@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../../api/axios'
 import PromoBannerSlider from './PromoBannerSlider';
 import CategoryGrid from './CategoryGrid';
@@ -11,12 +12,12 @@ const MOCK_BANNERS = [
 ];
 
 const MOCK_CATEGORIES = [
-    { id: 'c1', name: 'Món chính', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJea-m_K3FixBJ-TbZxkJgfQ2EgqYUNgWy2LmGgOSGITzpuhUUYCVZ4vQ&s=10', link: '/menu?category=fastfood' },
-    { id: 'c2', name: 'Pizza', imageUrl: 'https://pizzahut.vn/_next/image?url=https%3A%2F%2Fcdn.pizzahut.vn%2Fimages%2FWeb_V3%2FProducts_MenuTool%2FPesto%20H%E1%BA%A3i%20S%E1%BA%A3n._20250317172201GL5.webp&w=1170&q=75', link: '/menu?category=milktea' },
-    { id: 'c3', name: 'Gà rán', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJSH1oVFCBjq13mIjK_Kgy0ixI7bcU-XnPXTCz2hoQFuMgYx2Kbi_K1L9-&s=10', link: '/menu?category=rice' },
-    { id: 'c4', name: 'Đồ uống', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScAOGatmvawiDeDp9vKvALwcrXHwBIj6Dhmwsz_Wg7YPeqwkhrueVFRAk&s=10', link: '/menu?category=snack' },
-    { id: 'c5', name: 'Cà phê', imageUrl: 'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2026/6/7/bi-quyet-pha-ca-phe-ngon-10-ly-nhu-scaled-1780833704154867879700.jpg', link: '/menu?category=cake' },
-    { id: 'c6', name: 'Tráng miệng', imageUrl: 'https://riversidepalace.vn/newsmultidata/1-873.jpg', link: '/menu?category=vegan' },
+    { id: 'c1', name: 'Món chính', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJea-m_K3FixBJ-TbZxkJgfQ2EgqYUNgWy2LmGgOSGITzpuhUUYCVZ4vQ&s=10' },
+    { id: 'c2', name: 'Pizza', imageUrl: 'https://pizzahut.vn/_next/image?url=https%3A%2F%2Fcdn.pizzahut.vn%2Fimages%2FWeb_V3%2FProducts_MenuTool%2FPesto%20H%E1%BA%A3i%20S%E1%BA%A3n._20250317172201GL5.webp&w=1170&q=75' },
+    { id: 'c3', name: 'Gà rán', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJSH1oVFCBjq13mIjK_Kgy0ixI7bcU-XnPXTCz2hoQFuMgYx2Kbi_K1L9-&s=10' },
+    { id: 'c4', name: 'Đồ uống', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScAOGatmvawiDeDp9vKvALwcrXHwBIj6Dhmwsz_Wg7YPeqwkhrueVFRAk&s=10' },
+    { id: 'c5', name: 'Cà phê', imageUrl: 'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2026/6/7/bi-quyet-pha-ca-phe-ngon-10-ly-nhu-scaled-1780833704154867879700.jpg' },
+    { id: 'c6', name: 'Tráng miệng', imageUrl: 'https://riversidepalace.vn/newsmultidata/1-873.jpg' },
 ];
 
 interface HomeProduct {
@@ -28,6 +29,7 @@ interface HomeProduct {
 }
 
 const HomeView: React.FC = () => {
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [bestSellers, setBestSellers] = useState<HomeProduct[]>([]);
     const [recommended, setRecommended] = useState<HomeProduct[]>([]);
@@ -97,6 +99,10 @@ const HomeView: React.FC = () => {
         fetchSpecificDishes();
     }, []);
 
+    const handleCategoryClick = (categoryName: string) => {
+        navigate(`/category?type=${encodeURIComponent(categoryName)}`);
+    };
+
     return (
         <div className="home-layout">
             <main className="home-main-content">
@@ -106,7 +112,10 @@ const HomeView: React.FC = () => {
                     </section>
 
                     <section className="home-section">
-                        <CategoryGrid categories={MOCK_CATEGORIES} isLoading={isLoading} />
+                        <CategoryGrid
+                            categories={MOCK_CATEGORIES}
+                            onCategoryClick={handleCategoryClick}
+                            isLoading={isLoading} />
                     </section>
 
                     <section className="home-section">

@@ -5,18 +5,19 @@ export interface Category {
     id: string | number;
     name: string;
     imageUrl: string;
-    link: string;
 }
 
 interface CategoryGridProps {
     categories: Category[];
     isLoading?: boolean;
+    onCategoryClick?: (categoryName: string) => void;
     title?: string;
 }
 
 const CategoryGrid: React.FC<CategoryGridProps> = ({
     categories,
     isLoading = false,
+    onCategoryClick,
     title = "Khám phá danh mục"
 }) => {
 
@@ -38,7 +39,16 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({
                 ) : (
                     /* Trạng thái hiển thị dữ liệu thật */
                     categories.map((category) => (
-                        <a href={category.link} className="category-item" key={category.id}>
+                        <a
+                            className="category-item"
+                            key={category.id}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (onCategoryClick) {
+                                    onCategoryClick(category.name);
+                                }
+                            }}
+                        >
                             <div className="category-image-wrapper">
                                 <img
                                     src={category.imageUrl}

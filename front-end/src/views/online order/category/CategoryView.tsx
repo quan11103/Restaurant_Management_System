@@ -9,7 +9,7 @@ import ProductSection from '../../../components/product/ProductSection';
 import EmptyState from '../../../components/EmptyState';
 import Pagination from '../../../components/Pagination';
 import { type Product } from '../../../types';
-import './SearchView.css';
+import './CategoryView.css';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -20,9 +20,9 @@ const SORT_OPTIONS = [
     { value: 'rating', label: 'Đánh giá cao' },
 ];
 
-const SearchView: React.FC = () => {
+const CategoryView: React.FC = () => {
     const [searchParams] = useSearchParams();
-    const queryFromUrl = searchParams.get('q') || '';
+    const queryFromUrl = searchParams.get('type') || '';
 
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -51,11 +51,10 @@ const SearchView: React.FC = () => {
             try {
                 const response = await axiosClient.get('/dishes', {
                     params: {
-                        q: queryFromUrl || undefined,
                         page: currentPage,
                         limit: ITEMS_PER_PAGE,
                         sortBy: sortBy,
-                        type: typeFilter || undefined,
+                        type: queryFromUrl || undefined,
                         minPrice: priceFilter.minPrice || undefined,
                         maxPrice: priceFilter.maxPrice || undefined,
                         minRating: minRatingFilter || undefined,
@@ -155,27 +154,28 @@ const SearchView: React.FC = () => {
     };
 
     return (
-        <div className="search-view-container">
+        <div className="category-view-container">
             <PageHeader
-                className="search-page-header"
+                className="category-page-header"
                 title={
                     queryFromUrl
-                        ? `Kết quả tìm kiếm cho "${queryFromUrl}" (${totalItems})`
+                        ? `Danh mục "${queryFromUrl}" (${totalItems})`
                         : `Tất cả sản phẩm (${totalItems})`
                 }
             />
 
-            <div className="search-view-layout">
+            <div className="category-view-layout">
                 {/* Bộ lọc bên trái */}
                 <FilterSidebar
                     key={filterKey}
                     onApplyFilter={handleApplyFilter}
                     onClearFilter={handleClearFilter}
+                    hideCategory
                 />
 
                 {/* Nội dung chính bên phải */}
-                <main className="search-results-main">
-                    <div className="search-toolbar">
+                <main className="category-results-main">
+                    <div className="category-toolbar">
                         <span className="results-count-info">
                             Hiển thị kết quả trang {currentPage} / {totalPages}
                         </span>
@@ -191,13 +191,13 @@ const SearchView: React.FC = () => {
                     </div>
 
                     {error && (
-                        <div className="search-error-message" style={{ color: 'red', padding: '1rem', textAlign: 'center' }}>
+                        <div className="category-error-message" style={{ color: 'red', padding: '1rem', textAlign: 'center' }}>
                             {error}
                         </div>
                     )}
 
                     {products.length === 0 && !isLoading && !error ? (
-                        <div className="search-empty-container">
+                        <div className="category-empty-container">
                             <EmptyState
                                 icon={
                                     <svg
@@ -227,7 +227,7 @@ const SearchView: React.FC = () => {
                         </div>
                     ) : (
                         <ProductSection
-                            className="search-product-section"
+                            className="category-product-section"
                             products={products}
                             isLoading={isLoading}
                         />
@@ -248,4 +248,4 @@ const SearchView: React.FC = () => {
     );
 };
 
-export default SearchView;
+export default CategoryView;

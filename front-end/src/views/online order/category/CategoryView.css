@@ -1,11 +1,11 @@
-.search-view-container {
+.category-view-container {
     max-width: 1280px;
     margin: 0 auto;
     padding: 32px 16px;
 }
 
 /* Bố cục layout 2 cột */
-.search-view-layout {
+.category-view-layout {
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -13,17 +13,17 @@
 }
 
 @media (min-width: 768px) {
-    .search-view-layout {
+    .category-view-layout {
         flex-direction: row;
     }
 }
 
 /* Cột phải: Kết quả tìm kiếm */
-.search-results-main {
+.category-results-main {
     flex: 1;
 }
 
-.search-toolbar {
+.category-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -55,7 +55,7 @@
     width: 192px;
 }
 
-.search-empty-container {
+.category-empty-container {
     background-color: #ffffff;
     padding: 48px 24px;
     border-radius: 8px;
@@ -70,14 +70,14 @@
     justify-content: center;
 }
 
-.search-page-header {
+.category-page-header {
     padding-bottom: 0;
 }
 
-.search-product-section {
+.category-product-section {
     margin-top: 0;
 }
 
-.search-product-section .section-header {
+.category-product-section .section-header {
     margin-bottom: 0;
 }

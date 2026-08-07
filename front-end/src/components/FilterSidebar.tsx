@@ -6,10 +6,10 @@ import DecimalNumberInput from './DecimalNumberInput';
 export interface FilterSidebarProps {
     onApplyFilter: (filters: { minPrice: string; maxPrice: string; minRating: string; type: string }) => void;
     onClearFilter: () => void;
+    hideCategory?: boolean;
     className?: string;
 }
 
-// Danh sách danh mục
 const CATEGORIES = [
     { label: 'Món chính', value: 'Món chính' },
     { label: 'Pizza', value: 'Pizza' },
@@ -28,13 +28,13 @@ const CATEGORIES = [
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
     onApplyFilter,
     onClearFilter,
+    hideCategory = false,
     className = ''
 }) => {
-    // State quản lý các bộ lọc
     const [minPrice, setMinPrice] = useState<string>('');
     const [maxPrice, setMaxPrice] = useState<string>('');
     const [minRating, setMinRating] = useState<string>('');
-    const [selectedTypes, setSelectedTypes] = useState<string[]>([]); // Đổi thành mảng string[]
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
     // Dùng useRef giữ tham chiếu ổn định cho onApplyFilter tránh vòng lặp re-render
     const onApplyFilterRef = useRef(onApplyFilter);
@@ -42,7 +42,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         onApplyFilterRef.current = onApplyFilter;
     }, [onApplyFilter]);
 
-    // Tự động gọi hàm lọc khi bất kỳ filter nào thay đổi (sau 300ms)
     useEffect(() => {
         const timer = setTimeout(() => {
             onApplyFilterRef.current({
@@ -89,22 +88,24 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             </div>
 
             {/* Lọc theo danh mục */}
-            <div className="filter-group">
-                <h4 className="filter-group-title">Danh mục</h4>
-                <div className="filter-options-list">
-                    {CATEGORIES.map((cat) => (
-                        <label key={cat.value} className="checkbox-label">
-                            <input
-                                type="checkbox"
-                                className="custom-checkbox"
-                                checked={selectedTypes.includes(cat.value)}
-                                onChange={() => handleCategoryChange(cat.value)}
-                            />
-                            <span>{cat.label}</span>
-                        </label>
-                    ))}
+            {!hideCategory && (
+                <div className="filter-group">
+                    <h4 className="filter-group-title">Danh mục</h4>
+                    <div className="filter-options-list">
+                        {CATEGORIES.map((cat) => (
+                            <label key={cat.value} className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    className="custom-checkbox"
+                                    checked={selectedTypes.includes(cat.value)}
+                                    onChange={() => handleCategoryChange(cat.value)}
+                                />
+                                <span>{cat.label}</span>
+                            </label>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Lọc theo giá */}
             <div className="filter-group">
