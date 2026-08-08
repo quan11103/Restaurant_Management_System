@@ -66,6 +66,57 @@
     font-weight: 700;
 }
 
+/* --- CHART SECTION --- */
+.dashboard-chart-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+}
+
+.chart-wrapper {
+    padding: 20px 24px 30px 0;
+    /* Cách lề một chút để hiển thị trục Y đẹp hơn */
+    width: 100%;
+}
+
+/* Fix Recharts Tooltip Focus Outline (nếu có) */
+.recharts-wrapper:focus {
+    outline: none;
+}
+
+/* --- CHART FILTERS --- */
+.chart-filter-group {
+    display: flex;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.filter-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #595959;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    color: #1890ff;
+}
+
+.filter-btn.active {
+    background-color: #ffffff;
+    color: #1890ff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 /* --- TABLE SECTION --- */
 .dashboard-table-section {
     background-color: #ffffff;
@@ -121,7 +172,6 @@
     border-bottom: none;
 }
 
-/* --- KIỂU DÁNG CỘT TRONG BẢNG --- */
 .rank-badge {
     display: inline-block;
     padding: 4px 10px;
@@ -161,7 +211,7 @@
     background-color: #f0f0f0;
 }
 
-.product-name {
+.dashboard-product-name {
     font-weight: 500;
 }
 

@@ -173,7 +173,7 @@ const OrderManagementView: React.FC = () => {
             title: 'Khách hàng',
             render: (item) => (
                 <div className="customer-cell">
-                    <span className="customer-name">{item.receiverName}</span>
+                    <span className="customer-name">{item.receiverName || 'Khách đặt tại quán'}</span>
                     <span className="customer-phone">{item.receiverPhone}</span>
                 </div>
             )
@@ -221,7 +221,7 @@ const OrderManagementView: React.FC = () => {
             key: 'actions',
             title: 'Thao tác',
             render: (item) => (
-                <div className="action-buttons">
+                <div className="omv-action-buttons">
                     <button className="btn-action view" onClick={() => handleOpenQuickView(item)} title="Xem chi tiết">
                         <Eye size={18} />
                     </button>

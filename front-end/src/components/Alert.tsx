@@ -37,7 +37,7 @@ const AlertItemComponent: React.FC<{ alert: Alert; onRemove: (id: string) => voi
         // 2. Chờ 300ms cho animation chạy xong rồi mới xóa hẳn khỏi React
         setTimeout(() => {
             onRemove(alert.id);
-        }, 300);
+        }, 500);
     };
 
     const renderIcon = (type: AlertType) => {

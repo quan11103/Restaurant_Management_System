@@ -1,17 +1,30 @@
 import React from 'react';
-import { Clock, MapPin } from 'lucide-react';
+import { Clock, MapPin, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { type Product } from '../../types';
 import RatingStars from './RatingStars';
+import Button from '../Button';
 import './ProductCard.css';
 
 interface ProductCardProps {
     product: Product;
+    onAddToCart?: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    };
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();  // Ngăn chặn sự kiện Link chuyển trang
+        e.stopPropagation(); // Ngăn chặn nổi bọt sự kiện
+
+        if (onAddToCart) {
+            onAddToCart(product);
+        } else {
+            console.log('Thêm vào giỏ hàng:', product.name);
+        }
     };
 
     return (
@@ -59,6 +72,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     {product.originalPrice && (
                         <span className="original-price">{formatPrice(product.originalPrice)}</span>
                     )}
+                </div>
+
+                <div className="product-actions">
+                    <Button
+                        variant="primary"
+                        fullWidth
+                        onClick={handleAddToCart}
+                        className="add-to-cart-btn"
+                    >
+                        <ShoppingCart size={18} />
+                        Thêm vào giỏ hàng
+                    </Button>
                 </div>
             </div>
         </Link>

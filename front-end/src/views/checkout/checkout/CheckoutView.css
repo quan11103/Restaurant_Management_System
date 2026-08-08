@@ -158,13 +158,14 @@
 .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     font-size: 1.1rem;
     color: #4a5568;
 }
 
 .summary-row.total-row {
     border-top: 0;
+    padding-top: 0;
 }
 
 .total-row {
@@ -223,8 +224,4 @@
 
 .btn-pay:hover {
     background: #2f855a;
-}
-
-.promo-code-box {
-    padding: 0;
 }

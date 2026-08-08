@@ -17,7 +17,7 @@
     border-radius: 8px;
     background-color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: slideInRight 0.3s ease-out forwards;
+    animation: slideInRight 0.4s ease-out forwards;
     position: relative;
     overflow: hidden;
     border-left: 5px solid;
@@ -92,24 +92,37 @@
 }
 
 @keyframes slideInRight {
-    from {
+    0% {
         transform: translateX(100%);
         opacity: 0;
     }
 
-    to {
+    70% {
+        transform: translateX(-50px);
+        /* Trượt lố sang bên trái 12px */
+        opacity: 1;
+    }
+
+    100% {
         transform: translateX(0);
+        /* Thụt nhẹ lùi lại về vị trí chuẩn */
         opacity: 1;
     }
 }
 
 @keyframes slideOutRight {
-    from {
+    0% {
         transform: translateX(0);
         opacity: 1;
     }
 
-    to {
+    70% {
+        transform: translateX(-50px);
+        /* Trượt lố sang bên trái 12px */
+        opacity: 1;
+    }
+
+    100% {
         transform: translateX(100%);
         opacity: 0;
     }

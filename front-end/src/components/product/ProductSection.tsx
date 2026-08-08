@@ -2,6 +2,8 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { type Product } from '../../types';
 import ProductCard from './ProductCard';
+import axiosClient from '../../api/axios'; // Đảm bảo đường dẫn này khớp với cấu trúc thư mục của bạn
+import { useAlert } from '../Alert';       // Đảm bảo đường dẫn này khớp với cấu trúc thư mục của bạn
 import './ProductSection.css';
 
 interface ProductSectionProps {
@@ -21,7 +23,28 @@ const ProductSection: React.FC<ProductSectionProps> = ({
     onViewAllClick,
     className = ''
 }) => {
+    const { showAlert } = useAlert();
     const skeletonArray = Array.from({ length: 12 });
+
+    // Hàm gọi API thêm vào giỏ hàng (mặc định thêm 1 sản phẩm)
+    const handleAddToCart = async (product: Product) => {
+        try {
+            const dishIdNumber = parseInt(String(product.id), 10);
+
+            await axiosClient.post('/cart-item', {
+                dishId: dishIdNumber,
+                quantity: 1 // Mặc định số lượng là 1 khi thêm từ danh sách ngoài
+            });
+            showAlert('success', `Đã thêm thành công 1 suất ${product.name} vào giỏ hàng!`);
+        } catch (err: any) {
+            console.error("Lỗi thêm vào giỏ hàng:", err);
+            if (err.response?.status === 401) {
+                showAlert('error', 'Vui lòng đăng nhập để thực hiện chức năng này!');
+            } else {
+                showAlert('error', err.response?.data?.message || 'Không thể thêm món ăn vào giỏ hàng. Vui lòng thử lại!');
+            }
+        }
+    };
 
     return (
         <section className={`product-section ${className}`}>
@@ -51,7 +74,11 @@ const ProductSection: React.FC<ProductSectionProps> = ({
                     ))
                 ) : (
                     products.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                            onAddToCart={handleAddToCart} // Truyền callback API xuống ProductCard
+                        />
                     ))
                 )}
             </div>

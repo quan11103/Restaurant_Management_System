@@ -125,9 +125,10 @@
     color: #2f3640;
 }
 
-.action-buttons {
+.omv-action-buttons {
     display: flex;
     gap: 8px;
+    min-width: 72px;
 }
 
 .btn-action {

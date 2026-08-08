@@ -35,7 +35,6 @@ const ProductDetailView: React.FC = () => {
     const [product, setProduct] = useState<DishDetail | null>(null);
     const [recommendedDishes, setRecommendedDishes] = useState<MappedProduct[]>([]);
 
-    // Thêm state lưu reviews từ ReviewSection
     const [reviews, setReviews] = useState<ReviewData[]>([]);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);

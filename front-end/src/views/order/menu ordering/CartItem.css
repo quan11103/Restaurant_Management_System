@@ -29,18 +29,6 @@
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 6px;
-    padding: 4px;
-}
-
-.qty-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    border-radius: 4px;
 }
 
 .qty-btn:hover:not(:disabled) {
