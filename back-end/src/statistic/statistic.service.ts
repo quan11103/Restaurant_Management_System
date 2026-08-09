@@ -73,11 +73,6 @@ export class StatisticService {
 
   // Lấy top món ăn bán chạy nhất theo Doanh Thu
   private async getTopDishes(limit: number) {
-    // Sử dụng Raw SQL để xử lý GroupBy và Join một cách tối ưu nhất
-    // - Liên kết OrderedDish với Order (để lọc đơn COMPLETED)
-    // - Liên kết OrderedDish với Dish (để lấy tên món)
-    // - Sub-query để lấy 1 imageUrl (ưu tiên isMain = true)
-
     const topDishes = await this.prisma.$queryRaw<any[]>`
       SELECT 
         d.id, 
@@ -120,7 +115,74 @@ export class StatisticService {
     }
   }
 
-  // --- CÁC HÀM XỬ LÝ RIÊNG BIỆT ---
+  async getProductOrders(productId: string, limit: number = 10, page: number = 1) {
+    const dishIdNum = parseInt(productId, 10);
+
+    if (isNaN(dishIdNum)) {
+      throw new BadRequestException('Mã món ăn không hợp lệ');
+    }
+
+    // Đảm bảo limitNum và pageNum luôn luôn là kiểu number nguyên bản, tránh bị NaN hoặc string
+    const limitNum = Math.max(1, parseInt(String(limit), 10) || 10);
+    const pageNum = Math.max(1, parseInt(String(page), 10) || 1);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Sử dụng transaction để lấy song song cả tổng số lượng và dữ liệu
+    const [totalRecords, orders] = await this.prisma.$transaction([
+      this.prisma.order.count({
+        where: {
+          orderedDishes: {
+            some: { dishId: dishIdNum }
+          }
+        }
+      }),
+
+      this.prisma.order.findMany({
+        where: {
+          orderedDishes: {
+            some: { dishId: dishIdNum }
+          }
+        },
+        include: {
+          client: {
+            select: { fullName: true, phone: true }
+          }
+        },
+        orderBy: {
+          orderTime: 'desc'
+        },
+        skip: skip,
+        take: limitNum, // Sử dụng limitNum đã ép kiểu chắc chắn là number
+      })
+    ]);
+
+    // Map dữ liệu khớp với Interface OrderItem trên frontend
+    const mappedOrders = orders.map(order => {
+      const name = order.receiverName || order.client?.fullName || '';
+      const phone = order.receiverPhone || order.client?.phone || '';
+
+      return {
+        id: order.id,
+        receiverName: name,
+        receiverPhone: phone,
+        orderTime: order.orderTime,
+        total: order.total,
+        status: order.status,
+      };
+    });
+
+    return {
+      data: mappedOrders,
+      meta: {
+        total: totalRecords,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(totalRecords / limitNum)
+      }
+    };
+  }
+
+  // --- CÁC HÀM XỬ LÝ RIÊNG BIỆT BIỂU ĐỒ (Giữ nguyên của bạn) ---
 
   private async getRevenueByDays(now: Date, limit: number) {
     const result = [];

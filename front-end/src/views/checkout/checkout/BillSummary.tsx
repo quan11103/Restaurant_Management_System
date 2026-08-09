@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Printer, CheckCircle2 } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import './BillSummary.css';
 
 export interface BillModel {

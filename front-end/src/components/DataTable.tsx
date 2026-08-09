@@ -11,13 +11,15 @@ interface DataTableProps<T> {
     columns: Column<T>[];
     data: T[];
     emptyMessage?: string;
+    onRowClick?: (record: T, index: number) => void; // Thêm callback nhận sự kiện click hàng
 }
 
 // Sử dụng Generic Type <T> để bảng nhận diện được mọi loại object truyền vào
 function DataTable<T extends Record<string, any>>({
     columns,
     data,
-    emptyMessage = "Không có dữ liệu"
+    emptyMessage = "Không có dữ liệu",
+    onRowClick
 }: DataTableProps<T>) {
 
     return (
@@ -39,7 +41,11 @@ function DataTable<T extends Record<string, any>>({
                         </tr>
                     ) : (
                         data.map((record, rowIndex) => (
-                            <tr key={rowIndex}>
+                            <tr
+                                key={rowIndex}
+                                onClick={() => onRowClick?.(record, rowIndex)}
+                                className={onRowClick ? 'clickable-row' : ''}
+                            >
                                 {columns.map((col, colIndex) => (
                                     <td key={colIndex}>
                                         {/* Nếu cột có hàm render tùy chỉnh thì chạy hàm, nếu không thì in ra giá trị gốc */}

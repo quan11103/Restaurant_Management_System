@@ -41,9 +41,18 @@
     background-color: #f1f7fd;
 }
 
+/* Thêm style để hiển thị con trỏ chuột dạng bàn tay và hiệu ứng hover khi hàng có thể click */
+.data-table tr.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.data-table tr.clickable-row:hover {
+    background-color: #f5f5f5;
+}
+
 .empty-cell {
     text-align: center;
-    padding: 40px !important;
     color: #888;
     font-style: italic;
 }
