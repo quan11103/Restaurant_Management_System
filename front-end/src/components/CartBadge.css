@@ -5,15 +5,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 8px;
-    color: #2c3e50;
+    color: inherit;
     transition: color 0.2s ease, transform 0.1s ease;
     border-radius: 50%;
-}
-
-.cart-badge-btn:hover {
-    color: #e84118;
-    background-color: #f5f6fa;
 }
 
 .cart-badge-btn:active {

@@ -9,7 +9,6 @@
 .admin-sidebar {
     width: 260px;
     background-color: #ffffff;
-    border-right: 1px solid #e0e0e0;
     display: flex;
     flex-direction: column;
 }
@@ -48,7 +47,7 @@
 }
 
 .sidebar-nav li {
-    padding: 0 16px;
+    padding: 0 0 0 16px;
     margin-bottom: 8px;
 }
 
@@ -59,7 +58,7 @@
     padding: 12px 16px;
     color: #555;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: 8px 0 0 8px;
     font-weight: 500;
     transition: all 0.2s ease-in-out;
 }
@@ -71,10 +70,14 @@
     /* Đảm bảo icon không bị bóp méo khi thu nhỏ màn hình */
 }
 
-.sidebar-nav a:hover,
-.sidebar-nav li.active a {
-    background-color: #e6f2ff;
-    color: #007bff;
+.sidebar-nav a:hover {
+    background-color: #fff5f2;
+    color: #e84118;
+}
+
+.sidebar-nav a.active-link {
+    background-color: #f4f6f8;
+    color: #e84118;
 }
 
 .admin-main {

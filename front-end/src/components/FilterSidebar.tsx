@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import './FilterSidebar.css';
 import RatingStars from './product/RatingStars';
 import DecimalNumberInput from './DecimalNumberInput';
+import Button from './Button'; // Import component Button
+import { Trash2 } from 'lucide-react'; // Import icon thùng rác
 
 export interface FilterSidebarProps {
     onApplyFilter: (filters: { minPrice: string; maxPrice: string; minRating: string; type: string }) => void;
@@ -82,9 +84,19 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <aside className={`filter-sidebar ${className}`.trim()}>
             <div className="filter-header">
                 <h3 className="filter-title">Bộ lọc</h3>
-                <button type="button" onClick={handleClear} className="btn-clear-filter">
-                    Xóa lọc
-                </button>
+
+                {/* Thay thế bằng component Button */}
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClear}
+                    className="btn-clear-filter"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                    <Trash2 size={14} />
+                    <span>Xóa lọc</span>
+                </Button>
             </div>
 
             {/* Lọc theo danh mục */}

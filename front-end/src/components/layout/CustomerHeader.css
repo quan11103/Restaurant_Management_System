@@ -3,7 +3,7 @@
     top: 0;
     z-index: 1000;
     /* Luôn nổi lên trên các thành phần khác */
-    background-color: #ffffff;
+    background-color: #fff5f2;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     height: 72px;
     display: flex;
@@ -98,7 +98,6 @@
 }
 
 .action-btn:hover {
-    background-color: #f5f6fa;
     color: #e84118;
 }
 
@@ -185,7 +184,7 @@
 }
 
 .action-btn.user-btn.user-logged-in {
-    color: #28a745;
+    color: #e84118;
 }
 
 a.action-btn.cart-wrapper {

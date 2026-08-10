@@ -260,7 +260,6 @@ const DashboardView: React.FC = () => {
     const handleOpenBillDetail = async (order: OrderItem) => {
         try {
             setIsBillOpen(false);
-            setIsModalLoading(true);
 
             const response = await axiosClient.get(`/orders/${order.id}`);
             const orderData = response.data?.data || response.data;
@@ -479,11 +478,7 @@ const DashboardView: React.FC = () => {
             {/* Modal hiển thị danh sách đơn hàng của món ăn đã chọn */}
             <Modal
                 isOpen={isModalOpen}
-                onClose={() => {
-                    setIsModalOpen(false);
-                    setSelectedProduct(null);
-                    setProductOrders([]);
-                }}
+                onClose={() => setIsModalOpen(false)}
                 title={selectedProduct ? `Danh sách đơn hàng có ${selectedProduct.name}` : 'Danh sách đơn hàng'}
                 maxWidth="850px"
             >
@@ -510,8 +505,8 @@ const DashboardView: React.FC = () => {
             {/* Chi tiết hóa đơn */}
             {isBillOpen && selectedOrder && (
                 <BillSummary
-                    isOpen={isBillOpen}
                     bill={selectedOrder}
+                    isOpen={isBillOpen}
                     onClose={() => setIsBillOpen(false)}
                     onPrint={() => {
                         window.print();

@@ -81,23 +81,6 @@
     font-size: 1.3rem;
 }
 
-.btn-submit-order {
-    width: 100%;
-    padding: 14px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
-}
-
-.btn-submit-order:hover:not(:disabled) {
-    background: #0056b3;
-}
-
 .btn-submit-order:disabled {
     background: #bdc3c7;
     cursor: not-allowed;

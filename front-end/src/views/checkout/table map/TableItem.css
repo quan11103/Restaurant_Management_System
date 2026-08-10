@@ -33,9 +33,8 @@
 
 /* 1. Trạng thái TRỐNG */
 .status-available {
-    background-color: #f8fafc;
+    background-color: #ffffff;
     border-color: #e2e8f0;
-    color: #64748b;
 }
 
 /* 2. Trạng thái ĐANG CÓ KHÁCH */

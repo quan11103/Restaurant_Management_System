@@ -28,19 +28,6 @@
     margin: 0;
 }
 
-.btn-clear-filter {
-    background: none;
-    border: none;
-    font-size: 0.875rem;
-    color: #3b82f6;
-    cursor: pointer;
-    padding: 0;
-}
-
-.btn-clear-filter:hover {
-    text-decoration: underline;
-}
-
 .filter-group {
     margin-bottom: 24px;
 }

@@ -9,16 +9,21 @@ import './ProductCard.css';
 interface ProductCardProps {
     product: Product;
     onAddToCart?: (product: Product) => void;
+    showCartIcon?: boolean; // Tùy chọn: có thể ẩn thủ công qua prop nếu muốn
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+    product,
+    onAddToCart,
+    showCartIcon = true
+}) => {
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
 
     const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault();  // Ngăn chặn sự kiện Link chuyển trang
-        e.stopPropagation(); // Ngăn chặn nổi bọt sự kiện
+        e.preventDefault();  // Ngăn chuyển trang
+        e.stopPropagation(); // Ngăn nổi bọt sự kiện
 
         if (onAddToCart) {
             onAddToCart(product);
@@ -81,8 +86,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
                         onClick={handleAddToCart}
                         className="add-to-cart-btn"
                     >
-                        <ShoppingCart size={18} />
-                        Thêm vào giỏ hàng
+                        {/* Ẩn bằng prop JS HOẶC ẩn bằng CSS class 'cart-icon' */}
+                        {showCartIcon && <ShoppingCart size={18} className="cart-icon" />}
+                        <span>Thêm vào giỏ hàng</span>
                     </Button>
                 </div>
             </div>
