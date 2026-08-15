@@ -11,10 +11,6 @@
     color: #6b7280;
 }
 
-.order-timeline-wrapper {
-    margin-bottom: 2rem;
-}
-
 /* Cấu trúc Grid thông minh: Tự động xuống hàng trên Mobile (1 cột) 
    và chia tỷ lệ 2 phần nội dung - 1 phần sidebar trên Desktop */
 .order-detail-layout {

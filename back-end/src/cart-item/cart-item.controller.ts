@@ -24,6 +24,21 @@ export class CartItemController {
     );
   }
 
+  // =========================================================
+  // ENDPOINT MỚI: Đặt lại đơn hàng (Reorder)
+  // Route: POST /cart-item/reorder/:orderId
+  // =========================================================
+  @Post('reorder/:orderId')
+  reorder(
+    @CurrentUser() user: JwtPayload,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    return this.cartItemService.reorder(
+      user.sub,
+      orderId,
+    );
+  }
+
   @Get()
   findAll(
     @CurrentUser() user: JwtPayload,
@@ -57,6 +72,15 @@ export class CartItemController {
     );
   }
 
+  @Delete('clear')
+  clearCart(
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.cartItemService.clearCart(
+      user.sub,
+    );
+  }
+
   @Delete(':id')
   remove(
     @CurrentUser() user: JwtPayload,
@@ -64,15 +88,6 @@ export class CartItemController {
   ) {
     return this.cartItemService.remove(
       id,
-      user.sub,
-    );
-  }
-
-  @Delete('clear')
-  clearCart(
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.cartItemService.clearCart(
       user.sub,
     );
   }

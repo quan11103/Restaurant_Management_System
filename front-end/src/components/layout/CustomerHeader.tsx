@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { User, Menu, LogOut, ClipboardList } from 'lucide-react';
+import { User, Menu, LogOut, ClipboardList, History } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../utils/auth';
 import Logo from './Logo';
@@ -152,15 +152,30 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ isLoggedIn, setIsLogged
                             <div className="user-popup">
                                 {isLoggedIn && (
                                     <div className="user-popup-header">
-                                        <p>Xin chào <strong>{userName}</strong>!</p>
+                                        <p className="welcome-text">
+                                            Xin chào
+                                            <strong className="user-name-display" title={userName}>
+                                                {userName}
+                                            </strong>
+                                        </p>
                                     </div>
                                 )}
                                 <div className="user-popup-body">
                                     {isLoggedIn ? (
-                                        <button className="btn-logout-popup" onClick={handleLogout}>
-                                            <LogOut size={16} />
-                                            Đăng xuất
-                                        </button>
+                                        <>
+                                            <Link
+                                                to="/order-history"
+                                                className="btn-history-popup"
+                                                onClick={() => setIsUserPopupOpen(false)}
+                                            >
+                                                <History size={16} />
+                                                Lịch sử đơn hàng
+                                            </Link>
+                                            <button className="btn-logout-popup" onClick={handleLogout}>
+                                                <LogOut size={16} />
+                                                Đăng xuất
+                                            </button>
+                                        </>
                                     ) : (
                                         <>
                                             <Link to="/login" className="btn-login-popup" onClick={() => setIsUserPopupOpen(false)}>

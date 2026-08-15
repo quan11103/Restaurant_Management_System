@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -82,6 +82,52 @@ export class CartItemService {
     }
 
     return cartItem;
+  }
+
+  async reorder(clientId: number, orderId: number) {
+    // 1. Tìm đơn hàng cũ kèm theo danh sách món và trạng thái món
+    const oldOrder = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        orderedDishes: {
+          include: {
+            dish: true, // Lấy thông tin dish để check isAvailable
+          },
+        },
+      },
+    });
+
+    // 2. Kiểm tra quyền sở hữu và sự tồn tại của đơn hàng
+    if (!oldOrder || oldOrder.clientId !== clientId) {
+      throw new NotFoundException('Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập');
+    }
+
+    // 3. Lọc ra các món vẫn còn đang kinh doanh
+    const validItems = oldOrder.orderedDishes.filter(
+      (item) => item.dish && item.dish.isAvailable
+    );
+
+    if (validItems.length === 0) {
+      throw new BadRequestException('Tất cả các món trong đơn hàng này hiện đã ngừng kinh doanh');
+    }
+
+    // 4. (Tùy chọn) Xóa giỏ hàng cũ trước khi thêm món mới vào
+    // Nếu nghiệp vụ của bạn là "cộng dồn" vào giỏ hàng đang có, hãy comment/xóa dòng này đi.
+    await this.clearCart(clientId);
+
+    // 5. Thêm lần lượt các món hợp lệ vào giỏ hàng
+    // Gọi lại hàm `this.create` để tận dụng logic có sẵn (cộng dồn & gọi interactionService)
+    for (const item of validItems) {
+      await this.create(clientId, {
+        dishId: item.dishId,
+        quantity: item.quantity,
+      });
+    }
+
+    return {
+      message: `Đã thêm ${validItems.length} món từ đơn hàng #${orderId} vào giỏ hàng.`,
+      skippedItems: oldOrder.orderedDishes.length - validItems.length, // Số món bị bỏ qua do hết hàng
+    };
   }
 
   async update(

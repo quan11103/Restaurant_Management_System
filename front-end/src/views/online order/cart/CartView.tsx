@@ -129,7 +129,6 @@ const CartView: React.FC = () => {
     };
 
     const handleProceedToCheckout = () => {
-        console.log('Đang chuyển hướng sang trang thanh toán...');
         navigate('/client-checkout', {
             state: { promoCode: appliedPromoCode, discountAmount: discountAmount }
         });

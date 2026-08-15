@@ -197,13 +197,12 @@ export class OrderController {
       }
 
       if (responseCode === '00') {
-        const dbResult = await this.orderService.updateBillForOrder(orderId, {
+        await this.orderService.updateBillForOrder(orderId, {
           paymentMethod: 'TRANSFER',
           paymentStatus: 'PAID',
           paymentTransactionNo: transactionNo,
           paymentBankCode: bankCode,
         });
-        console.log('✅ KẾT QUẢ PRISMA TRẢ VỀ SAU KHI LƯU:', dbResult);
       } else {
         console.log(
           '❌ VNPAY báo giao dịch thất bại, responseCode:',

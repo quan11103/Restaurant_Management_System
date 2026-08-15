@@ -2,19 +2,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FileQuestion } from 'lucide-react';
 import axiosClient from '../../../api/axios';
-// Import các component dùng chung
 import PageHeader from '../../../components/PageHeader';
 import Badge from '../../../components/Badge';
 import Button from '../../../components/Button';
 import DataTable from '../../../components/DataTable';
 import ConfirmModal from '../../../components/ConfirmModal';
 import EmptyState from '../../../components/EmptyState';
-// Các component bổ sung
 import OrderTimeline from '../../../components/OrderTimeline';
 import InfoCard from '../../../components/InfoCard';
 import OrderSummaryBox from '../../../components/OrderSummaryBox';
-
-// Import file style tách biệt
+import { useAlert } from '../../../components/Alert';
 import './OrderDetailView.css';
 
 interface OrderItem {
@@ -46,10 +43,14 @@ interface OrderDetail {
 export default function OrderDetailView() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { showAlert } = useAlert();
 
     const [order, setOrder] = useState<OrderDetail | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
+
+    // Thêm state loading riêng cho action Reorder để không làm mất UI cũ khi đang gọi API
+    const [isReordering, setIsReordering] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchOrderDetail = async () => {
@@ -57,16 +58,13 @@ export default function OrderDetailView() {
             setIsLoading(true);
             try {
                 const response = await axiosClient.get(`/orders/${id}`)
-
                 const data = response.data;
 
-                // Tự động tính toán subTotal dựa trên danh sách món ăn (orderedDishes)
                 const calculatedSubTotal = (data.orderedDishes || []).reduce(
                     (sum: number, item: any) => sum + (item.price * item.quantity),
                     0
                 );
 
-                // Ánh xạ chính xác theo cấu trúc JSON response mới
                 const mappedOrder: OrderDetail = {
                     id: data.id.toString(),
                     orderTime: data.orderTime,
@@ -86,7 +84,7 @@ export default function OrderDetailView() {
                         total: item.price * item.quantity
                     })),
                     subTotal: calculatedSubTotal,
-                    shippingFee: 0, // Hiện tại cấu trúc API chưa trả về phí ship, tạm thời gán bằng 0
+                    shippingFee: 0,
                     discount: data.bill?.discount || 0,
                     totalPay: data.total || 0
                 };
@@ -94,6 +92,7 @@ export default function OrderDetailView() {
                 setOrder(mappedOrder);
             } catch (error) {
                 console.error('Lỗi fetch chi tiết đơn hàng:', error);
+                showAlert('error', 'Đã xảy ra lỗi khi tải thông tin đơn hàng!', 'Lỗi hệ thống');
                 setOrder(null);
             } finally {
                 setIsLoading(false);
@@ -101,6 +100,7 @@ export default function OrderDetailView() {
         };
 
         fetchOrderDetail();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const formatCurrency = (amount: number) => {
@@ -115,23 +115,54 @@ export default function OrderDetailView() {
     ];
 
     const handleCancelOrder = async () => {
-        console.log('Đã gửi yêu cầu hủy đơn lên server cho mã:', id);
-        setIsCancelModalOpen(false);
+        if (!id) return;
+
+        try {
+            await axiosClient.patch(`/orders/${id}/cancel`);
+            setIsCancelModalOpen(false);
+            showAlert('success', 'Đã hủy đơn hàng thành công!', 'Thành công');
+            setOrder(prevOrder => prevOrder ? { ...prevOrder, status: 'CANCELLED' } : null);
+        } catch (error: any) {
+            console.error('Lỗi khi hủy đơn hàng:', error);
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra, không thể hủy đơn hàng lúc này.';
+            showAlert('error', errorMessage, 'Lỗi hệ thống');
+            setIsCancelModalOpen(false);
+        }
     };
 
     const handleRetryPayment = async () => {
         if (!id) return;
         try {
             const response = await axiosClient.post('/orders/retry-checkout')
-
             const result = response.data;
-
             if (result.success && result.paymentUrl) {
                 window.location.href = result.paymentUrl;
             }
         } catch (error: any) {
             console.error('Lỗi thanh toán lại:', error);
-            alert(error.message);
+            showAlert('error', error.message || 'Không thể tiến hành thanh toán lúc này', 'Lỗi hệ thống');
+        }
+    };
+
+    // Tích hợp logic xử lý Reorder
+    const handleReorder = async () => {
+        if (!id) return;
+
+        try {
+            setIsReordering(true); // Sử dụng state loading riêng cho nút bấm
+
+            // 1. Gọi API backend (cần đảm bảo backend có route POST /cart/reorder/:orderId)
+            await axiosClient.post(`/cart-item/reorder/${id}`);
+
+            showAlert('success', 'Đã thêm các món vào giỏ hàng!', 'Thành công');
+
+            // 2. Chuyển hướng sang trang Checkout (hoặc trang Giỏ hàng /cart)
+            navigate('/client-checkout');
+        } catch (error: any) {
+            console.error('Lỗi khi đặt lại đơn hàng:', error);
+            showAlert('error', error.response?.data?.message || 'Không thể đặt lại đơn hàng lúc này', 'Lỗi');
+        } finally {
+            setIsReordering(false);
         }
     };
 
@@ -202,7 +233,6 @@ export default function OrderDetailView() {
                     />
 
                     <div className="order-action-buttons">
-                        {/* Nút thanh toán lại chỉ khả dụng nếu đơn hàng đang PENDING, chưa thanh toán và chọn phương thức TRANSFER */}
                         {order.status === 'PENDING' && order.paymentStatus !== 'PAID' && order.paymentMethod === 'TRANSFER' && (
                             <Button variant="primary" onClick={handleRetryPayment} fullWidth>
                                 Thanh toán lại
@@ -216,8 +246,13 @@ export default function OrderDetailView() {
                         )}
 
                         {(order.status === 'DELIVERED' || order.status === 'COMPLETED' || order.status === 'CANCELLED') && (
-                            <Button variant="primary" onClick={() => navigate(`/cart`)} fullWidth>
-                                Mua lại đơn này
+                            <Button
+                                variant="primary"
+                                onClick={handleReorder}
+                                disabled={isReordering}
+                                fullWidth
+                            >
+                                {isReordering ? 'Đang xử lý...' : 'Đặt lại đơn hàng'}
                             </Button>
                         )}
                     </div>

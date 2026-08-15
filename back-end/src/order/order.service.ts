@@ -17,7 +17,6 @@ export class OrderService {
 
   // Đặt món tại quán
   async createOrder(createOrderDto: CreateOrderDto, staffId: number) {
-    // Bỏ waiterId ra khỏi DTO, lấy trực tiếp staffId từ JWT
     const { tableId, items } = createOrderDto;
 
     try {
@@ -79,7 +78,7 @@ export class OrderService {
           // Bàn trống -> Tạo Order mới với ID nhân viên lấy từ Token (staffId)
           const newOrder = await tx.order.create({
             data: {
-              waiterId: staffId, // <--- Ghi nhận ID nhân viên tạo đơn tại đây
+              waiterId: staffId,
               orderType: 'DINE_IN',
               status: 'PROCESSING',
               totalQuantity: currentOrderQuantity,
@@ -89,7 +88,6 @@ export class OrderService {
 
           targetOrderId = newOrder.id;
 
-          // Liên kết Order với Table
           await tx.orderTable.create({
             data: {
               orderId: targetOrderId,
@@ -98,7 +96,6 @@ export class OrderService {
             },
           });
 
-          // Cập nhật trạng thái bàn thành "Có khách"
           await tx.table.update({
             where: { id: tableId },
             data: { isOccupied: true }
@@ -287,7 +284,6 @@ export class OrderService {
       throw new BadRequestException('Vui lòng cung cấp ID đơn hàng (orderId) hoặc danh sách món ăn (items)!');
     }
 
-    // Kiểm tra phương thức thanh toán có phải tiền mặt không
     const isCash = paymentMethod === 'CASH';
 
     let isExistingOrder = false;
@@ -342,7 +338,6 @@ export class OrderService {
       });
     }
 
-    // Xử lý mã giảm giá
     let discount = 0.0;
     let promotionId: number | null = null;
 
@@ -392,7 +387,6 @@ export class OrderService {
     return await this.prisma.$transaction(async (tx) => {
       let resultOrderId: number;
 
-      // Trạng thái thanh toán & đơn hàng phụ thuộc vào việc có phải CASH hay không
       const paymentStatus = isCash ? 'PAID' : 'UNPAID';
       const orderStatus = isCash ? 'COMPLETED' : 'PENDING';
 
@@ -423,10 +417,8 @@ export class OrderService {
           },
         });
 
-        // =========================================================================
-        // CHỈ CẬP NHẬT ORDER_TABLE VÀ GIẢI PHÓNG BÀN NẾU ĐÃ THANH TOÁN TIỀN MẶT
+        // Chỉ cập nhật ORDER_TABLE và giải phóng bàn nếu thanh toán tiền mặt
         // (Nếu Chuyển khoản: Bàn và OrderTable giữ nguyên cho tới khi Webhook/Callback xác nhận)
-        // =========================================================================
         if (isCash) {
           await this.releaseTableAndCompleteOrder(tx, orderId);
         }
@@ -460,8 +452,7 @@ export class OrderService {
         resultOrderId = newOrder.id;
       }
 
-      // Tăng số lượt dùng mã giảm giá nếu có áp dụng thành công (Chỉ tăng khi là cash hoặc ghi nhận mã)
-      if (promotionId && isCash) {
+      if (promotionId) {
         await tx.promotion.update({
           where: { id: promotionId },
           data: {
@@ -508,7 +499,7 @@ export class OrderService {
     }
 
     if (startDate || endDate) {
-      where.orderTime = {}; // Lưu ý thay 'orderTime' bằng field lưu thời gian tạo đơn thực tế của bạn (vd: createdAt)
+      where.orderTime = {};
       if (startDate) where.orderTime.gte = new Date(startDate);
       if (endDate) where.orderTime.lte = new Date(endDate);
     }
@@ -617,7 +608,6 @@ export class OrderService {
         },
       });
 
-      // Tìm thông tin Order để kiểm tra orderType
       const order = await tx.order.findUnique({
         where: { id: numericOrderId },
       });
@@ -767,7 +757,6 @@ export class OrderService {
 
   // Hàm helper dùng chung: Xử lý logic side-effects khi hủy đơn
   private async processOrderCancellation(tx: any, order: any) {
-    // Chuyển trạng thái đơn hàng thành CANCELLED
     await tx.order.update({
       where: { id: order.id },
       data: { status: 'CANCELLED' },
@@ -782,7 +771,6 @@ export class OrderService {
       });
     }
 
-    // Xử lý Hóa đơn
     if (order.bill) {
       // Hoàn lại lượt sử dụng mã giảm giá
       if (order.bill.promotionId) {
@@ -792,7 +780,6 @@ export class OrderService {
         });
       }
 
-      // Đổi trạng thái thanh toán
       const newPaymentStatus = order.bill.paymentStatus === 'PAID' ? 'REFUNDED' : 'FAILED';
 
       await tx.bill.update({
@@ -815,13 +802,13 @@ export class OrderService {
     });
 
     if (orderTables.length > 0) {
-      // 1. Đánh dấu tất cả OrderTable liên quan đến Order này là đã thanh toán
+      // Đánh dấu tất cả OrderTable liên quan đến Order này là đã thanh toán
       await tx.orderTable.updateMany({
         where: { orderId: orderId },
         data: { isPaid: true },
       });
 
-      // 2. Với mỗi bàn liên kết, kiểm tra còn đơn nào chưa thanh toán không
+      // Với mỗi bàn liên kết, kiểm tra còn đơn nào chưa thanh toán không
       for (const ot of orderTables) {
         const remainingUnpaidOrder = await tx.orderTable.findFirst({
           where: {

@@ -184,7 +184,6 @@ const CheckOutView: React.FC = () => {
             });
 
             const result = response.data;
-            console.log('Checkout response:', result);
 
             const paymentUrl = result.paymentUrl;
 

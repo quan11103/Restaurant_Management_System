@@ -27,8 +27,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         if (onAddToCart) {
             onAddToCart(product);
-        } else {
-            console.log('Thêm vào giỏ hàng:', product.name);
         }
     };
 
