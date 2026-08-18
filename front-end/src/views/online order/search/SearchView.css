@@ -21,6 +21,7 @@
 /* Cột phải: Kết quả tìm kiếm */
 .search-results-main {
     flex: 1;
+    scroll-margin-top: 90px;
 }
 
 .search-toolbar {

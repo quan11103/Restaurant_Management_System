@@ -18,6 +18,16 @@ export interface DishQueryDto {
   limit?: number | string;
 }
 
+const removeVietnameseTones = (str: string) => {
+  if (!str) return '';
+  return str
+    .normalize('NFD') // Tách dấu ra khỏi ký tự gốc
+    .replace(/[\u0300-\u036f]/g, '') // Xóa các ký tự dấu
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase(); // Chuyển về chữ thường
+};
+
 @Injectable()
 export class DishService {
   constructor(
@@ -109,7 +119,6 @@ export class DishService {
     const where: any = {};
 
     // Lọc theo danh mục
-    // Lọc theo danh mục (Hỗ trợ 1 type, mảng type, hoặc chuỗi 'PIZZA,BURGER')
     if (type && type !== 'ALL') {
       let typeList: string[] = [];
 
@@ -125,7 +134,7 @@ export class DishService {
       if (typeList.length === 1) {
         where.type = typeList[0];
       } else if (typeList.length > 1) {
-        where.type = { in: typeList }; // Lọc theo danh sách nhiều type trong Prisma
+        where.type = { in: typeList };
       }
     }
 
@@ -145,17 +154,20 @@ export class DishService {
       }
     }
 
-    // Tìm kiếm từ khóa
+    // --- CẬP NHẬT LOGIC TÌM KIẾM ---
+    let memorySearchText = '';
+
     if (q) {
-      const searchConditions: any[] = [
-        { name: { contains: q, mode: 'insensitive' } }
-      ];
-
       if (!isNaN(Number(q))) {
-        searchConditions.push({ id: Number(q) });
+        // Nếu người dùng gõ số, ưu tiên tìm bằng DB (tìm ID món hoặc tên có chứa số)
+        where.OR = [
+          { id: Number(q) },
+          { name: { contains: q, mode: 'insensitive' } }
+        ];
+      } else {
+        // Nếu gõ chữ, không đưa vào `where` của DB, mà lưu lại để Lọc không dấu trên RAM
+        memorySearchText = removeVietnameseTones(q);
       }
-
-      where.OR = searchConditions;
     }
 
     // Cấu hình Sắp xếp
@@ -163,11 +175,10 @@ export class DishService {
     if (sortBy === 'price_asc') orderBy = { price: 'asc' };
     if (sortBy === 'price_desc') orderBy = { price: 'desc' };
 
-    // Nếu sắp xếp hoặc lọc theo rating (giá trị tính toán động)
-    const isRatingFilterOrSort = Boolean(minRating) || sortBy === 'rating';
+    // Kích hoạt luồng Memory Process nếu có tìm kiếm text HOẶC lọc/sắp xếp theo rating
+    const isMemoryProcessRequired = Boolean(minRating) || sortBy === 'rating' || memorySearchText !== '';
 
-    if (isRatingFilterOrSort) {
-      // Lấy toàn bộ món thỏa mãn filter DB để tính rating và lọc trên Memory
+    if (isMemoryProcessRequired) {
       const allDishes = await this.prisma.dish.findMany({
         where,
         include: {
@@ -179,7 +190,14 @@ export class DishService {
 
       let mappedDishes = allDishes.map((dish) => this.mapDishWithRating(dish));
 
-      // Lọc theo minRating
+      // 1. LỌC THEO TỪ KHÓA (KHÔNG DẤU)
+      if (memorySearchText) {
+        mappedDishes = mappedDishes.filter((dish) =>
+          removeVietnameseTones(dish.name).includes(memorySearchText)
+        );
+      }
+
+      // 2. Lọc theo minRating
       if (minRating !== undefined && minRating !== '') {
         const minRatingNum = Number(minRating);
         mappedDishes = mappedDishes.filter(
@@ -187,7 +205,7 @@ export class DishService {
         );
       }
 
-      // Sắp xếp theo rating giảm dần
+      // 3. Sắp xếp theo rating giảm dần
       if (sortBy === 'rating') {
         mappedDishes.sort((a, b) => b.rating - a.rating);
       }
@@ -205,7 +223,7 @@ export class DishService {
       };
     }
 
-    // Luồng Phân trang chuẩn bằng Database khi không lọc theo Rating
+    // Luồng Phân trang chuẩn bằng Database (Khi chỉ xem danh sách thông thường)
     const [dishes, totalRecords] = await this.prisma.$transaction([
       this.prisma.dish.findMany({
         where,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import axiosClient from '../../../api/axios';
@@ -23,6 +23,7 @@ const SORT_OPTIONS = [
 const SearchView: React.FC = () => {
     const [searchParams] = useSearchParams();
     const queryFromUrl = searchParams.get('q') || '';
+    const resultsRef = useRef<HTMLElement>(null);
 
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -36,10 +37,22 @@ const SearchView: React.FC = () => {
     const [priceFilter, setPriceFilter] = useState<{ minPrice?: string; maxPrice?: string }>({});
     const [minRatingFilter, setMinRatingFilter] = useState<string>('');
     const [filterKey, setFilterKey] = useState<number>(0);
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [queryFromUrl, sortBy, priceFilter, minRatingFilter, typeFilter]);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        resultsRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+    }, [currentPage]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -144,13 +157,10 @@ const SearchView: React.FC = () => {
     };
 
     const handlePageChange = (newPage: number) => {
-        setIsLoading(true);
-        setProducts([]);
         setCurrentPage(newPage);
-
-        window.scrollTo({
-            top: 72,
+        resultsRef.current?.scrollIntoView({
             behavior: 'smooth',
+            block: 'start',
         });
     };
 
@@ -174,7 +184,7 @@ const SearchView: React.FC = () => {
                 />
 
                 {/* Nội dung chính bên phải */}
-                <main className="search-results-main">
+                <main ref={resultsRef} className="search-results-main">
                     <div className="search-toolbar">
                         <span className="results-count-info">
                             Hiển thị kết quả trang {currentPage} / {totalPages}

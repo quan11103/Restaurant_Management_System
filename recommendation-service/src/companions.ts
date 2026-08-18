@@ -13,12 +13,12 @@ export const COMPANION_DISHES: Record<number, number[]> = {
     4: [71],   // Bún bò Huế -> Kim chi
     5: [78],   // Bún chả -> Gỏi cuốn
     6: [76],   // Bún riêu -> Nem rán
-    10: [78],  // Bún cá
+    10: [77],  // Bún cá
     11: [70],  // Bún mắm
-    14: [78],  // Bún mọc
+    14: [77],  // Bún mọc
     15: [71],  // Bún Thái
     16: [71],  // Bún Thái siêu cay
-    17: [78],  // Bún cá rô đồng
+    17: [77],  // Bún cá rô đồng
 
     // =========================
     // Hủ tiếu - Miến - Bánh canh

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import axiosClient from '../../../api/axios';
@@ -23,6 +23,7 @@ const SORT_OPTIONS = [
 const CategoryView: React.FC = () => {
     const [searchParams] = useSearchParams();
     const queryFromUrl = searchParams.get('type') || '';
+    const resultsRef = useRef<HTMLElement>(null);
 
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -36,10 +37,22 @@ const CategoryView: React.FC = () => {
     const [priceFilter, setPriceFilter] = useState<{ minPrice?: string; maxPrice?: string }>({});
     const [minRatingFilter, setMinRatingFilter] = useState<string>('');
     const [filterKey, setFilterKey] = useState<number>(0);
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
         setCurrentPage(1);
     }, [queryFromUrl, sortBy, priceFilter, minRatingFilter, typeFilter]);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        resultsRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+    }, [currentPage]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -143,13 +156,10 @@ const CategoryView: React.FC = () => {
     };
 
     const handlePageChange = (newPage: number) => {
-        setIsLoading(true);
-        setProducts([]);
         setCurrentPage(newPage);
-
-        window.scrollTo({
-            top: 72,
+        resultsRef.current?.scrollIntoView({
             behavior: 'smooth',
+            block: 'start',
         });
     };
 
@@ -174,7 +184,7 @@ const CategoryView: React.FC = () => {
                 />
 
                 {/* Nội dung chính bên phải */}
-                <main className="category-results-main">
+                <main ref={resultsRef} className="category-results-main">
                     <div className="category-toolbar">
                         <span className="results-count-info">
                             Hiển thị kết quả trang {currentPage} / {totalPages}

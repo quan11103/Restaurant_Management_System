@@ -44,13 +44,15 @@ const Pagination: React.FC<PaginationProps> = ({
         return pages;
     };
 
-    const handlePrevious = () => {
+    const handlePrevious = (e: React.MouseEvent) => {
+        e.preventDefault();
         if (currentPage > 1) {
             onPageChange(currentPage - 1);
         }
     };
 
-    const handleNext = () => {
+    const handleNext = (e: React.MouseEvent) => {
+        e.preventDefault();
         if (currentPage < totalPages) {
             onPageChange(currentPage + 1);
         }
@@ -60,6 +62,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <div className={`pagination-container ${className}`.trim()}>
             {/* Nút Quay lại */}
             <button
+                type="button"
                 className="pagination-btn pagination-nav"
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
@@ -76,8 +79,12 @@ const Pagination: React.FC<PaginationProps> = ({
                             <span className="pagination-ellipsis">...</span>
                         ) : (
                             <button
+                                type="button"
                                 className={`pagination-btn pagination-number ${currentPage === page ? 'active' : ''}`}
-                                onClick={() => onPageChange(page as number)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onPageChange(page as number);
+                                }}
                             >
                                 {page}
                             </button>
@@ -88,6 +95,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
             {/* Nút Đi tiếp */}
             <button
+                type="button"
                 className="pagination-btn pagination-nav"
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
